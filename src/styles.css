@@ -1,1 +1,33 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+    background-color: rgb(99, 223, 99);
+    margin: 5px;
+}
+
+.light-blue-background {
+    background-color: #bcf1f8;
+}
+
+.light-green-background {
+    background-color: #98ee9f;
+}
+
+.light-yellow-background {
+    background-color: #e4da67;
+}
+
+.light-pink-background {
+    background-color: #ec86a8;
+}
+
+.light-lavender-background {
+    background-color: #c065ce;
+}
+
+.light-grey-background {
+    background-color: #a59e9e;
+}
+
+.light-mint-background {
+    background-color: #e0f2f1;
+}

@@ -1,0 +1,13 @@
+<div class="ad-overlay" *ngIf="showAds">
+    <div class="ad-popup">
+        <button class="btn-close" (click)="closeAds()" aria-label="Close"></button>
+
+        <div id="adCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item" *ngFor="let ad of ads; let i = index" [class.active]="i === 0">
+                    <img [src]="ad.imageUrl" class="d-block w-100" [alt]="ad.altText">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

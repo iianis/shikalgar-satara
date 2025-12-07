@@ -1,0 +1,225 @@
+
+// export const falicitations = [
+//     { name: "ज. साहिल सिकंदर शिकलगार", date: "25/2/2025", village: "नेर - खटाव", desc: "तरूण उद्योजक - S S Kitchen Trolley, Koregaon" },
+//     { name: "ज. हसन शबाना इलाही शिकलगार", date: "25/2/2025", village: "पारे", desc: "शिक्षण क्षेत्र - MPSC प्रवेश परीक्षेत चांगल्या गुणांनी उत्तीर्ण होऊन महसूल विभागात उच्च पदावर नोकरी मिळाली." },
+//     { name: "ज. मुनीर शिकलगार", date: "22/2/2025", village: "विटा", desc: "सामाजिक कार्य" },
+//     { name: "स्वालिहा इकबाल मुलाणी", date: "16/2/2025", village: "वेणेगाव", desc: "शिक्षण क्षेत्र - अन्न व औषध प्रशासन 2023 च्या परीक्षेतून उत्तीर्ण होऊन अन्नसुरक्षा अधिकारी या पदी निवड झाली आहे." },
+//     { name: "सफिया अयूब शिकलगार", date: "16/2/2025", village: "सातारा", desc: "शिक्षण क्षेत्र - राष्ट्रभाषा प्रवेशिका सर्टिफिकेट" },
+//     { name: "ज. आयाज शिकलगार", date: "1/1/2025", village: "वडगांव हवेली", desc: "सामाजिक कार्य" },
+//     { name: "ज. मुनव्वर शिकलगार", date: "1/1/2025", village: "विटा", desc: "सामाजिक कार्य, लेखक" },
+//     { name: "ज. आमीन शब्बीर शिकलगार", date: "1/11/2023", village: "वडगांव हवेली (कार्वे नाका)", desc: "शिक्षण क्षेत्र - उत्कृष्ट शिक्षक सन्मान मिळाला." },
+//     { name: "ज. अब्दुल मजिद शिकलगार", date: "1/1/2025", village: "कडेगांव (सांगली)", desc: "सामाजिक कार्य - शिकलगार रिश्ते हा व्हाॅस्ट अॅप ग्रुप आहे. या व्दारे अब्दुल भाई यांनी समाज सेवा म्हणून शेकडो लग्नं जमवली. गरजू जोडप्यांना भांडी व इतर जरूरी सामान देऊ केले." },
+//     { name: "सानिया असलम शिकलगार", date: "1/12/2024", village: "शेणोली (सांगली)", desc: "शिक्षण क्षेत्र - BHMS" },
+//     { name: "सुहाना नौशाद शिकलगार", date: "1/7/2024", village: "पुणे", desc: "शिक्षण क्षेत्र - SSC 97%" },
+//     { name: "सिमरन सलिम शिकलगार", date: "1/7/2024", village: "वडगांव हवेली (कार्वे नाका)", desc: "शिक्षण क्षेत्र - SSC 97%" },
+// ]
+
+export const remembrances = [
+    { name: "म. ज. यासिन शमशूद्दीन शिकलगार", date: "25/2/2025", village: "गोळेश्वर" },
+    { name: "म. ज. तौफिक हसन शिकलगार", date: "22/2/2025", village: "पेड" },
+    { name: "म. सुरैयाबी मोहम्मद इसाक शिकलगार", date: "13/2/2025", village: "विटा" },
+    { name: "म. रहामतबी रजाक शिकलगार", date: "2/2/2025", village: "आंधळी " },
+    { name: "म. ज. मौला रसूल शिकलगार", date: "29/12/2024", village: "गुरसाळे - वडूज" },
+    { name: "म. ज. दस्तगीर रमझान शिकलगार", date: "21/12/2024", village: "वाठार" },
+    { name: "म. ज. सिकंदर मेहबूब शिकलगार", date: "19/12/2024", village: "शेणोली" },
+]
+
+export const events = [
+    { title: "लेंगरे उरूस - वार्षिक सभा", desc: "", venue: "लेंगरे", date: "8/4/2025", contact: "ज. याकूब भाई, विटा", order: 1 },
+    { title: "तिमाही मिटींग १", desc: "मागील घडामोडींची पाठपुरावा, चालू घडामोडींचा आढावा, आणि पुढील वाटचाली बद्दल चर्चा", venue: "सेक्रेटरी निवास, कराड", date: "10/1/2025", contact: 9886174607, order: 2 },
+    { title: "तिमाही मिटींग २", desc: "मागील घडामोडींची पाठपुरावा, चालू घडामोडींचा आढावा, आणि पुढील वाटचाली बद्दल चर्चा", venue: "वडूज", date: "10/4/2025", contact: 9886174607, order: 3 },
+    { title: "तिमाही मिटींग ३", desc: "मागील घडामोडींची पाठपुरावा, चालू घडामोडींचा आढावा, आणि पुढील वाटचाली बद्दल चर्चा", venue: "कोरेगाव", date: "10/7/2025", contact: 9886174607, order: 4 },
+    { title: "तिमाही मिटींग ४", desc: "मागील घडामोडींची पाठपुरावा, चालू घडामोडींचा आढावा, आणि पुढील वाटचाली बद्दल चर्चा", venue: "सातारा", date: "10/10/2025", contact: 9886174607, order: 5 },
+    { title: "वार्षिक सर्वसाधारण सभा", desc: "मागील घडामोडींची पाठपुरावा, चालू घडामोडींचा आढावा, आणि पुढील वाटचाली बद्दल चर्चा", venue: "वर्धनगड", date: "10/9/2025", contact: 9886174607, order: 6 },
+    { title: "शिकलगार जमात वार्षिक सभा", desc: "", venue: "मुंबई", date: "12/12/2025", contact: "ज. नौशाद भाई, मुंबई", order: 7 },
+    //{ title: "शादी का पैगाम", desc: "नदिम नौशाद शिकलगार और शिफा शिकलगार, ठिक शाम ६.३० बजे", venue: "साई गार्डन, शिरूर", date: "6/2/2025", contact: "ज. नौशाद भाई, मुंबई" },
+]
+
+export const guides = [
+    { name: "ज. मज्जिद भाई शिकलगार", village: "सातारा " },
+    { name: "ज. बाबू भाई शिकलगार", village: "कराड" },
+    { name: "ज. रफीक भाई शिकलगार", village: "कोरेगाव" },
+    { name: "ज. शब्बीर भाई शिकलगार", village: "सातारा" },
+    { name: "ज. दस्तगीर सर शिकलगार", village: "कराड - विरळी" },
+    { name: "ज. अस्लम सर शिकलगार", village: "सातारा" },
+]
+
+export const directors = [
+    { name: "ज. अनिस शिकलगार", village: "सातारा", taluka: "सातारा", designation: "अध्यक्ष", phone: 9886174607, order: 1 },
+    { name: "ज. रमज़ान शिकलगार", village: "नागठाणे", taluka: "सातारा", designation: "उपाध्यक्ष", phone: 9673917786, order: 2 },
+    { name: "शमीमबी शिकलगार", village: "विरळी", taluka: "माण", designation: "सचिव", phone: 9850987905, order: 3 },
+    { name: "ज. दिलावर शिकलगार", village: "उंब्रज", taluka: "कराड", designation: "ख़ज़िनदार", phone: 9975140777, order: 4 },
+    { name: "ज. गुलामनबी शिकलगार", village: "मलकापुर", taluka: "कराड", designation: "सदस्य", phone: 9822091497, order: 5 },
+    { name: "ज. दस्तगीर शिकलगार", village: "कोरेगांव", taluka: "कोरेगांव", designation: "सदस्य", phone: 9922137676, order: 6 },
+    { name: "म. ज. नसीम शिकलगार", village: "वर्धनगड", taluka: "खटाव", designation: "सदस्य", phone: 9923876637, order: 99 },
+    { name: "ज. मौलाअली शिकलगार", village: "शेणोली", taluka: "कराड", designation: "सदस्य", phone: 9730934326, order: 8 },
+    { name: "ज. आज़म शिकलगार", village: "सातारा", taluka: "सातारा", designation: "सदस्य", phone: 7875714541, order: 9 },
+    { name: "ज. दस्तगीर शिकलगार", village: "कराड", taluka: "कराड", designation: "सदस्य", phone: 9021017511, order: 10 },
+    { name: "ज. समीर शिकलगार", village: "कलेढोण", taluka: "खटाव", designation: "सदस्य", phone: 9421216524, order: 11 },
+    { name: "ज. मुबारक शिकलगार", village: "वडूज", taluka: "खटाव", designation: "सदस्य", phone: 9766683586, order: 12 },
+]
+
+export const scholarships = [
+    { name: "MESCO Trust, Mumbai", type: "Education Scholarship/Loan", desc: "A selfless organisation that helps people from all communities", url: "https://www.mescotrust.org/", contact: "Visit MESCO Trust, Mumbai" },
+    { name: "Reliance Foundation", type: "Education Scholarship", desc: "Scholarship for the academic year 2024-25 is open to undergraduate students from households with an income of under Rs. 15 lakh. The program aims to encourage applications from girls and specially-abled students. Reliance Foundation has already granted over 23,000 scholarships and plans to award 50,000 scholarships in the next ten years..", url: "https://scholarships.reliancefoundation.org/UG_Scholarship.aspx", contact: "Visit Reliance Foundation UG Scholarship" },
+    { name: "AMP Scholarship Fund", type: "Education Scholarship", desc: "Get funds for economically backwards", url: "https://indiazakat.com/", contact: "Visit India Zakat Website" },
+    { name: "Director of Technical Education", type: "Education Scholarship", desc: "Savitri Bai Phule, Rajashri Shahu Scholarship", url: "https://dte.maharashtra.gov.in", contact: "Visit Maharashtra DTE Website" },
+    { name: "ILM Welfare Society", type: "Coaching Facility", desc: "Free coaching for MPSC; UPSC;", url: "https://ilm.org.in/", contact: "Visit ILM Welfare Society" },
+    { name: "Cummins Scholarship Program", type: "Education Scholarship", desc: "Funding under CSR program", url: "https://nurturingbrilliance.org", contact: "Contact: indiacr&#64;cummins.com; 8956553173;" },
+    { name: "Dr. P A Inamdar University", type: "Coaching Facility", desc: "", url: "https://drpaiu.edu.in/", contact: "Visit Dr. P A Inamdar University" },
+    { name: "बांधकाम विभागाची स्कॉलरशिप", type: "Education Scholarship", desc: "1. मेडिकल एमबीबीएस, बीडीएस, बी एच एम एस, बी ए एम एस साठी एक लाख रुपये<br>2. दहावीनंतर नर्सिंग साठ हजार रुपये<br>3. बारावी सायन्स नंतरचे नर्सिंग एक लाख रुपये<br>4. इंजीनियरिंग साठ हजार रुपये<br>5. डिप्लोमा वीस हजार रुपये<br>6. आयटीआय वीस हजार रुपये<br>7. दहावी अकरावी बारावी दहा हजार रुपये<br>***********आवश्यक कागदपत्रे<br>1. आधार कार्ड<br>2. रेशनिंग कार्ड<br>3. फोटो<br>4. कुटुंबातील सर्वांच्या आधार कार्ड<br>टीप<br>बांधकाम विभागाची नवीन नोंदणी असावी जुनी नोंदणी चालणार नाही<br>कुटुंबातील पहिल्या दोन अपत्यांना लाभ मिळू शकेल<br>******<br>स्कॉलरशिप साठी लागणारी कागदपत्रे समक्ष भेटून सांगितले जातील </p>स्कॉलरशिप साठी लागणारी कागदपत्रे समक्ष भेटून सांगितले जातील", url: "", contact: "संपर्क: अल्ताफ भाई शिकलगार, गोळेश्वर - 95611 71761" },
+    { name: "Tata Capital Pankh Scholarship", type: "Education Scholarship", desc: "For all the courses after 10th", url: "https://www.tatacapital.com/blog/loan-for-education/tips-to-apply-for-scholarships/", contact: "" },
+    { name: "ZScholars Program", type: "Education Scholarship", desc: "ZS Associate India Pvt. Ltd. - CSR Program<br>All graduation programs from Delhi, Pune, Chennai, Bangalore. <br>Scholarship upto 20,000/- to 50,000/-<br>1. Recent passport size photo<br>2. Class 12 marksheet & passing certificate. Marks 60% and above<br>3. Aadhar card<br>4. Bonafide Certificate from last college<br>5. Family Income Proof - Salary slip, IT Return<br> 6. Bank account details of the applicant - Natinalized Bank - Aadhar linked<br>", url: "", contact: "Last Date: January end every year" },
+    { name: "PMC Scholarship", type: "Education Scholarship", desc: "अब्दुल कलाम योजनेतून दहावीत ज्यांना 80 टक्के मार्क आहेत आणि बारावीत 70 टक्के मार्क आहेत त्यांना दहावी वाल्यांना 15 हजार रुपये आणि बारावी वाल्यांना 25 हजार रुपये मिळतात त्या योजनेचा सर्व पालकांनी व मुलांनी लाभ घ्यावा. ऑनलाइन फॉर्म असतो. तो भरायचा ", url: "https://www.pmc.gov.in/en/educational-schemes/", contact: "Visit: PMC Educational-schemes" },
+]
+
+export const
+    charities = [
+        {
+            name: "शैक्षणिक मदत", village: "सातारा", desc: "1. एक विद्यार्थीनी D. Pharm चे शिक्षण घेत आहे जिच्या पालकांची आमदनी बेताची आहे. 2. एक जोडप ज्यांचं हातावरचं पोट, दोन शाळकरी मुलींचे संगोपन करत आहेत", donations: 5, order: 1, familiesByTaluka: [
+                { taluka: "सातारा", count: 2 },
+                //{ taluka: "कराड", count: 0 },
+                { taluka: "खटाव ", count: 2 },
+                //{ taluka: "कोरेगांव", count: 0 },
+                //{ taluka: "माण", count: 0 },
+                //{ taluka: "फलटण", count: 0 },
+                //{ taluka: "वाई", count: 0 },
+                { taluka: "खंडाळा", count: 2 },
+                //{ taluka: "पाटण", count: 0 },
+            ]
+        },
+        {
+            name: "वैद्यकीय मदत", village: "नागठाणे", desc: "1. एक कुटूंब प्रमुख ह्रदयविकार रूग्ण, ४-६ महिने दवाखाना, कमावण्याच्या स्थितीत नाही. 2. एक कुटुंब ज्यांचा तरूण मुलगा मणक्यांच्या विकाराने त्रस्त आहे. 3. कुटूंब प्रमुख आणि पत्नी दोघं अपघातग्रस्त, काही महिने घरातच रहाव लागले.", donations: 5, order: 2, familiesByTaluka: [
+                { taluka: "सातारा", count: 2 },
+                { taluka: "कराड", count: 3 },
+                { taluka: "खटाव ", count: 3 },
+                { taluka: "कोरेगांव", count: 0 },
+                { taluka: "माण", count: 2 },
+                //{ taluka: "फलटण", count: 0 },
+                //{ taluka: "वाई", count: 0 },
+                //{ taluka: "खंडाळा", count: 0 },
+                //{ taluka: "पाटण", count: 0 },
+            ]
+        },
+        {
+            name: "आर्थिक मदत", village: "विरळी", desc: "1. जेष्ठ नागरिक आपल्या पत्नी व सुने बरोबर राहतात, ज्यांचा तरूण मुलगा स्वर्गवासी झाला. 2. विधवा महिला आपल्या प्रौढ मुलीची शुश्रुषा करत आहे.", donations: 6, order: 3, familiesByTaluka: [
+                { taluka: "सातारा", count: 6 },
+                { taluka: "कराड", count: 9 },
+                { taluka: "खटाव ", count: 6 },
+                { taluka: "कोरेगांव", count: 6 },
+                { taluka: "माण", count: 2 },
+                //{ taluka: "फलटण", count: 0 },
+                //{ taluka: "वाई", count: 0 },
+                //{ taluka: "खंडाळा", count: 0 },
+                //{ taluka: "पाटण", count: 0 },
+            ]
+        }
+    ]
+
+export const
+    donors = [
+        { name: "ज. इसाकभाई महंमद शेख", date: "20/03/2024", village: "पुणे (औंध - सातारा)", donationType: "जकात", amount: 50 },
+        { name: "ज. अजिमुल्ला चॉंद शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 15 },
+        { name: "ज. निसारभाई महंमद शिकलगार", date: "20/03/2024", village: "पुणे (औंध - सातारा)", donationType: "जकात", amount: 5 },
+        { name: "ज. सरफराज कदीर मणेर", date: "20/03/2024", village: "पुणे - सातारा", donationType: "जकात", amount: 5 },
+        { name: "ज. कदीर कासम मणेर", date: "24/3/2024", village: "पुणे - सातारा", donationType: "जकात", amount: 2.5 },
+        { name: "ज. फिरोज इस्माईल शिकलगार", date: "20/03/2024", village: "पुणे (औंध - सातारा)", donationType: "जकात", amount: 5 },
+        { name: "ज. डॉ. तौसिफ असलम शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 5 },
+        { name: "ज. दस्तगीर सर शिकलगार", date: "20/03/2024", village: "कराड - विरळी", donationType: "जकात", amount: 5 },
+        { name: "ज. डॉ. तस्लिम द. शिकलगार", date: "20/03/2024", village: "कराड - विरळी", donationType: "जकात", amount: 1 },
+        //{ name: "ज. डॉ. वसिम द. शिकलगार", date: "20/03/2024", village: "कराड - विरळी", donationType: "जकात", amount: 0 },
+        { name: "ज. दस्तगीर सर शिकलगार", date: "20/03/2024", village: "वाठार", donationType: "जकात", amount: 1 },
+        //{ name: "ज. ताजुद्दीनभाई शेखदीन शिकलगार", date: "20/03/2024", village: "पुणे - कुळकजाई", donationType: "जकात", amount: 3 },
+        { name: "सायराबी इकबाल शेख", date: "20/03/2024", village: "पुणे - सातारा", donationType: "जकात", amount: 4 },
+        { name: "वहिदाबी इकराम शेख", date: "20/03/2024", village: "पुणे - सातारा", donationType: "जकात", amount: 2 },
+        { name: "ज. इन्शानअली जमील शिकलगार", date: "20/03/2024", village: "पुणे - खटाव", donationType: "जकात", amount: 2 },
+        { name: "ज. दिलावरभाई अ. शिकलगार", date: "20/03/2024", village: "दरूज", donationType: "जकात", amount: 2 },
+        { name: "ज. अय्याज महंमद सिकिलकर", date: "20/03/2024", village: "फलटण", donationType: "जकात", amount: 1.4 },
+        { name: "ज. समीर कासम शिकलगार", date: "20/03/2024", village: "पुणे (औंध - सातारा)", donationType: "जकात", amount: 5 },
+        { name: "ज. समीर मदारसाहेब मणेर", date: "20/03/2024", village: "अहमदनगर", donationType: "जकात", amount: 1 },
+        { name: "ज. रहिमतुल्ला अंबीर शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "ज. सादिक दस्तगीर शिकलगार", date: "20/03/2024", village: "पुणे - कुळकजाई", donationType: "जकात", amount: 1 },
+        { name: "ज. अकील अल्लाबक्ष शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "ज. मेहबूबभाई शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 0.6 },
+        { name: "ज. समीर नबिलाल शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
+        { name: "ज. डॉ. फय्याज म. शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "ज. सुलेमानभाई शिकलगार", date: "20/03/2024", village: "पुणे - कुळकजाई", donationType: "जकात", amount: 1 },
+        //{ name: "ज. दिलावर अब्बासभाई  शिकलगार", date: "20/03/2024", village: "पुणे - कुळकजाई", donationType: "जकात", amount: 2 },
+        { name: "ज. साहिल शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "सिमरनबी रियाज शिकलगार", date: "01/11/2024", village: "मुंबई", donationType: "जकात", amount: 1 },
+        { name: "हसिनाबी अ. शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
+
+        { name: "ज. दिलेरखान शिकलगार", date: "20/03/2024", village: "वाई", donationType: "जकात", amount: 0.5 },
+        { name: "ज. अमीरभाई शिकलगार", date: "20/03/2024", village: "कराड", donationType: "जकात", amount: .5 },
+        //{ name: "ज. मज्जिदभाई नजीर शिकलगार", date: "20/03/2024", village: "मुंबई - विरळी", donationType: "जकात", amount: 0 },
+
+
+        { name: "शकिलाबी शिकलगार", date: "1/1/2025", village: "सातारा", donationType: "जकात", amount: 0.5 },
+        { name: "सिमरनबी रियाज शिकलगार", date: "01/02/2025", village: "मुंबई", donationType: "जकात", amount: 5 },
+        { name: "ज. रियाजभाई निजाम शिकलगार", date: "01/02/2025", village: "सातारा", donationType: "शिक्षण", amount: 10 },
+
+
+        { name: "ज. मज्जिद रमजान शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "ज. रिगल फुट वेअर", date: "24/3/2024", village: "मलकापूर - कराड", donationType: "जकात", amount: 5 },
+        { name: "ज. इक्बाल रमजान शिकलगार", date: "24/3/2024", village: "मुंबई - विरळी", donationType: "जकात", amount: 1 },
+        { name: "नूरजहाँबी ताजूद्दीन शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 3 },
+
+        { name: "ज. अमीर अब्दुल गनी शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.7 },
+        { name: "ज. अमीन शब्बीर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "ज. सिकंदर गुंडूलाल शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
+        { name: "ज. बाबासाहेब फकीर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "बानूबी महंमद शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: .5 },
+
+        { name: "ज. अल्ताफ शिराज शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
+        { name: "ज. सय्यद बादशाह शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.251 },
+        { name: "ज. इस्माईल अमीर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 3 },
+        { name: "ज. वजीर मुबारक शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "सिमरनबी वजीर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+
+        { name: "ज. अन्सार अली शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
+        { name: "ज. दादासो जांगू शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
+        { name: "ज. वजीर मुबारक शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "ज. नवाज दस्तगीर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "ज. सोहेल मुनीर सिक्किलकर", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
+
+        { name: "ज. बशीर बापू शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 4 },
+        { name: "ज. नियाज रज्जाक शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 2 },
+        { name: "ज. इक्बाल महंमद शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "ज. शमशूद्दीन यूसुफ शिकलगार", date: "24/3/2024", village: "शेणोली - इचलकरंजी", donationType: "जकात", amount: 2 },
+        { name: "ज. चॉंद दिवान शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
+
+        //{ name: "ज. अय्याज महंमद सिकिलकर", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1.4 },
+        { name: "ज. नाजिमा हरून शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
+        { name: "ज. नदीम आझाद शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
+        { name: "ज. फिरोज दिलावर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.350 },
+        { name: "नौझीयाबी राशिद शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 3 },
+
+        { name: "ज. इक्बाल रमजान शिकलगार", date: "01/11/2023", village: "मुंबई - विरळी", donationType: "अधिवेशन", amount: 5 },
+        { name: "ज. तस्लिम दस्तगीर शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 2 },
+        { name: "बेनझीरबी दिलावर शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 5 },
+        { name: "ज. फारूख अब्दुल्लरहीम शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 5 },
+        { name: "ज. रियाज महामूद शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 2 },
+
+        { name: "ज. शब्बीर सय्यद शेख", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 4 },
+        { name: "ज. दिलावर अब्बास शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.5 },
+        { name: "ज. शौकत अजमुद्दीन शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.2 },
+        { name: "ज. युनूस हसन शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.1 },
+        { name: "ज. अस्लम कमरूद्दीन शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.2 },
+
+        { name: "ज. समीर बाबालाल शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.2 },
+        { name: "ज. रियाज बादशाह शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.2 },
+        { name: "ज. शौकत मकबूल शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.2 },
+        { name: "ज. हजरत अली अ.रहीम शिकलगार", date: "01/11/2023", village: "शेणोली", donationType: "अधिवेशन", amount: 2.5 },
+        { name: "ज. अस्लम बाबालाल शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 5 },
+
+        { name: "रिझवानाबी करीम शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 1 },
+        { name: "ज. नसीमभाई अंबीर शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.5 },
+        //{ name: "ज.  शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "जकात", amount: 1 },
+    ]
+
+export const initiatives = [
+    { name: "दत्तक पालक", desc: "गरजू विद्यार्थ्यांसाठी या योजने अंतर्गत आपण त्यांचा वार्षिक खर्च पूर्ण/अंशतः दोन ते चार भागात मागणी नुसार उपलब्ध करून देण्याचा विचार आहे. या साठी लागणारा निधी<br>१. आपण आपल्या सभासदांकडून मिळणाऱ्या देणगी<br>२. उस्फूर्त पणे पुढं येणाऱ्या सभासद मंडळी<br>३. अथवा काही NGO संस्था <br>यांच्या सहाय्याने पूर्ण करू शकतो.<br>आपले काही विचार असल्यास आम्हाला जरूर कळवा.", contact: "अनिस शिकलगार, सातारा - 9886174607" },
+    { name: "शिष्यवृत्ती - शैक्षणिक", desc: "आपल्या समाजातील १०वी, १२वी, उच्च शिक्षण घेणाऱ्या विद्यार्थ्यांच्या उल्लेखनीय यशाचे कौतुक करणं हे खुपच आवश्यक आहे. यामुळे भविष्यात होतकरू विद्यार्थ्यांना प्रोत्साहन मिळेल. हि योजना विचाराधीन असून, लवकरच त्यासाठी ठराविक रक्कम सुनिश्चित केली जाईल.", contact: "अनिस शिकलगार, सातारा" },
+    { name: "महिला लघू-उद्योग", desc: "या विषयी आपल्या काही सुचना/विचार असतील तर जरूर कळवा.", contact: "शमीमबी शिकलगार, विरळी" },
+    { name: "होतकरू उद्योजक", desc: "विविध उद्योग धंद्यात कौतुकास्पद कामगिरी करणाऱ्या तरूणांना प्रोत्साहन देणे.", contact: "गुलामनबी शिकलगार, मलकापुर" },
+]

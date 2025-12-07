@@ -1,0 +1,180 @@
+<div class="container mt-2 mb-4">
+    <div class="header-banner mb-4 text-center">
+        <img src="assets/images/banner.jpg" class="img-fluid" alt="Header Banner">
+    </div>
+</div>
+<div class="container d-flex align-items-center mt-2 mb-4">
+    <div class="section-header display-6 fw-bold">
+        नवीन माहितीची नोंद
+    </div>
+</div>
+<div class="container">
+    <div class="form-group">
+        <label for="eventType">वर्ग निवडा:</label>
+        <select class="form-control" id="eventType" [(ngModel)]="selectedEventType"
+            (change)="onEventTypeChange($event)">
+            <option value="charities">गरजूंची मदत</option>
+            <option value="donors">देणगीदार</option>
+            <option value="falicitations">कौतुकास्पद कामगिरी</option>
+            <option value="remembrances">प्रियजनांच्या आठवणी</option>
+            <option value="scholarships">शिष्यवृत्ती</option>
+            <option value="guides">मार्गदर्शक</option>
+            <option value="events">कार्यक्रमाची सुची</option>
+            <option value="directors">Directors</option>
+        </select>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+        <!-- Common fields -->
+        <div class="form-group mt-3">
+            <label for="name">नावं:</label>
+            <input type="text" class="form-control" id="name" [(ngModel)]="formData.name" name="name" required>
+        </div>
+
+        <div class="form-group mt-3" *ngIf="selectedEventType !== 'scholarships' && selectedEventType !== 'events'">
+            <label for="name">तालुका:</label>
+            <select class="form-control" id="taluka" required [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="formData.taluka" (change)="onTalukaChange($event)" style="appearance:auto;">
+                <option value="none">आपला तालुका</option>
+                <option *ngFor="let taluka of talukas" [value]="taluka.name"
+                    [attr.selected]="taluka.id === 1 ? '' : null">
+                    {{ taluka.name }}
+                </option>
+            </select>
+        </div>
+        <div class="form-group mt-3" *ngIf="selectedEventType !== 'scholarships' && selectedEventType !== 'events'">
+            <label for="village">गावं:</label>
+            <select class="form-control" id="village" required [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="formData.village" (change)="onVillageChange($event)" style="appearance:auto;">
+                <option value="none">आपल गावं</option>
+                <option *ngFor="let village of villagesByTaluka" [value]="village.name">
+                    {{ village.name }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group mt-3" *ngIf="selectedEventType !== 'guides'">
+            <label for="date">तारीख:</label>
+            <input type="date" class="form-control" id="date" [(ngModel)]="formData.date" (change)="onDateChange()"
+                name="date" required>
+        </div>
+
+        <!-- Additional fields for donations -->
+        <div *ngIf="selectedEventType === 'donors'">
+            <div class="form-group mt-3">
+                <label for="amount">रक्कम:</label>
+                <input type="number" class="form-control" id="amount" [(ngModel)]="formData.amount" name="amount">
+            </div>
+            <div class="form-group mt-3">
+                <label for="donationType">देणगी प्रकार:</label>
+                <select class="form-control" id="donationType" [(ngModel)]="formData.donationType" name="donationType">
+                    <option value="जकात" selected>जकात</option>
+                    <option value="फित्रा">फित्रा</option>
+                    <option value="सदका">सदका</option>
+                    <option value="शैक्षणिक">शैक्षणिक</option>
+                    <option value="अधिवेशन">अधिवेशन</option>
+                    <option value="वार्षिक">वार्षिक</option>
+                    <option value="इतर">इतर</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Additional fields for charity -->
+        <div *ngIf="selectedEventType === 'charities'">
+            <div class="form-group mt-3">
+                <label for="type">वर्गीकरण:</label>
+                <select class="form-control" id="type" [(ngModel)]="formData.type" name="type">
+                    <option value="आर्थिक" selected>आर्थिक</option>
+                    <option value="शैक्षणिक">शैक्षणिक</option>
+                    <option value="वैद्यकीय">वैद्यकीय</option>
+                    <option value="इतर">इतर</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Additional fields for scholarships -->
+        <div *ngIf="selectedEventType === 'scholarships'">
+            <div class="form-group mt-3">
+                <label for="type">वर्गीकरण:</label>
+                <select class="form-control" id="type" [(ngModel)]="formData.type" name="type">
+                    <option value="शैक्षणिक">शैक्षणिक</option>
+                    <option value="व्यवसायिक">व्यवसायिक</option>
+                    <option value="इतर">इतर</option>
+                </select>
+            </div>
+            <div class="form-group mt-3">
+                <label for="company">कंपनी:</label>
+                <input type="text" class="form-control" id="company" [(ngModel)]="formData.company" name="company"
+                    required>
+            </div>
+            <div class="form-group mt-3">
+                <label for="url">व्हेब साईट:</label>
+                <input type="text" class="form-control" id="url" [(ngModel)]="formData.url" name="url" required>
+            </div>
+            <div class="form-group mt-3">
+                <label for="desc">तपशील:</label>
+                <textarea class="form-control" id="desc" [(ngModel)]="formData.desc" name="desc" rows="3"></textarea>
+            </div>
+            <div class="form-group mt-3">
+                <label for="contact">संपर्क:</label>
+                <input type="text" class="form-control" id="contact" [(ngModel)]="formData.contact" name="contact"
+                    required>
+            </div>
+        </div>
+
+        <!-- Additional fields for scholarships -->
+        <div *ngIf="selectedEventType === 'events'">
+            <div class="form-group mt-3">
+                <label for="desc">तपशील:</label>
+                <textarea class="form-control" id="desc" [(ngModel)]="formData.desc" name="desc" rows="3"></textarea>
+            </div>
+            <div class="form-group mt-3">
+                <label for="venue">स्थळ:</label>
+                <input type="text" class="form-control" id="venue" [(ngModel)]="formData.venue" name="venue" required>
+            </div>
+            <div class="form-group mt-3">
+                <label for="contact">संपर्क:</label>
+                <input type="text" class="form-control" id="contact" [(ngModel)]="formData.contact" name="contact"
+                    required>
+            </div>
+        </div>
+
+        <!-- Additional fields for falicitation and deaths -->
+        <div *ngIf="selectedEventType === 'falicitations'">
+            <div class="form-group mt-3">
+                <label for="desc">तपशील:</label>
+                <textarea class="form-control" id="desc" [(ngModel)]="formData.desc" name="desc" rows="3"></textarea>
+            </div>
+        </div>
+
+
+        <!-- Additional fields for scholarships -->
+        <div *ngIf="selectedEventType === 'directors'">
+            <div class="form-group mt-3">
+                <label for="phone">फोन:</label>
+                <input type="text" class="form-control" id="phone" [(ngModel)]="formData.phone" name="phone" required>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">नोंद करा</button>
+
+
+        <div class="form-group mt-5">
+            <label for="masterdata">Load Data</label>
+            <select class="form-control" id="masterdata" required [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="masterdata" (change)="onMasterDataChange($event)" style="appearance:auto;">
+                <option value="none">Select Master Collection Data to Load</option>
+                <option *ngFor="let item of masterdatas" [value]="item.name">
+                    {{ item.name }}
+                </option>
+            </select>
+
+            <button type="submit" class="btn btn-primary mt-3 mr-3" (click)="goLoadMasterData()">Load</button>
+            <button type="submit" class="btn btn-primary mt-3 mr-3" (click)="goExportData()">Export</button>
+
+        </div>
+        <div class="mt-2 mb-5">
+            <input type="file" (change)="goImportData($event)" accept=".csv" />
+        </div>
+    </form>
+</div>

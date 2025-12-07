@@ -1,0 +1,29 @@
+<div class="container mt-2 mb-4">
+    <div class="header-banner mb-4 text-center">
+        <img src="assets/images/banner.jpg" class="img-fluid" alt="Header Banner">
+    </div>
+</div>
+<div class="container d-flex align-items-center">
+    <button class="btn btn-primary me-3" (click)="goBack()">मागे जा</button>
+    <div class="section-header display-8 fw-bold">
+        जकात, सदका, फित्रा व इतर निधीतून समाजातील गरजू कुटुंबांना शैक्षणिक, वैद्यकीय आर्थिक मदत दिली जाते
+    </div>
+</div>
+<div class="container mt-3">
+    <div class="card mt-2">
+        <div class="card-header fs-4">तालुका निहाय लाभार्थी कुटुंब</div>
+    </div>
+    <div *ngFor="let item of charities">
+        <div class="card mt-2">
+            <div class="card-header fs-4">{{ item.name }}</div>
+            <div class="card-body">
+                <div class="card-title">{{item.desc}}</div>
+                <div class="d-flex flex-wrap">
+                    <div *ngFor="let family of item.familiesByTaluka" class="me-3">
+                        <p>{{family.taluka}} - {{family.count}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

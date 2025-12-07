@@ -1,0 +1,23 @@
+<div class="container d-flex align-items-center">
+    <div class="section-header display-6 fw-bold">जझाकल्ला खैर!!</div>
+</div>
+
+<div class="container mt-4">
+    <!-- Include the search component -->
+    <app-search placeholder="देणगीदार नांव शोधा..." (searchChange)="onSearchChange($event)"></app-search>
+
+    <div class="container" style="max-height: 500px; overflow-y: auto;">
+        <div class="row">
+            <div class="container" *ngFor="let item of filteredData; let i=index">
+                <div class="card mt-2">
+                    <div class="card-header"> {{item.name}}, {{item.village}} - {{item.donationType}}</div>
+                    <!-- <div class="card-body">
+              <h5 class="card-title">{{item.donationType}}</h5>
+              <p class="card-text">देणगीची रक्कम रु.xxxxx सआभार मिळाली.</p>
+              <p class="card-text"> दिनांक: {{item.date}} </p>
+            </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

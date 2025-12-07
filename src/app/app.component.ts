@@ -1,12 +1,18 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { getAnalytics } from "firebase/analytics";
+import { initializeApp } from "firebase/app";
+import { environment } from '../../environments/environments';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css'],
+  standalone: false
 })
 export class AppComponent {
-  title = 'shikalgar-satara';
+  title = 'Shikalgar-Satara';
+  constructor() {
+    const app = initializeApp(environment.firebaseConfig);
+    const analytics = getAnalytics(app);
+  }
 }

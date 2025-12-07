@@ -1,0 +1,10 @@
+<div class="container mt-2">
+    <div class="container" style="max-height: 500px; overflow-y: auto;">
+        <div class="card mt-3" *ngFor="let item of masterData; let i=index">
+            <div class="card-body">
+                <h5 class="card-title">{{item.name}}</h5>
+                <h5 class="card-text">{{item.contact}}</h5>
+            </div>
+        </div>
+    </div>
+</div>

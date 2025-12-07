@@ -1,0 +1,18 @@
+<div class="container d-flex justify-content-center align-items-center mt-2">
+    <div class="header-banner mb-4 text-center">
+        <img src="assets/images/banner.jpg" class="img-fluid" alt="Header Banner">
+    </div>
+</div>
+<div class="container d-flex justify-content-center align-items-center mt-2">
+    <div class="section-header display-6 fw-bold">
+        अभिप्राय / मदतीचा अर्ज
+    </div>
+</div>
+<div class="container mt-3">
+    <div *ngFor="let item of masterdata">
+        <div class="card mt-2">
+            <div class="card-header fs-4"> {{ item.issue }}</div>
+            <div class="card-title mt-2 ps-3"> दिनांक: {{ formatTimestampToDate(item.timestamp) }}</div>
+        </div>
+    </div>
+</div>

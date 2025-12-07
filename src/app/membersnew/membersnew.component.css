@@ -1,0 +1,9 @@
+.alert-custom-error {
+    color: white;
+    background-color: red;
+}
+
+.alert-custom-success {
+    color: white;
+    background-color: yellowgreen;
+}

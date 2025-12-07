@@ -1,0 +1,16 @@
+<div class="container mt-4" style="max-height: 500px; overflow-y: auto;">
+    <div class="row">
+        <div class="container mt-2" *ngFor="let item of masterdata">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{item.type}}</h5>
+                    <p class="card-text"> {{item.name}} </p>
+                    <p class="card-text" [innerHTML]="item.desc"></p>
+                </div>
+                <div class="card-footer text-muted">
+                    <a [href]="item.url" target="_blank">{{item.contact}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

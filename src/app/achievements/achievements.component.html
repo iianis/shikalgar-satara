@@ -1,0 +1,13 @@
+<div class="container d-flex align-items-center">
+    <div class="section-header display-6 fw-bold">अभिनंदन!!</div>
+</div>
+<div class="container mt-4" style="max-height: 500px; overflow-y: auto;">
+    <div class="row">
+        <div class="card mt-2" *ngFor="let item of masterdata; let i=index">
+            <div class="card-body">
+                <h5 class="card-title">{{item.name}}, {{item.village}}</h5>
+                <p class="card-text">{{item.desc}}</p>
+            </div>
+        </div>
+    </div>
+</div>

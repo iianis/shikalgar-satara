@@ -1,0 +1,71 @@
+<div class="container mt-2 mb-4">
+    <div class="header-banner mb-4 text-center">
+        <img src="assets/images/banner.jpg" class="img-fluid" alt="Header Banner">
+    </div>
+</div>
+<div class="container d-flex align-items-center">
+    <button class="btn btn-primary me-3" (click)="goBack()">मागे जा</button>
+    <button class="btn btn-primary me-3" (click)="goRegister()">नोंदणी करा</button>
+    <div class="section-header display-4 fw-bold">
+        सभासद यादी
+    </div>
+</div>
+
+<!-- Include the search component and pass the placeholder text -->
+<app-search placeholder="सभासद नांव शोधा..." (searchChange)="onSearchChange($event)"></app-search>
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-md-1">
+            <label for="taluka" class="form-label">तालुका</label>
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="taluka" required [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="mytaluka" (change)="onTalukaChange($event)" style="appearance:auto;">
+                <option value="none">आपला तालुका</option>
+                <option *ngFor="let taluka of talukas" [value]="taluka.name">
+                    {{ taluka.name }}
+                </option>
+            </select>
+            <div class="invalid-feedback">
+                आपला तालुका.
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-1">
+            <label for="village" class="form-label">गावं</label>
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" id="village" required [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="myvillage" (change)="onVillageChange($event)" style="appearance:auto;">
+                <option value="none">आपल गावं</option>
+                <option *ngFor="let village of villagesByTaluka" [value]="village.name">
+                    {{ village.name }}
+                </option>
+            </select>
+            <div class="invalid-feedback">
+                आपल गावं.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-3">
+    <div *ngFor="let member of filteredMembers">
+        <div class="card mt-2">
+            <div class="card-header fs-4">
+                <span [ngClass]="{ 'bg-light text-danger': member.alive }">
+                    {{ member.fname || member.name }}
+                    {{ member.lname }}, {{ member.village }}
+                </span>
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title fs-6">{{ member!.designation }}</h5>
+                <!-- <p class="card-text"> नोंदणी: {{ member!.joinedon}} </p> -->
+            </div>
+        </div>
+    </div>
+</div>

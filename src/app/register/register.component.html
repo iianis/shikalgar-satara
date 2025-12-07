@@ -1,0 +1,39 @@
+<div *ngIf="isRegistered" class="alert alert-info" role="alert"> You are already registered! </div>
+
+<div *ngIf="!isRegistered" class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center mt-2">Register</h2>
+            <form (ngSubmit)="requestVerification()">
+                <div class="mb-2">
+                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
+                        placeholder="Enter your phone" required>
+                </div>
+                <div class="mb-1">
+                    <label for="fname" class="form-label">Member Details</label>
+                    <input type="text" name="fname" class="form-control" id="fname" placeholder="Enter your first name">
+                </div>
+                <div class="mb-2">
+                    <input type="text" name="mname" class="form-control" id="mname" placeholder="middle name">
+                </div>
+                <div class="mb-2">
+                    <input type="text" name="village" class="form-control" id="village"
+                        placeholder="Enter your village">
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="taluka" class="form-control" id="taluka" placeholder="Enter your taluka">
+                </div>
+                <div id="recaptcha-container"></div>
+                <!-- <button type="submit mt-2" class="btn btn-primary">Request Verification Code</button><br> -->
+                <button *ngIf="verificationId == ''" class="btn btn-secondary mt-2 me-2" (click)="onBack()">मागे
+                    जा</button>
+                <!-- <button *ngIf="verificationId == ''" class="btn mt-2 me-2" (click)="onLogin()">Login</button> -->
+            </form>
+
+            <form *ngIf="verificationId" (ngSubmit)="verifyCode()">
+                <button type="submit" class="btn btn-success mt-2">Register</button>
+            </form>
+        </div>
+    </div>
+</div>

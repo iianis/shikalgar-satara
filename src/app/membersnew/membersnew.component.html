@@ -1,0 +1,94 @@
+<div class="container mt-3">
+    <div class="header-banner mb-4 text-center">
+        <img src="assets/images/banner.jpg" class="img-fluid" alt="Header Banner">
+    </div>
+    <h2>नवीन अथवा चालू सभासद माहिती नोंद</h2>
+    <p>सध्या आम्ही फक्त सातारा भागातील सभासद माहिती संकलित करत आहोत याची कृपया नोंद घ्यावी.</p>
+    <hr>
+    <form>
+        <!-- Failure message div -->
+        <div *ngIf="memberPhoneExists" class="alert alert-error alert-custom-error mt-3" role="alert">
+            दिलेल्या फोन नंबर ची नोंद आमच्या कडे आहे. त्या सभासदची माहिती पाहण्यासाठी खालील बटण दाबा. - धन्यवाद!
+            <button type="button" id=1 class="btn btn-primary me-2" (click)="loadMemberInformation()">मागील सभासद नोंद
+                दाखवा</button>
+            <button type="button" id=2 class="btn btn-primary me-2" (click)="onCancel()">रहित करा</button>
+        </div>
+        <!-- Failure message div -->
+        <div *ngIf="memberPhoneValidationFailure" class="alert alert-error alert-custom-error mt-3" role="alert">
+            दिलेला फोन नंबर तपासून पहा - धन्यवाद!
+        </div>
+        <!-- Failure message div -->
+        <div *ngIf="memberValidationFailure" class="alert alert-error alert-custom-error mt-3" role="alert">
+            दिलेली फोन , नाव व गावं इत्यादी माहिती तपासून पहा - धन्यवाद!
+        </div>
+
+        <!-- Success message div -->
+        <div *ngIf="memberSaveSuccess" class="alert alert-error alert-custom-success mt-3" role="alert">
+            आपण दिलेल्या सभासद माहितीची नोंद घेण्यात आली आहे - धन्यवाद!
+        </div>
+
+        <!-- Failure message div -->
+        <div *ngIf="memberSaveFailure" class="alert alert-error alert-custom-error mt-3" role="alert">
+            नोंदणी काम अपूर्ण - दिलेला फोन, नाव व गावं इत्यादी माहिती तपासून पहा - धन्यवाद!
+        </div>
+
+        <div class="form-group">
+            <label for="phone">फोन</label>
+            <input type="tel" class="form-control" id="phone" [(ngModel)]="item.phone"
+                [ngModelOptions]="{standalone: true}" placeholder="आपला फोन" required pattern="[0-9]{10}">
+            <div class="invalid-feedback" *ngIf="memberPhoneExists">
+                आपला फोन.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="taluka">तालुका</label>
+            <select class="form-control" id="taluka" required [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="item.taluka" (change)="onTalukaChange($event)" style="appearance:auto;">
+                <option value="none">आपला तालुका</option>
+                <option *ngFor="let taluka of talukas" [value]="taluka.name"
+                    [attr.selected]="taluka.id === 1 ? '' : null">
+                    {{ taluka.name }}
+                </option>
+            </select>
+            <div class="invalid-feedback">
+                आपला तालुका.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="village">गावं</label>
+            <select class="form-control" id="village" required [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="item.village" (change)="onVillageChange($event)" style="appearance:auto;">
+                <option value="none">आपल गावं</option>
+                <option *ngFor="let village of villagesByTaluka" [value]="village.name">
+                    {{ village.name }}
+                </option>
+            </select>
+            <div class="invalid-feedback">
+                आपल गावं.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="fname">नाव</label>
+            <input type="text" class="form-control" id="fname" [(ngModel)]="item.fname"
+                [ngModelOptions]="{standalone: true}" placeholder="आपलं आणि वडिलांच नाव" required maxlength="20">
+            <div class="invalid-feedback">
+                आपलं आणि वडिलांच नाव (max 20 characters).
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="lname">आडनाव</label>
+            <input type="text" class="form-control" id="lname" [(ngModel)]="item.lname"
+                [ngModelOptions]="{standalone: true}" placeholder="आपलं आडनाव" required maxlength="20">
+            <div class="invalid-feedback">
+                आपलं आडनाव (max 20 characters).
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary me-2" (click)="goValidateNSave()">नोंद करा</button>
+        <button type="reset" class="btn btn-secondary me-2" (click)="onCancel()">रहीत करा</button>
+        <button type="reset" class="btn btn-secondary" (click)="goBack()">मागे जा</button>
+    </form>
+</div>

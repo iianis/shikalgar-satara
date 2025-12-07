@@ -1,0 +1,22 @@
+<div class="container mt-2 mb-4">
+    <div class="header-banner mb-4 text-center">
+        <img src="assets/images/banner.jpg" class="img-fluid" alt="Header Banner">
+    </div>
+</div>
+<div class="container d-flex align-items-center">
+    <button class="btn btn-primary me-3" (click)="goBack()">मागे जा</button>
+    <div class="section-header display-4 fw-bold">
+        कार्यक्रमांची यादी
+    </div>
+</div>
+
+<div class="container mt-2" *ngFor="let item of masterdata; let i=index">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{item.title || item.name}}</h5>
+            <p class="card-text">{{item.desc}}</p>
+        </div>
+        <div class="card-header"> स्थळ: {{item.venue}} </div>
+        <div class="card-footer text-muted"> दिनांक: {{item.date}}; संपर्क: {{item.contact}} </div>
+    </div>
+</div>
