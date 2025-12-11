@@ -1,0 +1,36 @@
+<h2 class="text-center my-4 fw-bold text-primary">
+    Shikalgar (Kulakjai) Family Tree
+</h2>
+<div class="container-fluid">
+    <!-- Left panel -->
+    <div *ngIf="showLeft" class="p-3">
+        <h4 class="text-center mb-3">Select Family Member</h4>
+        <ul>
+            <ng-container *ngFor="let root of hierarchyTree">
+                <li>
+                    <span (click)="selectNode(root.id)">{{ root.name }}</span>
+                    <ul *ngIf="root.childs?.length">
+                        <ng-container *ngFor="let child of root.childs">
+                            <li>
+                                <span (click)="selectNode(child.id)">{{ child.name }}</span>
+                                <ul *ngIf="child.childs?.length">
+                                    <ng-container *ngFor="let grand of child.childs">
+                                        <li>
+                                            <span (click)="selectNode(grand.id)">{{ grand.name }}</span>
+                                        </li>
+                                    </ng-container>
+                                </ul>
+                            </li>
+                        </ng-container>
+                    </ul>
+                </li>
+            </ng-container>
+        </ul>
+    </div>
+
+    <!-- Right panel -->
+    <div *ngIf="!showLeft" class="p-3">
+        <button class="btn btn-secondary mb-3" (click)="goBack()">← Back</button>
+        <ngx-org-chart [nodes]="selectedTree"></ngx-org-chart>
+    </div>
+</div>

@@ -21,9 +21,9 @@ import { VerificationModule } from '../verification/verification.module';
 
 @NgModule({
   declarations: [
-    MembernewComponent,
+    //MembernewComponent,
     RequestsComponent,
-    EventsDataCollectorComponent,
+    //EventsDataCollectorComponent,
     //AffiliatesComponent,
     //AboutusComponent,
     AdsPopupComponent,
@@ -44,9 +44,9 @@ import { VerificationModule } from '../verification/verification.module';
     VerificationModule
   ], // Add FormsModule here
   exports: [
-    MembernewComponent,
+    //MembernewComponent,
     RequestsComponent,
-    EventsDataCollectorComponent,
+    //EventsDataCollectorComponent,
     //AffiliatesComponent,
     //AboutusComponent,
     AdsPopupComponent,

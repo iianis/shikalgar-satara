@@ -30,7 +30,7 @@ import { CommonModule } from '@angular/common';
     BrowserModule,
     CommonModule,
     FormsModule,
-    PortalModule,
+    PortalModule
     //SharedModule
   ],
   providers: [],

@@ -4,7 +4,6 @@ import { AnnouncementRoutingModule } from './announcement-routing.module';
 import { LogodescriptionModule } from '../logodescription/logodescription.module';
 import { AnnouncementComponent } from './announcement.component';
 
-
 @NgModule({
   declarations: [AnnouncementComponent],
   imports: [

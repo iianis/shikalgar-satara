@@ -16,6 +16,7 @@ import { AffiliatesComponent } from './affiliates/affiliates.component';
 import { UpscComponent } from './upsc/upsc.component';
 import { AdsPopupComponent } from './advertisement/ads-popup/ads-popup.component';
 import { AnnouncementComponent } from './announcement/announcement.component';
+import { FamilytreeComponent } from './familytree/familytree.component';
 
 const routes: Routes = [
   {
@@ -89,6 +90,10 @@ const routes: Routes = [
       {
         path: 'adspopup',
         component: AdsPopupComponent
+      },
+      {
+        path: 'familytree',
+        component: FamilytreeComponent
       }
     ]
   },

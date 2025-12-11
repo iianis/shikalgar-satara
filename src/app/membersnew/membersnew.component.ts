@@ -1,16 +1,17 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FirebaseService } from '../services/firebase.service';
 import { taluka, talukas, village, villages } from '../../data/areas';
 import { take } from 'rxjs';
 import { IMember } from '../interfaces/interfaces';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-membersnew',
     templateUrl: './membersnew.component.html',
     styleUrls: ['./membersnew.component.css'],
-    standalone: false
+    imports: [FormsModule, CommonModule]
 })
 export class MembernewComponent implements OnInit {
 

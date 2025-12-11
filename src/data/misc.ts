@@ -91,8 +91,8 @@ export const
         {
             name: "वैद्यकीय मदत", village: "नागठाणे", desc: "1. एक कुटूंब प्रमुख ह्रदयविकार रूग्ण, ४-६ महिने दवाखाना, कमावण्याच्या स्थितीत नाही. 2. एक कुटुंब ज्यांचा तरूण मुलगा मणक्यांच्या विकाराने त्रस्त आहे. 3. कुटूंब प्रमुख आणि पत्नी दोघं अपघातग्रस्त, काही महिने घरातच रहाव लागले.", donations: 5, order: 2, familiesByTaluka: [
                 { taluka: "सातारा", count: 2 },
-                { taluka: "कराड", count: 3 },
-                { taluka: "खटाव ", count: 3 },
+                { taluka: "कराड", count: 1 },
+                { taluka: "खटाव ", count: 1 },
                 { taluka: "कोरेगांव", count: 0 },
                 { taluka: "माण", count: 2 },
                 //{ taluka: "फलटण", count: 0 },
@@ -103,8 +103,8 @@ export const
         },
         {
             name: "आर्थिक मदत", village: "विरळी", desc: "1. जेष्ठ नागरिक आपल्या पत्नी व सुने बरोबर राहतात, ज्यांचा तरूण मुलगा स्वर्गवासी झाला. 2. विधवा महिला आपल्या प्रौढ मुलीची शुश्रुषा करत आहे.", donations: 6, order: 3, familiesByTaluka: [
-                { taluka: "सातारा", count: 6 },
-                { taluka: "कराड", count: 9 },
+                { taluka: "सातारा", count: 8 },
+                { taluka: "कराड", count: 11 },
                 { taluka: "खटाव ", count: 6 },
                 { taluka: "कोरेगांव", count: 6 },
                 { taluka: "माण", count: 2 },
@@ -148,70 +148,56 @@ export const
         { name: "ज. साहिल शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 1 },
         { name: "सिमरनबी रियाज शिकलगार", date: "01/11/2024", village: "मुंबई", donationType: "जकात", amount: 1 },
         { name: "हसिनाबी अ. शिकलगार", date: "20/03/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
-
         { name: "ज. दिलेरखान शिकलगार", date: "20/03/2024", village: "वाई", donationType: "जकात", amount: 0.5 },
         { name: "ज. अमीरभाई शिकलगार", date: "20/03/2024", village: "कराड", donationType: "जकात", amount: .5 },
         //{ name: "ज. मज्जिदभाई नजीर शिकलगार", date: "20/03/2024", village: "मुंबई - विरळी", donationType: "जकात", amount: 0 },
-
-
         { name: "शकिलाबी शिकलगार", date: "1/1/2025", village: "सातारा", donationType: "जकात", amount: 0.5 },
         { name: "सिमरनबी रियाज शिकलगार", date: "01/02/2025", village: "मुंबई", donationType: "जकात", amount: 5 },
         { name: "ज. रियाजभाई निजाम शिकलगार", date: "01/02/2025", village: "सातारा", donationType: "शिक्षण", amount: 10 },
-
-
         { name: "ज. मज्जिद रमजान शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
         { name: "ज. रिगल फुट वेअर", date: "24/3/2024", village: "मलकापूर - कराड", donationType: "जकात", amount: 5 },
         { name: "ज. इक्बाल रमजान शिकलगार", date: "24/3/2024", village: "मुंबई - विरळी", donationType: "जकात", amount: 1 },
         { name: "नूरजहाँबी ताजूद्दीन शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 3 },
-
         { name: "ज. अमीर अब्दुल गनी शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.7 },
         { name: "ज. अमीन शब्बीर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
         { name: "ज. सिकंदर गुंडूलाल शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
         { name: "ज. बाबासाहेब फकीर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
         { name: "बानूबी महंमद शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: .5 },
-
         { name: "ज. अल्ताफ शिराज शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
         { name: "ज. सय्यद बादशाह शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.251 },
         { name: "ज. इस्माईल अमीर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 3 },
         { name: "ज. वजीर मुबारक शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
         { name: "सिमरनबी वजीर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
-
         { name: "ज. अन्सार अली शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
         { name: "ज. दादासो जांगू शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
         { name: "ज. वजीर मुबारक शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
         { name: "ज. नवाज दस्तगीर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
         { name: "ज. सोहेल मुनीर सिक्किलकर", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
-
         { name: "ज. बशीर बापू शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 4 },
         { name: "ज. नियाज रज्जाक शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 2 },
         { name: "ज. इक्बाल महंमद शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
         { name: "ज. शमशूद्दीन यूसुफ शिकलगार", date: "24/3/2024", village: "शेणोली - इचलकरंजी", donationType: "जकात", amount: 2 },
         { name: "ज. चॉंद दिवान शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
-
         //{ name: "ज. अय्याज महंमद सिकिलकर", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1.4 },
         { name: "ज. नाजिमा हरून शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 1 },
         { name: "ज. नदीम आझाद शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.5 },
         { name: "ज. फिरोज दिलावर शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 0.350 },
         { name: "नौझीयाबी राशिद शिकलगार", date: "24/3/2024", village: "सातारा", donationType: "जकात", amount: 3 },
-
         { name: "ज. इक्बाल रमजान शिकलगार", date: "01/11/2023", village: "मुंबई - विरळी", donationType: "अधिवेशन", amount: 5 },
         { name: "ज. तस्लिम दस्तगीर शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 2 },
         { name: "बेनझीरबी दिलावर शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 5 },
         { name: "ज. फारूख अब्दुल्लरहीम शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 5 },
         { name: "ज. रियाज महामूद शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 2 },
-
         { name: "ज. शब्बीर सय्यद शेख", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 4 },
         { name: "ज. दिलावर अब्बास शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.5 },
         { name: "ज. शौकत अजमुद्दीन शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.2 },
         { name: "ज. युनूस हसन शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.1 },
         { name: "ज. अस्लम कमरूद्दीन शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.2 },
-
         { name: "ज. समीर बाबालाल शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.2 },
         { name: "ज. रियाज बादशाह शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.2 },
         { name: "ज. शौकत मकबूल शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.2 },
         { name: "ज. हजरत अली अ.रहीम शिकलगार", date: "01/11/2023", village: "शेणोली", donationType: "अधिवेशन", amount: 2.5 },
         { name: "ज. अस्लम बाबालाल शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 5 },
-
         { name: "रिझवानाबी करीम शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 1 },
         { name: "ज. नसीमभाई अंबीर शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "अधिवेशन", amount: 0.5 },
         //{ name: "ज.  शिकलगार", date: "01/11/2023", village: "सातारा", donationType: "जकात", amount: 1 },

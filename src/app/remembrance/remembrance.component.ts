@@ -13,7 +13,7 @@ export class RemembranceComponent {
     masterdata: any = [];
 
     ngOnInit(): void {
-        this.firebaseService.getMasterDataOrderByTimestamp("remembrances", "timestamp").subscribe(data => {
+        this.firebaseService.getMasterDataOrderByTimestamp("remembrances", "order").subscribe(data => {
             //debugger;
             this.masterdata = data;
         });

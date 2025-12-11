@@ -20,7 +20,7 @@ export class AchievementsComponent {
     masterdata: any = [];
 
     ngOnInit(): void {
-        this.firebaseService.getMasterDataOrderByField("falicitations", "order").subscribe(data => {
+        this.firebaseService.getMasterDataOrderByTimestamp("falicitations", "order").subscribe(data => {
             //debugger;
             this.masterdata = data;
         });

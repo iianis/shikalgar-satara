@@ -2,16 +2,18 @@ import { Component, inject } from '@angular/core';
 import { FirebaseService } from '../services/firebase.service';
 import { charities, directors, donors, events, guides, initiatives, remembrances, scholarships } from '../../data/misc';
 import { format, parse } from 'date-fns';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { taluka, talukas, village, villages } from '../../data/areas';
 import { members } from '../../data/members';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-eventsdatacollector',
     templateUrl: './eventsdatacollector.component.html',
     //styleUrls: ['./eventsdatacollector.component.css'],
+    imports: [FormsModule, CommonModule],
     providers: [DatePipe],
-    standalone: false
+    standalone: true
 })
 export class EventsDataCollectorComponent {
     selectedEventType: string = 'charities';
