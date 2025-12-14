@@ -1,22 +1,23 @@
-<h2 class="text-center my-4 fw-bold text-primary">
+<h2 class="text-center my-4 fw-bold text-secondary">
     Shikalgar (Kulakjai) Family Tree
 </h2>
 <div class="container-fluid">
     <!-- Left panel -->
     <div *ngIf="showLeft" class="p-3">
-        <h4 class="text-center mb-3">Select Family Member</h4>
+        <h4 class="text-center mb-3">Select a member to view the family heirarchy.</h4>
         <ul>
             <ng-container *ngFor="let root of hierarchyTree">
                 <li>
-                    <span (click)="selectNode(root.id)">{{ root.name }}</span>
+                    <span class="node-link" (click)="selectNode(root.id)">{{ root.name }}</span>
                     <ul *ngIf="root.childs?.length">
                         <ng-container *ngFor="let child of root.childs">
                             <li>
-                                <span (click)="selectNode(child.id)">{{ child.name }}</span>
+                                <span class="node-link" (click)="selectNode(child.id)">{{ child.name }}</span>
                                 <ul *ngIf="child.childs?.length">
                                     <ng-container *ngFor="let grand of child.childs">
                                         <li>
-                                            <span (click)="selectNode(grand.id)">{{ grand.name }}</span>
+                                            <span class="node-link" (click)="selectNode(grand.id)">{{ grand.name
+                                                }}</span>
                                         </li>
                                     </ng-container>
                                 </ul>

@@ -194,3 +194,42 @@ li span:hover {
     text-decoration: underline;
     color: #007acc;
 }
+
+.left-panel ul {
+    list-style-type: none;
+    padding-left: 16px;
+}
+
+.left-panel li {
+    margin: 6px 0;
+}
+
+.node-link {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #0d6efd;
+    /* Bootstrap primary blue */
+    font-weight: 500;
+}
+
+.node-link:hover {
+    background-color: #e7f1ff;
+    /* light blue background */
+    text-decoration: none;
+}
+
+.node-link:active {
+    background-color: #cfe2ff;
+    /* darker blue when clicked */
+}
+
+.node-link::before {
+    /* content: "➤ "; */
+    content: "+ ";
+    /* arrow indicator */
+    color: #6c757d;
+    /* muted gray */
+}
