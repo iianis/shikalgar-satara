@@ -7,14 +7,15 @@ import { FormsModule } from '@angular/forms';
 interface Member {
     id: number;
     name: string;
-    relation?: string;
     parentid: number | null;
-    hierarchyid: number | null;
+    relation?: string;
+    hierarchyid: number;
     education?: string;
     village?: string;
     occupation?: string;
     dob?: string;
     status?: string;
+    phone?: string;
 }
 
 interface INode {
@@ -39,12 +40,14 @@ export class FamilytreeComponent implements OnInit {
 
     familyTree: INode[] = [];
     fullTree: INode[] = [];
+    members: any[] = [];
     hierarchyTree: any[] = [];
     selectedTree: INode[] = [];
     showLeft = true;
+    selectedFamily = "";
 
     ngOnInit() {
-        this.hierarchyTree = this.buildHierarchy(2); // depth limit = 2
+        //this.hierarchyTree = this.buildHierarchy(2); // depth limit = 2
     }
 
     // Helper: compute depth of a node
@@ -58,6 +61,7 @@ export class FamilytreeComponent implements OnInit {
         }
         return depth;
     }
+
     buildHierarchy(maxDepth: number): any[] {
         const buildNode = (member: Member, depth: number): any => {
             if (depth > maxDepth) return null;
@@ -65,6 +69,7 @@ export class FamilytreeComponent implements OnInit {
             return {
                 id: member.id,
                 name: member.name,
+                //cssClass: this.getCssClass(member.hierarchyid), // assign style based on relation
                 childs: children
                     .map(c => buildNode(c, depth + 1))
                     .filter(c => c !== null)
@@ -101,11 +106,11 @@ export class FamilytreeComponent implements OnInit {
     buildOrgTree(members: Member[]): INode[] {
         // Step 1: Create a lookup map
         const lookup: { [key: number]: INode } = {};
-
+        console.log("buildOrgTree");
         members.forEach(m => {
             lookup[m.id] = {
                 name: m.name,
-                cssClass: this.getCssClass(m.relation), // assign style based on relation
+                cssClass: this.getCssClass(m.hierarchyid), // assign style based on relation
                 childs: []
             };
         });
@@ -129,10 +134,21 @@ export class FamilytreeComponent implements OnInit {
     }
 
     // Helper: decide CSS class based on relation
-    getCssClass(relation?: string): string {
-        if (!relation) return 'ngx-org-member';
-        switch (relation.toLowerCase()) {
-            case 'aadi-purush':
+    getCssClass(hierarchyid: number = 0): string {
+        //if (hierarchyid) return 'ngx-org-member';
+        console.log("hierarchyid: " + hierarchyid);
+        switch (hierarchyid) {
+            case 0:
+                return 'ngx-org-ceo';
+            case 1:
+                return 'ngx-org-head';
+            case 2:
+                return 'ngx-org-ceo';
+            case 3:
+                return 'ngx-org-ceo';
+            case 4:
+                return 'ngx-org-ceo';
+            case 5:
                 return 'ngx-org-ceo';
             default:
                 return 'ngx-org-member';
@@ -145,7 +161,19 @@ export class FamilytreeComponent implements OnInit {
         alert(`You clicked on ${node.name}`);
     }
 
-    members: Member[] = [//ngx-graph
+    loadTree(type: string) {
+        this.selectedFamily = type;
+        if (type === 'kulakjai') {
+            this.members = this.members1;
+        } else if (type === 'baramati') {
+            this.members = this.members2;
+        }
+
+        this.hierarchyTree = this.buildHierarchy(2); // depth limit = 2
+        this.showLeft = true; // reset to left panel view
+    }
+
+    members1: Member[] = [
         { id: 1, name: "Sheikhusman Baban", hierarchyid: 0, relation: "Aadi-Purush", parentid: null },
         { id: 2, name: "Mohamad+Bibi", hierarchyid: 1, relation: "", parentid: 1 },
         { id: 3, name: "Sheikhdin+Khutub", hierarchyid: 1, relation: "", parentid: 1 },
@@ -247,11 +275,11 @@ export class FamilytreeComponent implements OnInit {
         { id: 84, name: "Mushtaq+Samina", hierarchyid: 0, relation: "", parentid: 10 },
         { id: 85, name: "Firoz+Firdos", hierarchyid: 0, relation: "", parentid: 10 },
         { id: 86, name: "Saniya", hierarchyid: 0, relation: "", parentid: 82 },
-        { id: 87, name: "Mohsin", hierarchyid: 0, relation: "", parentid: 83 },
-        { id: 88, name: "S2", hierarchyid: 0, relation: "", parentid: 83 },
+        { id: 87, name: "Soyeb", hierarchyid: 0, relation: "", parentid: 83 },
+        { id: 88, name: "Mohsin", hierarchyid: 0, relation: "", parentid: 83 },
         { id: 89, name: "Arsh", hierarchyid: 0, relation: "", parentid: 84 },
-        { id: 90, name: "D1", hierarchyid: 0, relation: "", parentid: 84 },
-        { id: 91, name: "D2", hierarchyid: 0, relation: "", parentid: 84 },
+        { id: 90, name: "Aliya", hierarchyid: 0, relation: "", parentid: 84 },
+        { id: 91, name: "Anam", hierarchyid: 0, relation: "", parentid: 84 },
         { id: 92, name: "Rehan", hierarchyid: 0, relation: "", parentid: 85 },
         { id: 93, name: "Sara", hierarchyid: 0, relation: "", parentid: 85 },
         { id: 94, name: "Ayub+Naseem", hierarchyid: 0, relation: "", parentid: 6 },
@@ -292,15 +320,25 @@ export class FamilytreeComponent implements OnInit {
         { id: 129, name: "Shahnoor+Firoz", hierarchyid: 0, relation: "", parentid: 14 },
         { id: 1291, name: "Swaliha", hierarchyid: 0, relation: "", parentid: 129 },
         { id: 1292, name: "Alfiya", hierarchyid: 0, relation: "", parentid: 129 },
-        { id: 1292, name: "Zakiya", hierarchyid: 0, relation: "", parentid: 129 },
+        { id: 1293, name: "Zakiya", hierarchyid: 0, relation: "", parentid: 129 },
         { id: 130, name: "Mubasshir", hierarchyid: 0, relation: "", parentid: 128 },
         { id: 131, name: "Tahir", hierarchyid: 0, relation: "", parentid: 128 },
         { id: 132, name: "Muneer", hierarchyid: 0, relation: "", parentid: 128 },
-        { id: 133, name: "Sadik", hierarchyid: 0, relation: "", parentid: 13 },
-        { id: 134, name: "Ayesha", hierarchyid: 0, relation: "", parentid: 13 },
-        { id: 135, name: "Shamshad", hierarchyid: 0, relation: "", parentid: 13 },
-        { id: 136, name: "Benazeer", hierarchyid: 0, relation: "", parentid: 13 },
-        { id: 137, name: "Jasmin", hierarchyid: 0, relation: "", parentid: 13 },
+        { id: 133, name: "Aasiya+Mahmood", hierarchyid: 0, relation: "", village: "Karad", parentid: 13 },
+        { id: 1331, name: "Rafat", hierarchyid: 0, relation: "", parentid: 133 },
+        { id: 134, name: "Shamshad+Mukhtar", hierarchyid: 0, relation: "", village: "Kondhwa Pune", parentid: 13 },
+        { id: 1341, name: "Arbaaz", hierarchyid: 0, relation: "", parentid: 134 },
+        { id: 1342, name: "Rukhsar+ Attar", hierarchyid: 0, relation: "", village: "Dehu Pune", parentid: 134 },
+        { id: 135, name: "Sadik+Rameeza", hierarchyid: 0, relation: "", village: "Karad", parentid: 13 },
+        { id: 1351, name: "Swaliha", hierarchyid: 0, relation: "", parentid: 135 },
+        { id: 1352, name: "Firdos", hierarchyid: 0, relation: "", parentid: 135 },
+        { id: 1353, name: "Aksa", hierarchyid: 0, relation: "", parentid: 135 },
+        { id: 136, name: "Bebinaaz+Aayaj", hierarchyid: 0, relation: "", village: "Kondhawa Pune", parentid: 13 },
+        { id: 1361, name: "Faizal", hierarchyid: 0, relation: "", parentid: 136 },
+        { id: 1362, name: "Kaif", hierarchyid: 0, relation: "", parentid: 136 },
+        { id: 137, name: "Jasmin+Kamil", hierarchyid: 0, relation: "", village: "Moshi Chikhli Pune", parentid: 13 },
+        { id: 1371, name: "Arshiya", hierarchyid: 0, relation: "", village: "", parentid: 137 },
+        { id: 1372, name: "Faeem", hierarchyid: 0, relation: "", village: "", parentid: 137 },
         { id: 138, name: "Gulshan+Gulab", hierarchyid: 0, relation: "", parentid: 5 },
         { id: 139, name: "Amin", hierarchyid: 0, relation: "", parentid: 5 },
         { id: 140, name: "Afsar Ali", hierarchyid: 0, relation: "", parentid: 138 },
@@ -332,7 +370,6 @@ export class FamilytreeComponent implements OnInit {
         { id: 159, name: "Nagina+", hierarchyid: 0, relation: "", parentid: 148 },
         { id: 1591, name: "Ajmal", hierarchyid: 0, relation: "", parentid: 159 },
         { id: 1592, name: "D", hierarchyid: 0, relation: "", parentid: 159 },
-
         { id: 160, name: "Riyaz+Hasina", hierarchyid: 0, relation: "", village: "Nagthane", parentid: 147 },
         { id: 1601, name: "Reehan", hierarchyid: 0, relation: "", parentid: 160 },
         { id: 1602, name: "Ayan", hierarchyid: 0, relation: "", parentid: 160 },
@@ -351,7 +388,6 @@ export class FamilytreeComponent implements OnInit {
         { id: 1614, name: "Shamshad+Imam Indori", hierarchyid: 0, relation: "", village: "", parentid: 147 },
         { id: 16141, name: "Rinaz Shaikh", hierarchyid: 0, relation: "", village: "", parentid: 1614 },
         { id: 16142, name: "Rojina+", hierarchyid: 0, relation: "", village: "", parentid: 1614 },
-
         { id: 162, name: "Safdar+Alisha", hierarchyid: 0, relation: "", parentid: 146 },
         { id: 1621, name: "Mahevish", hierarchyid: 0, relation: "", parentid: 162 },
         { id: 163, name: "Sameer+Asma", hierarchyid: 0, relation: "", parentid: 145 },
@@ -360,5 +396,147 @@ export class FamilytreeComponent implements OnInit {
         { id: 1642, name: "Khatija", hierarchyid: 0, relation: "", parentid: 164 },
         { id: 165, name: "Anaya", hierarchyid: 0, relation: "", parentid: 163 },
         { id: 166, name: "Zidaan", hierarchyid: 0, relation: "", parentid: 163 }
+    ];
+
+    members2: Member[] = [
+        //{ id: , name: "", hierarchyid: 0, relation: "", village:"", phone:"", parentid: },
+        { id: 1, name: "Abdul Bhai+", hierarchyid: 0, relation: "Aadi-Purush", village: "Baramati", parentid: null },
+        { id: 2, name: "Dagadu Bhai+", hierarchyid: 1, relation: "", village: "", phone: "", parentid: 1 },
+        { id: 3, name: "Munnawar aka Manaji", hierarchyid: 1, relation: "", village: "", phone: "", parentid: 1 },
+        { id: 4, name: "Manik+", hierarchyid: 1, relation: "", village: "", phone: "", parentid: 1 },
+        { id: 5, name: "Mohamad Hanif", hierarchyid: 2, relation: "", village: "", phone: "", parentid: 2 },
+        { id: 6, name: "Rajjak+", hierarchyid: 2, relation: "", village: "", phone: "", parentid: 2 },
+        { id: 7, name: "Ajij+", hierarchyid: 2, relation: "", village: "", phone: "", parentid: 2 },
+        { id: 8, name: "Musa+Khairunissa aka Fatima Shaikh", hierarchyid: 2, relation: "", village: "", phone: "", parentid: 2 },
+        { id: 9, name: "Dastagir+", hierarchyid: 2, relation: "", village: "", phone: "", parentid: 4 },
+        { id: 10, name: "Mehboob+Chandbi", hierarchyid: 2, relation: "", village: "", phone: "", parentid: 4 },
+        { id: 11, name: "Latif+Hawa", hierarchyid: 2, relation: "", village: "", phone: "", parentid: 4 },
+        { id: 12, name: "Gulam Ali+", hierarchyid: 3, relation: "", village: "", phone: "", parentid: 5 },
+        { id: 13, name: "Rafiq+", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 12 },
+        { id: 14, name: "Shafiq", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 12 },
+        { id: 15, name: "Iqbal+", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 12 },
+        { id: 16, name: "Anis+", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 12 },
+
+        { id: 17, name: "Mushtaq+", hierarchyid: 3, relation: "", village: "", phone: "", parentid: 6 },
+        { id: 18, name: "Shaheen+", hierarchyid: 3, relation: "", village: "", phone: "", parentid: 6 },
+        { id: 19, name: "Asif+", hierarchyid: 3, relation: "Nisar bhai ke samdhi", village: "", phone: "", parentid: 7 },
+        { id: 20, name: "Yusuf+", hierarchyid: 3, relation: "", village: "", phone: "", parentid: 7 },
+        { id: 21, name: "D1+", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 20 },
+        { id: 22, name: "Jubeda+Husein", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 20 },
+        { id: 23, name: "Hurmat+", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 20 },
+        { id: 24, name: "Tahera+Yusuf", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 20 },
+
+        { id: 25, name: "Mumtaz+Ajij Maner", hierarchyid: 3, relation: "", village: "", phone: "", parentid: 8 },
+        { id: 26, name: "Salima+Nijamuddin Shikalgar", hierarchyid: 3, relation: "", village: "", phone: "", parentid: 8 },
+        { id: 27, name: "Ayesha+Jamil Shikalgar", hierarchyid: 3, relation: "", village: "", phone: "", parentid: 8 },
+        { id: 28, name: "Naseem+Madar Maner", hierarchyid: 3, relation: "", village: "", phone: "", parentid: 8 },
+        { id: 29, name: "Najma+Philip", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 25 },
+        { id: 30, name: "Rehana+Shabbir", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 25 },
+        { id: 31, name: "Niyaj+Shabana", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 25 },
+        { id: 32, name: "Parvez+Saira", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 25 },
+        { id: 33, name: "Sufiya+Shakir", hierarchyid: 4, relation: "", village: "", phone: "", parentid: 25 },
+        { id: 34, name: "Ronny", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 29 },
+        { id: 35, name: "D1", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 29 },
+        { id: 36, name: "D2", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 29 },
+        { id: 37, name: "Imran+Reshma", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 30 },
+        { id: 38, name: "Imtiyaz+", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 30 },
+        { id: 39, name: "Alisha+", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 31 },
+        { id: 40, name: "Shafeen", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 31 },
+        { id: 41, name: "Farheen+", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 32 },
+        { id: 42, name: "Aarju+", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 32 },
+        { id: 43, name: "S", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 32 },
+        { id: 44, name: "Rumana", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 33 },
+        { id: 45, name: "Maliha", hierarchyid: 5, relation: "", village: "", phone: "", parentid: 33 },
+        { id: 46, name: "Shamim+Salim", hierarchyid: 4, relation: "", parentid: 26 },
+        { id: 47, name: "Riyaj+Jahida", hierarchyid: 4, relation: "", parentid: 26 },
+        { id: 48, name: "Anis+Shabana", hierarchyid: 4, relation: "", parentid: 26 },
+        { id: 49, name: "Saif Ali", hierarchyid: 5, relation: "", parentid: 46 },
+        { id: 50, name: "Aman", hierarchyid: 5, relation: "", parentid: 46 },
+        { id: 51, name: "Simran", hierarchyid: 5, relation: "", parentid: 47 },
+        { id: 52, name: "Sana", hierarchyid: 5, relation: "", parentid: 47 },
+        { id: 53, name: "Sahil", hierarchyid: 5, relation: "", parentid: 48 },
+        { id: 54, name: "Reshma+Naushad", hierarchyid: 4, relation: "", parentid: 27 },
+        { id: 55, name: "Juber", hierarchyid: 5, relation: "", parentid: 54 },
+        { id: 56, name: "Inshan+", hierarchyid: 4, relation: "", parentid: 27 },
+        { id: 57, name: "D1", hierarchyid: 5, relation: "", parentid: 56 },
+        { id: 58, name: "D2", hierarchyid: 5, relation: "", parentid: 56 },
+        { id: 59, name: "Sameer+Bismillah", hierarchyid: 5, relation: "", parentid: 28 },
+        { id: 60, name: "Arfaan", hierarchyid: 5, relation: "", parentid: 59 },
+        { id: 61, name: "S2", hierarchyid: 5, relation: "", parentid: 59 },
+        { id: 62, name: "Mansoor+Farheen", hierarchyid: 5, relation: "", parentid: 28 },
+        { id: 63, name: "S", hierarchyid: 5, relation: "", parentid: 62 },
+        { id: 64, name: "D", hierarchyid: 5, relation: "", parentid: 62 },
+        { id: 65, name: "D", hierarchyid: 5, relation: "", parentid: 41 }, //farheen
+        { id: 66, name: "D", hierarchyid: 5, relation: "", parentid: 42 }, //aarju
+        { id: 67, name: "S", hierarchyid: 5, relation: "", parentid: 39 }, //alisha
+        { id: 68, name: "D", hierarchyid: 5, relation: "", parentid: 37 }, //imran
+        { id: 69, name: "D", hierarchyid: 5, relation: "", parentid: 38 }, //imtiyaz
+        { id: 70, name: "D", hierarchyid: 5, relation: "", parentid: 34 }, //ronny
+        { id: 71, name: "D", hierarchyid: 5, relation: "", parentid: 34 },
+        { id: 72, name: "Husein+Jarina", hierarchyid: 2, relation: "", parentid: 9 },
+        { id: 73, name: "Hasan", hierarchyid: 2, relation: "", parentid: 9 },
+        { id: 74, name: "Najir+Hurmat", hierarchyid: 2, relation: "", parentid: 9 },
+        { id: 75, name: "Gani+", hierarchyid: 2, relation: "", parentid: 9 },
+        { id: 76, name: "Johra+Ajij", hierarchyid: 2, relation: "", parentid: 9 },
+        { id: 77, name: "Sufiya+Farooq", hierarchyid: 3, relation: "", parentid: 75 },
+        { id: 78, name: "Asif+", hierarchyid: 3, relation: "", parentid: 75 },
+        { id: 79, name: "Gulnaaj", hierarchyid: 3, relation: "", parentid: 75 },
+        { id: 80, name: "S2", hierarchyid: 3, relation: "", parentid: 75 },
+        { id: 81, name: "Sugra+", hierarchyid: 2, relation: "", parentid: 76 },
+        { id: 82, name: "Mushtaq+Bebi", hierarchyid: 2, relation: "", parentid: 81 },
+        { id: 83, name: "Shabbir+Irshad", hierarchyid: 2, relation: "", parentid: 81 },
+        { id: 84, name: "Farooq+", hierarchyid: 2, relation: "", parentid: 81 },
+        { id: 85, name: "Najim+", hierarchyid: 2, relation: "", parentid: 81 },
+        //Memhoob Bhai
+        { id: 86, name: "Bebi+Mushtaq", hierarchyid: 3, relation: "", village: "Chakan", parentid: 10 },
+        { id: 87, name: "Muneer+", hierarchyid: 3, relation: "", parentid: 10 },
+        { id: 88, name: "Salim+", hierarchyid: 3, relation: "", parentid: 10 },
+        { id: 89, name: "Rehana", hierarchyid: 3, relation: "", parentid: 10 },
+        { id: 90, name: "Asma+Tahir Ali", hierarchyid: 3, relation: "", parentid: 10 },
+        { id: 99, name: "Afsar aka Ahmed+", hierarchyid: 3, relation: "", parentid: 10 },
+        { id: 100, name: "Saqlain+", hierarchyid: 4, relation: "", parentid: 99 },
+        { id: 101, name: "D", hierarchyid: 4, relation: "", parentid: 99 },
+        { id: 91, name: "Rizwana+", hierarchyid: 3, relation: "", parentid: 10 },
+        { id: 92, name: "Sameer+", hierarchyid: 4, relation: "", parentid: 86 },
+        { id: 93, name: "Rinaz+", hierarchyid: 4, relation: "", parentid: 86 },
+        { id: 94, name: "Shaheen+", hierarchyid: 4, relation: "", parentid: 86 },
+        { id: 95, name: "Suhail+", hierarchyid: 4, relation: "", parentid: 87 },
+        { id: 96, name: "D", hierarchyid: 4, relation: "", parentid: 87 },
+        { id: 97, name: "Ajim+Heena", hierarchyid: 4, relation: "", parentid: 88 },
+        { id: 98, name: "Tehsin+Mohsin", hierarchyid: 4, relation: "", village: "Solapur", parentid: 88 },
+        { id: 101, name: "Simran", hierarchyid: 4, relation: "", parentid: 91 },
+        { id: 102, name: "S", hierarchyid: 4, relation: "", parentid: 92 },
+        { id: 103, name: "S", hierarchyid: 4, relation: "", parentid: 93 },
+        { id: 104, name: "D", hierarchyid: 4, relation: "", parentid: 93 },
+        { id: 105, name: "S", hierarchyid: 4, relation: "", parentid: 94 },
+        { id: 106, name: "S", hierarchyid: 4, relation: "", parentid: 104 },
+        { id: 107, name: "S", hierarchyid: 4, relation: "", parentid: 104 },
+        //Latif Bhai
+        { id: 108, name: "Imtiyaz+Shabnam", hierarchyid: 4, relation: "", parentid: 11 },
+        { id: 109, name: "Shehnaaz+Mahmood", hierarchyid: 4, relation: "", parentid: 11 },
+        { id: 110, name: "Irshad+Shabbir", hierarchyid: 4, relation: "", parentid: 11 },
+        { id: 111, name: "Maqsood+", hierarchyid: 4, relation: "", parentid: 11 },
+        { id: 112, name: "Javed+", hierarchyid: 4, relation: "", parentid: 11 },
+        { id: 113, name: "Yasmin+Aslam", hierarchyid: 4, relation: "", parentid: 11 },
+        { id: 114, name: "Wajid+Eliza", hierarchyid: 4, relation: "", parentid: 11 },
+        { id: 115, name: "Tanveer+", hierarchyid: 4, relation: "", parentid: 108 },
+        { id: 116, name: "Tarannum", hierarchyid: 4, relation: "", parentid: 108 },
+        { id: 117, name: "Nagina+", hierarchyid: 4, relation: "", parentid: 109 },
+        { id: 118, name: "Aayaj+Nilofar", hierarchyid: 4, relation: "", parentid: 109 },
+        { id: 119, name: "Firoz+", hierarchyid: 4, relation: "", parentid: 109 },
+        { id: 120, name: "Nilofar+Aayaj", hierarchyid: 4, relation: "", parentid: 110 },
+        { id: 121, name: "S", hierarchyid: 4, relation: "", parentid: 110 },
+        { id: 122, name: "S", hierarchyid: 4, relation: "", parentid: 111 },
+        { id: 123, name: "D", hierarchyid: 4, relation: "", parentid: 111 },
+        { id: 124, name: "S", hierarchyid: 4, relation: "", parentid: 112 },
+        { id: 125, name: "D", hierarchyid: 4, relation: "", parentid: 112 },
+        { id: 128, name: "S", hierarchyid: 4, relation: "", parentid: 114 },
+        { id: 129, name: "D", hierarchyid: 4, relation: "", parentid: 114 },
+        { id: 126, name: "Tausif+Farheen", hierarchyid: 4, relation: "", parentid: 113 },
+        { id: 127, name: "Naved+Heena", hierarchyid: 4, relation: "", parentid: 113 },
+        { id: 130, name: "Sabiha", hierarchyid: 4, relation: "", parentid: 126 },
+        { id: 131, name: "Anaya", hierarchyid: 4, relation: "", parentid: 127 },
+        { id: 132, name: "S", hierarchyid: 4, relation: "", parentid: 128 },
+        { id: 133, name: "D", hierarchyid: 4, relation: "", parentid: 129 },
     ];
 }

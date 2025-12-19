@@ -1,10 +1,27 @@
 <h2 class="text-center my-4 fw-bold text-secondary">
-    Shikalgar (Kulakjai) Family Tree
+    Family Tree
 </h2>
+
 <div class="container-fluid">
+
+    <!-- Buttons to switch family trees -->
+    <div class="text-center mb-4">
+        <button class="btn mx-2"
+            [ngClass]="{'btn-primary': selectedFamily === 'kulakjai', 'btn-outline-primary': selectedFamily !== 'kulakjai'}"
+            (click)="loadTree('kulakjai')">
+            Kulakjai
+        </button>
+
+        <button class="btn mx-2"
+            [ngClass]="{'btn-success': selectedFamily === 'baramati', 'btn-outline-success': selectedFamily !== 'baramati'}"
+            (click)="loadTree('baramati')">
+            Baramati
+        </button>
+    </div>
+
     <!-- Left panel -->
     <div *ngIf="showLeft" class="p-3">
-        <h4 class="text-center mb-3">Select a member to view the family heirarchy.</h4>
+        <h4 class="text-center mb-3">Select a member to view the family tree.</h4>
         <ul>
             <ng-container *ngFor="let root of hierarchyTree">
                 <li>
@@ -16,8 +33,9 @@
                                 <ul *ngIf="child.childs?.length">
                                     <ng-container *ngFor="let grand of child.childs">
                                         <li>
-                                            <span class="node-link" (click)="selectNode(grand.id)">{{ grand.name
-                                                }}</span>
+                                            <span class="node-link" (click)="selectNode(grand.id)">
+                                                {{ grand.name }}
+                                            </span>
                                         </li>
                                     </ng-container>
                                 </ul>
