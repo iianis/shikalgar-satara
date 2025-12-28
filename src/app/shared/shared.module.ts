@@ -7,7 +7,7 @@ import { EventsDataCollectorComponent } from '../eventsdatacollector/eventsdatac
 import { AffiliatesComponent } from '../affiliates/affiliates.component';
 import { AboutusComponent } from '../aboutus/aboutus.component';
 import { AdsPopupComponent } from '../advertisement/ads-popup/ads-popup.component';
-import { AnnouncementComponent } from '../announcement/announcement.component';
+//import { AnnouncementComponent } from '../announcement/announcement.component';
 import { GalleryComponent } from '../gallery/gallery.component';
 import { ActivitiesRoutingModule } from '../activities/activities-routing.module';
 import { DirectorsModule } from '../directors/directors.module';
@@ -27,7 +27,7 @@ import { VerificationModule } from '../verification/verification.module';
     //AffiliatesComponent,
     //AboutusComponent,
     AdsPopupComponent,
-    AnnouncementComponent,
+    //AnnouncementComponent,
     //GalleryComponent
   ],
   imports: [
