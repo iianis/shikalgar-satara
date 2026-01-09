@@ -22,7 +22,7 @@ export class EventslistComponent implements OnInit {
 
     ngOnInit(): void {
 
-        this.firebaseService.getMasterDataOrderByField("events", "timestamp").subscribe(data => {
+        this.firebaseService.getMasterDataOrderByFieldDesc("events", "order").subscribe(data => {
             //debugger;
             this.masterdata = data;
             //this.sortEventsByDate();

@@ -17,6 +17,8 @@ import { UpscComponent } from './upsc/upsc.component';
 import { AdsPopupComponent } from './advertisement/ads-popup/ads-popup.component';
 import { AnnouncementComponent } from './announcement/announcement.component';
 import { FamilytreeComponent } from './familytree/familytree.component';
+import { EventplanningComponent } from './eventplanning/eventplanning.component';
+import { EventhighlightComponent } from './eventhighlight/eventhighlight.component';
 
 const routes: Routes = [
   {
@@ -31,10 +33,14 @@ const routes: Routes = [
     path: 'login',
     component: LoginComponent
   },
-  // {
-  //   path: 'register',
-  //   component: RegisterComponent
-  // },
+  {
+    path: 'eventplanning',
+    component: EventplanningComponent
+  },
+  {
+    path: 'eventhighlight',
+    component: EventhighlightComponent
+  },
   {
     path: 'register',
     component: MembernewComponent

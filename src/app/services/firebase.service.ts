@@ -71,6 +71,12 @@ export class FirebaseService {
       .valueChanges();
   }
 
+  getMasterDataOrderByFieldDesc(collectionName: string, fieldName: string): Observable<any[]> {
+    return this.firestore.collection(collectionName + this.checkIfWeAreTesting(),
+      ref => ref.orderBy(fieldName, 'desc'))
+      .valueChanges();
+  }
+
   getMasterDataOrderByTimestamp(collectionName: string, fieldName: string): Observable<any[]> {
     return this.firestore.collection(collectionName + this.checkIfWeAreTesting(),
       ref => ref.orderBy(fieldName, 'desc'))
