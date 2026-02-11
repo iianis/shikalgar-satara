@@ -1,0 +1,44 @@
+/* Ensure Bootstrap Icons are available */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css");
+
+/* Custom fix for the tiebreaker icon visibility */
+.tiebreaker-icon {
+    display: inline-flex !important;
+    align-items: center;
+    vertical-align: middle;
+    color: #0d6efd;
+    /* Explicit Bootstrap Primary Blue */
+    opacity: 1 !important;
+}
+
+/* tournament.component.css */
+::ng-deep body {
+    background-color: lightcoral !important;
+    /* Replace with your desired color */
+    margin: 0;
+    padding: 0;
+}
+
+:host {
+    background-color: lightcoral !important;
+    /* Replace with your desired color */
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure the header text pops */
+.navbar-brand {
+    letter-spacing: -1px;
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Style adjustments for the cards to look better on orange */
+.tournament-card {
+    border: none !important;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.text-muted {
+    color: #555 !important;
+    /* Making muted text slightly darker for readability on orange */
+}

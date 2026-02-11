@@ -19,6 +19,9 @@ import { AnnouncementComponent } from './announcement/announcement.component';
 import { FamilytreeComponent } from './familytree/familytree.component';
 import { EventplanningComponent } from './eventplanning/eventplanning.component';
 import { EventhighlightComponent } from './eventhighlight/eventhighlight.component';
+import { TournamentListComponent } from './tournament-list/tournament-list.component';
+import { TournamentDetailComponent } from './tournament-detail/tournament-detail.component';
+import { TournamentStandingsComponent } from './tournament-standings/tournament-standings.component';
 
 const routes: Routes = [
   {
@@ -117,6 +120,9 @@ const routes: Routes = [
   { path: 'register', loadChildren: () => import('./membersnew/membersnew.module').then(m => m.MembersnewModule) },
   { path: 'education', loadChildren: () => import('./upsc/upsc.module').then(m => m.UpscModule) },
   { path: 'adspopup', loadChildren: () => import('./advertisement/advertisement.module').then(m => m.AdvertisementModule) },
+  { path: 'tournaments', component: TournamentListComponent },
+  { path: 'tournament/:id', component: TournamentDetailComponent },
+  { path: 'tournament/:id/standings', component: TournamentStandingsComponent },
 ];
 
 @NgModule({

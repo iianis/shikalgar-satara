@@ -1,0 +1,68 @@
+<header class="shadow-sm mb-4" style="background-color: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);">
+    <nav class="navbar navbar-dark container">
+        <div class="container-fluid justify-content-between align-items-center py-2">
+            <a class="navbar-brand d-flex align-items-center fw-bold fs-3" href="#">
+                <span class="me-2">🏆</span>
+                <span class="tracking-tight">7PD <span class="text-white-50">Sports</span></span>
+            </a>
+
+            <div class="d-none d-md-flex align-items-center text-white">
+                <div class="badge bg-dark px-3 py-2 rounded-pill">
+                    <span class="spinner-grow spinner-grow-sm text-danger me-2" role="status"></span>
+                    Live Tracking Active
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="container mb-4">
+    <div class="container mb-3">
+        <button (click)="goBack()" class="btn btn-outline-secondary btn-sm me-3">Back</button>
+    </div>
+    <div class="d-flex align-items-center mb-4">
+        <h1 class="h2 mb-0">Group Standings</h1>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-xl-6" *ngFor="let groupName of ['A', 'B', 'C', 'D']">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Group {{ groupName }}</h5>
+                    <span class="badge bg-white text-primary">Top 2 Qualify</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">Pos</th>
+                                <th>Player</th>
+                                <th class="text-center">P</th>
+                                <th class="text-center">W</th>
+                                <th class="text-center">L</th>
+                                <th class="text-center">+/-</th>
+                                <th class="text-center pe-3">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let entry of getStandings(groupName); let i = index"
+                                [class.table-success]="i < 2" class="position-relative">
+                                <td class="ps-3 fw-bold">{{ i + 1 }}</td>
+                                <td>
+                                    <div class="fw-bold">{{ entry.name }}</div>
+                                </td>
+                                <td class="text-center">{{ entry.played }}</td>
+                                <td class="text-center text-success">{{ entry.won }}</td>
+                                <td class="text-center text-danger">{{ entry.lost }}</td>
+                                <td class="text-center small"
+                                    [ngClass]="entry.pointsDifference > 0 ? 'text-success' : 'text-muted'">
+                                    {{ entry.pointsDifference > 0 ? '+' : '' }}{{ entry.pointsDifference }}
+                                </td>
+                                <td class="text-center fw-bold pe-3">{{ entry.points }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

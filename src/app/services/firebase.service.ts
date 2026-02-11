@@ -238,4 +238,92 @@ export class FirebaseService {
       });
     });
   }
+
+  async loadDataIntoCollection(
+    collectionName: string, data: any[],
+  ) {
+    try {
+      console.log('Seeding started...');
+
+      // Write each entry to the Firebase collection
+      const batch = this.firestore.firestore.batch(); // Use batch for efficient writes
+
+      data.forEach((item: any) => {
+        const docRef = this.firestore.collection(collectionName).doc().ref;
+        if (item.hasOwnProperty('order')) {
+          item.order = Number(item.order);
+        }
+        if (item.hasOwnProperty('timestamp')) {
+          // Ensure you have imported firebase from 'firebase/app'
+          // Alternatively, if you prefer a JavaScript Date object, you can simply use: item.timestamp = new Date(item.timestamp);
+          //item.timestamp = firebase.firestore.Timestamp.fromDate(new Date(item.timestamp));
+        } else {
+          item.timestamp = firebase.firestore.Timestamp.fromDate(new Date());
+        }
+        batch.set(docRef, item); // Add each item as a document
+      });
+
+      // Commit the batch
+      await batch.commit();
+      console.log('Data successfully written to Firebase!');
+    } catch (error) {
+      console.error('Error processing the Data file or writing to Firebase:', error);
+    }
+  }
+
+  getDocuments(collectionName: string): Observable<any[]> {
+    return this.firestore.collection(collectionName).snapshotChanges().pipe(
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data() as any;
+        const id = a.payload.doc.id; return { id, ...data };
+      })));
+  }
+
+  getDocumentsOrderByField(collectionName: string, fieldName: string): Observable<any[]> {
+    return this.firestore.collection(collectionName + this.checkIfWeAreTesting(),
+      ref => ref.orderBy(fieldName))
+      .valueChanges();
+  }
+
+  getDocumentsOrderByFieldDesc(collectionName: string, fieldName: string): Observable<any[]> {
+    return this.firestore.collection(collectionName + this.checkIfWeAreTesting(),
+      ref => ref.orderBy(fieldName, 'desc'))
+      .valueChanges();
+  }
+
+  async updateMatchDocument(documentData: any): Promise<void> {
+    try {
+      const collectionName = 'matches' + this.checkIfWeAreTesting();
+      const matchId = documentData.matchId;
+      console.log('updateMatchDocument: 1!');
+
+      if (!matchId) {
+        throw new Error('matchId is required to update a match document');
+      }
+
+      console.log('updateMatchDocument: 2! matchId:', matchId);
+      const matchDocRef = this.firestore.collection(collectionName).doc(matchId);
+
+      console.log('updateMatchDocument: 21!');
+      const matchDoc = await matchDocRef.get();
+
+      console.log('updateMatchDocument: 3!');
+      documentData.timestamp = Timestamp.now();
+
+      console.log('updateMatchDocument: 4!');
+      if (matchDoc) {
+        console.log('updateMatchDocument: 5!');
+        // Update existing document
+        await matchDocRef.update(documentData);
+        console.log('updateMatchDocument: 6!');
+        console.log('updateMatchDocument: Existing match updated successfully!');
+      } else {
+        // Create new document if not found
+        //await matchDocRef.set(documentData);
+        console.log('updateMatchDocument: New match document created successfully!');
+      }
+    } catch (error) {
+      console.error('Error processing the updateMatchDocument Data writing to Firebase:', error);
+    }
+  };
 }

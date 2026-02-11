@@ -1,0 +1,24 @@
+/* tournament.component.css */
+::ng-deep body {
+    background-color: lightcoral !important;
+    /* Replace with your desired color */
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure the header text pops */
+.navbar-brand {
+    letter-spacing: -1px;
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Style adjustments for the cards to look better on orange */
+.tournament-card {
+    border: none !important;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.text-muted {
+    color: #555 !important;
+    /* Making muted text slightly darker for readability on orange */
+}
