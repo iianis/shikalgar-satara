@@ -10,16 +10,28 @@ import { setThrowInvalidWriteToSignalError } from '@angular/core/primitives/sign
 export class SlideshowComponent {
     slides = [
         { title: "", image: "/assets/images/slide1.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide10.jpg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026/61.jpg", header1: "", header2: "" },
+        { title: "", image: "/assets/images/slide7.jpg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026/62.jpg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026/4.jpg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026/9.JPG", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026/11.JPG", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026/57.jpg", header1: "", header2: "" },
+
+        { title: "", image: "/assets/gallery/2026/55.jpg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026/60.jpg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026/63.jpg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026/8.JPG", header1: "", header2: "" },
+
+        //{ title: "", image: "/assets/images/slide10.jpg", header1: "", header2: "" },
+        { title: "", image: "/assets/images/slide11.jpeg", header1: "", header2: "" },
         { title: "", image: "/assets/images/slide2.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide3.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide4.jpg", header1: "", header2: "" },
+        //{ title: "", image: "/assets/images/slide3.jpg", header1: "", header2: "" },
+        //{ title: "", image: "/assets/images/slide4.jpg", header1: "", header2: "" },
         { title: "", image: "/assets/images/slide5.jpg", header1: "", header2: "" },
         { title: "", image: "/assets/images/slide6.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide7.jpg", header1: "", header2: "" },
         { title: "", image: "/assets/images/slide8.jpg", header1: "", header2: "" },
         { title: "", image: "/assets/images/slide9.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide11.jpeg", header1: "", header2: "" },
         { title: "", image: "/assets/images/slide12.jpeg", header1: "", header2: "" },
     ];
 }

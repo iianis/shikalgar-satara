@@ -19,6 +19,8 @@ import { AnnouncementComponent } from './announcement/announcement.component';
 import { FamilytreeComponent } from './familytree/familytree.component';
 import { EventplanningComponent } from './eventplanning/eventplanning.component';
 import { EventhighlightComponent } from './eventhighlight/eventhighlight.component';
+import { AuditsComponent } from './audits/audits.component';
+import { FlashnewsComponent } from './flashnews/flashnews.component';
 
 const routes: Routes = [
   {
@@ -52,6 +54,14 @@ const routes: Routes = [
   {
     path: 'announcement',
     component: AnnouncementComponent
+  },
+  {
+    path: 'audits',
+    component: AuditsComponent
+  },
+  {
+    path: 'flashnews',
+    component: FlashnewsComponent
   },
   {
     path: '',
@@ -117,6 +127,7 @@ const routes: Routes = [
   { path: 'register', loadChildren: () => import('./membersnew/membersnew.module').then(m => m.MembersnewModule) },
   { path: 'education', loadChildren: () => import('./upsc/upsc.module').then(m => m.UpscModule) },
   { path: 'adspopup', loadChildren: () => import('./advertisement/advertisement.module').then(m => m.AdvertisementModule) },
+  { path: 'flashnews', loadChildren: () => import('./flashnews/flashnews.module').then(m => m.FlashnewsModule) },
 ];
 
 @NgModule({

@@ -13,6 +13,7 @@ import { ActivitiesModule } from '../activities/activities.module';
 import { UpipaymentModule } from '../upipayment/upipayment.module';
 import { FormsModule } from '@angular/forms';
 import { AdvertisementModule } from '../advertisement/advertisement.module';
+import { FlashnewsModule } from '../flashnews/flashnews.module';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { AdvertisementModule } from '../advertisement/advertisement.module';
     LogoModule,
     ActivitiesModule,
     FormsModule,
-    AdvertisementModule
+    AdvertisementModule,
+    FlashnewsModule
   ]
 })
 export class HomeModule { }

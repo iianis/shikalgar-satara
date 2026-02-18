@@ -1,0 +1,181 @@
+<div class="container my-3" *ngIf="isFlashNewsShow" #ramadanCard>
+    <div class="card shadow">
+        <div class="container my-2">
+            <div class="card shadow border-0 overflow-hidden" style="border-radius: 15px;">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                    aria-label="Close" (click)="ramadanCard.style.display='none'">
+                </button>
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h2 class="fw-bold mb-0">आम ऐलान</h2>
+                </div>
+
+                <div class="card-body p-4 p-md-5 text-dark">
+                    <div class="mb-4 text-center">
+                        <h4 class="fw-bold text-success mb-3">अस्सलामु अलैकुम व रहमतुल्लाही व बरकातुहु!</h4>
+                        <p class="fs-5">आप सभी को रमज़ान महीना मुबारक हो।</p>
+                    </div>
+
+                    <p>हर रमजान मे हम रोज़ा रखने, कुरआन की तिलावत करने और नमाज़ अदा करने की तैयारी करते हैं, आइए इस
+                        मुबारक समय
+                        हम ज़रूरतमंदों की मदत भी करें।</p>
+
+                    <p>अपनी संघटना <strong>ज़कात, सदक़ा और फ़ित्रा</strong> के ज़रिए मिली आपकी रक्कम उन परिवारों तक
+                        पहुँचाती हैं जिन्हें इसकी सबसे ज़्यादा ज़रूरत है।</p>
+
+                    <div class="row my-4">
+                        <div class="col-md-10 mx-auto">
+                            <div class="p-3 border-start border-success border-4 bg-light rounded shadow-sm">
+                                <p class="fw-bold mb-2 text-success">हमेशा की तरह इस साल भी, अपनी संघटना कुछ ऐसे ही काम
+                                    अंजाम देगी:</p>
+                                <ul class="list-unstyled mb-0 ms-2">
+                                    <li class="mb-2"><i
+                                            class="bi bi-check-circle-fill text-success me-2"></i><strong>माली
+                                            मदत</strong> – ज़रूरतमंद परीवार</li>
+                                    <li class="mb-2"><i
+                                            class="bi bi-check-circle-fill text-success me-2"></i><strong>मेडीकल
+                                            मदत</strong> – ज़रूरी इलाज और दवाई</li>
+                                    <li class="mb-0"><i
+                                            class="bi bi-check-circle-fill text-success me-2"></i><strong>तालीमी
+                                            मदत</strong> – स्कुल फीस, किताबें इत्यादी</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-secondary">
+                        <p>इस सिससिले मे हम आपसे इन फंड्स की दरख्वास्त करते है। हालाँकि आप में से कई लोग पहले से ही
+                            अलग-अलग संस्थाओं को मदत देते हैं, जो बहोत अच्छी बात है।</p>
+                        <p class="fw-bold text-dark">इसलिए, हम आप से दरख्वास्त करते है के आप अपनी जकात का एक छोटा सा
+                            हिस्सा हमारी संघटना के लिए भी रखें. ताकी हम सब मिलकर सातारा और करिबी इलाकों मे लोगों की मदत
+                            कर सके।</p>
+                        <p>आपकी दी रक्कम इस मुबारक महीने में किसी भाई या बहन के काम जरूर आऐगी।</p>
+                    </div>
+
+                    <div class="text-center mt-5 pt-3 border-top">
+                        <p class="fst-italic text-muted">अल्लाह (सुब्हानहु व तआला) हमारे रोज़े, नमाज़ और जकात को क़बूल
+                            फ़रमाए और हम सब पर अपनी रहमत नाज़िल करे।</p>
+                        <h3 class="text-success fw-bold">जज़ाकल्लाह ख़ैर।</h3>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-dark text-white p-4">
+                    <div class="row align-items-center">
+                        <div class="col-lg-7 border-end border-secondary mb-4 mb-lg-0">
+                            <h5 class="text-warning fw-bold mb-3"><i class="bi bi-bank me-0"></i>बॅंक कि मालूमात</h5>
+                            <div class="row g-0">
+                                <div class="col-sm-6">
+                                    <p class="mb-1 small text-secondary">Bank Name</p>
+                                    <p class="mb-2">Indian Bank</p>
+                                    <p class="mb-1 small text-secondary">Account Number</p>
+                                    <p class="mb-2 fs-5">7554249332</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p class="mb-1 small text-secondary">Branch</p>
+                                    <p class="mb-2">06408 – Karad</p>
+                                    <p class="mb-1 small text-secondary">IFSC Code</p>
+                                    <p class="mb-0 ">IDIB000K592</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5 ps-lg-5">
+                            <h5 class="text-warning fw-bold mb-3">UPI Code</h5>
+                            <p class="mb-२"><i class="bi bi-telephone me-2 text-success"></i> निचे दिया गया है।</p>
+                        </div>
+
+                        <div class="col-lg-5 ps-lg-5">
+                            <h5 class="text-warning fw-bold mb-3">संपर्क (Contact)</h5>
+                            <p class="mb-2"><i class="bi bi-globe me-2 text-success"></i> <a
+                                    href="https://shikalgar-satara.web.app/"
+                                    class="text-white text-decoration-none">shikalgar-satara.web.app</a></p>
+                            <p class="mb-2"><i class="bi bi-envelope me-2 text-success"></i>
+                                satarashikalgar&#64;gmail.com</p>
+                            <p class="mb-0"><i class="bi bi-telephone me-2 text-success"></i> 9886174607</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- <h4 class="text-center mb-4">सहाय्य डॅशबोर्ड</h4> -->
+            <h4 class="text-center mb-2 bg-warning text-white py-3 rounded">
+                <!-- मागील काही वर्षातील उपलब्धी --> उल्लेखनीय कामगिरी
+            </h4>
+            <h5 class="text-center mb-4">
+                मागील वर्षात आम्ही आपल्या सहकार्याने खालील उपक्रम यशस्वीरीत्या राबवले.
+            </h5>
+            <div class="container my-4">
+                <div class="row g-4">
+                    <!-- आर्थिक सहाय्य -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 shadow-sm text-center">
+                            <div class="card-body">
+                                <h5 class="text-primary">आर्थिक सहाय्य</h5>
+                                <h6 class="fw-bold">कुटुंब संख्या: ३४</h6>
+                                <h3 class="fw-bold">निधी वाटप: ₹ १,४०,०००/-</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- शैक्षणिक सहाय्य -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 shadow-sm text-center">
+                            <div class="card-body">
+                                <h5 class="text-success">शैक्षणिक सहाय्य</h5>
+                                <h6 class="fw-bold">कुटुंब संख्या: ६</h6>
+                                <h3 class="fw-bold">निधी वाटप: ₹ ५०,०००/-</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- वैद्यकीय सहाय्य -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 shadow-sm text-center">
+                            <div class="card-body">
+                                <h5 class="text-danger">वैद्यकीय सहाय्य</h5>
+                                <h6 class="fw-bold">कुटुंब संख्या: ७</h6>
+                                <h3 class="fw-bold">निधी वाटप: ₹ ३५,०००/-</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- शिफारस पत्र -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 shadow-sm text-center">
+                            <div class="card-body">
+                                <h5 class="text-warning">शिफारस पत्र वाटप</h5>
+                                <h3 class="fw-bold">१५०+</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 shadow-sm text-center">
+                            <div class="card-body">
+                                <h5 class="text-success">सभासद नोंदणी फेरफार</h5>
+                                <h3 class="fw-bold">४५०+</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 shadow-sm text-center">
+                            <div class="card-body">
+                                <h5 class="text-danger">देणगीदार</h5>
+                                <h3 class="fw-bold">१२५+</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card h-100 shadow-sm text-center">
+                            <div class="card-body">
+                                <h5 class="text-danger">विचाराधीन</h5>
+                                <h3 class="fw-bold">लघुउदयोग आर्थिक मदत</h3>
+                                <h3 class="fw-bold">दत्तक पालक योजना</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
