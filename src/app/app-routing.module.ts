@@ -21,6 +21,7 @@ import { EventplanningComponent } from './eventplanning/eventplanning.component'
 import { EventhighlightComponent } from './eventhighlight/eventhighlight.component';
 import { AuditsComponent } from './audits/audits.component';
 import { FlashnewsComponent } from './flashnews/flashnews.component';
+import { ZakatcalculatorComponent } from './zakatcalculator/zakatcalculator.component';
 
 const routes: Routes = [
   {
@@ -62,6 +63,10 @@ const routes: Routes = [
   {
     path: 'flashnews',
     component: FlashnewsComponent
+  },
+  {
+    path: 'zakatcalculator',
+    component: ZakatcalculatorComponent
   },
   {
     path: '',

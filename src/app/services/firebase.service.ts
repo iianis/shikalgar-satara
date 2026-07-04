@@ -141,6 +141,7 @@ export class FirebaseService {
   // Function to read Firebase collection and write to CSV
   async exportCollectionToCsv(collectionName: string): Promise<void> {
     try {
+      //debugger;
       // Fetch data from Firebase collection
       const snapshot = await firstValueFrom(this.firestore.collection(collectionName).get());
 

@@ -1,0 +1,202 @@
+<div class="container mt-2 mb-2">
+    <div class="header-banner mb-4 text-center">
+        <img src="assets/images/banner.jpg" class="img-fluid" alt="Header Banner">
+    </div>
+</div>
+<div class="container mt-2">
+    <button class="btn btn-primary me-3" (click)="goBack()">मागे जा</button>
+</div>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-success text-white py-3">
+                    <h3 class="mb-0 text-center">Zakat Calculator</h3>
+                </div>
+                <div class="card-body p-4">
+
+                    <div class="row mb-4 bg-light p-3 rounded">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Gold Rate (per gram) </label>
+                            <p>सोने का मार्केट रेट।</p>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" class="form-control" [(ngModel)]="goldRate">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Silver Rate (per gram) </label>
+                            <p>चांदी का मार्केट रेट।</p>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" class="form-control" [(ngModel)]="silverRate">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Total Gold (Grams) </label>
+                        <p>आपके पास कितना ग्रॅम सोना है?</p>
+                        <input type="number" class="form-control" [(ngModel)]="goldGrams" placeholder="Enter grams">
+                        <small class="text-muted">Value: {{ goldTotal | currency:'INR' }}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Total Silver (Grams) </label>
+                        <p>आपके पास कितना ग्रॅम चांदी है?</p>
+                        <input type="number" class="form-control" [(ngModel)]="silverGrams" placeholder="Enter grams">
+                        <small class="text-muted">Value: {{ silverTotal | currency:'INR' }}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Cash in Hand / Bank Balance </label>
+                        <p>आपके पास कितना रुपिया है? (कॅश या बँक
+                            बॅलेंस वगैरह)</p>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" class="form-control" [(ngModel)]="cashInHand">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Business Stock / Saleable Assets</label>
+                        <p>आपके बिज़नेस स्टॉक की टोटल क़ीमत लिखिए। (हर वो चीज़ जो बेचने की निय्यत से खरीदी गई हो
+                            इसमें शामिल होगी जैसे दुकान का स्टॉक, गाड़ी, घर या जमीन वगैरह...)
+                        </p>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" class="form-control" [(ngModel)]="businessStock">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span><strong>Total Assets (Gross): </strong></span>
+                        <span> ऊपर की चारों चीज़ों का टोटल।</span>
+                        <span class="text-primary fw-bold">{{ grossTotal | currency:'INR' }}</span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-danger fw-bold">Loan/Debt Deduction (Current Year)</label>
+                        <p>क्या आप पर क़र्ज़ है? अगर है तो कितना है?</p>
+                        <label>नोट: अगर क़र्ज़ क़िस्तवार कई सालों में देना हो, तो सिर्फ़ एक साल की रक़म कम करे।</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-danger text-white">₹</span>
+                            <input type="number" class="form-control border-danger" [(ngModel)]="loanAmount">
+                        </div>
+                    </div>
+
+                    <div class="alert alert-secondary d-flex justify-content-between">
+                        <span class="fw-bold">Final Amount :</span>
+                        <span class="fw-bold">{{ netAssets | currency:'INR' }}</span>
+                    </div>
+
+                    <div class="p-3 border rounded mb-4">
+                        <p class="mb-1 text-muted">Nisab Amount: <strong>{{ nisabThreshold | currency:'INR'
+                                }}</strong></p>
+                        <div *ngIf="isEligible" class="text-success fw-bold">
+                            <i class="bi bi-check-circle-fill"></i> You are eligible to pay Zakat. आप पर ज़कात फ़र्ज़
+                            हैं|
+                        </div>
+                        <div *ngIf="!isEligible" class="text-muted italic">
+                            <i class="bi bi-info-circle"></i> Amount is below Nisab. Zakat is not mandatory. आप पर ज़कात
+                            फ़र्ज़ नही हैं|
+                        </div>
+                    </div>
+
+                    <div class="card bg-success text-white text-center p-4" *ngIf="isEligible">
+                        <h5 class="mb-1">Total Zakat Payable (2.5%)</h5>
+                        <h2 class="display-5 fw-bold">{{ zakatPayable | currency:'INR' }}</h2>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container mb-5">
+    <div class="card border-0 shadow-sm bg-light">
+        <div class="card-body p-4 p-md-5">
+
+            <div class="text-center mb-4">
+                <h4 class="fw-bold text-success">आप पर ज़कात फ़र्ज़ हैं? अगर है तो कितनी ? आइए जानते हैं...</h4>
+                <p class="text-muted">इस फ़ॉर्म को नीचे बताए गए तरीके के मुताबिक़ भरते जाए...</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item bg-transparent border-0 ps-0">
+                            <strong>(1) सोना:</strong> आपके पास जितना सोना है उसका आजका मार्केट रेट लिखिए।
+                        </li>
+                        <li class="list-group-item bg-transparent border-0 ps-0">
+                            <strong>(2) चांदी:</strong> आपके पास जितनी चांदी है उसका आजका मार्केट रेट लिखिए।
+                        </li>
+                        <li class="list-group-item bg-transparent border-0 ps-0">
+                            <strong>(3) रुपिया:</strong> आपके पास कितना रुपिया (कॅश या बँक बॅलेंस वगैरह) है? लिखिए।
+                        </li>
+                        <li class="list-group-item bg-transparent border-0 ps-0">
+                            <strong>(4) तिजारत का माल:</strong> आपके बिज़नेस स्टॉक की टोटल क़ीमत लिखिए। (हर वो चीज़ जो
+                            बेचने की निय्यत से खरीदी गई हो इसमें शामिल होगी जैसे दुकान का स्टॉक, गाड़ी, घर या जमीन
+                            वगैरह...)
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 bg-white rounded border">
+                        <p><strong>कुल रक़म:</strong> ऊपर की चारों चीज़ों का टोटल लिखिए।</p>
+                        <p><strong>क़र्ज़:</strong> क्या आप पर क़र्ज़ है? अगर है तो कितना है? लिखिए।</p>
+                        <p class="small text-muted italic">नोट: अगर क़र्ज़ क़िस्तवार कई सालों में देना हो, तो सिर्फ़ एक
+                            साल की रक़म कम करे।</p>
+                        <p class="mb-0"><strong>नतीजा:</strong> अगर बाक़ी रक़म 612.360 ग्रॅम चांदी की क़ीमत (₹
+                            1,83,708/-) के बराबर या ज़्यादा हो, तो <strong>Final Amount / 40</strong> ज़कात आप पर फ़र्ज़
+                            है।</p>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-5">
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <h5 class="text-success fw-bold border-bottom pb-2">ज़कात कहाँ ख़र्च करें?</h5>
+                    <ol class="small mt-3">
+                        <li>ऐसा ग़रीब जिसके पास ज़रूर सामान के सिवा ₹ 1,83,708/- से कम माल हो।</li>
+                        <li>मदरसे</li>
+                        <li>मुस्तहिक़ ज़रूरत मंद क़रीबी रिश्तेदार (भाई-बहन, चचा-चची, फुफा-फुफी, ख़ाला-खालु, मामु-मुमानी,
+                            भांजा-भतीजा, बहू, दामाद)</li>
+                        <li>ऐसा क़र्ज़दार जो अपना क़र्ज़ अदा ना कर सकता हो।</li>
+                    </ol>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <h5 class="text-danger fw-bold border-bottom pb-2">जिनको ज़कात देना जाइज़ नहीं:</h5>
+                    <ol class="small mt-3">
+                        <li>गैर मुस्लिम</li>
+                        <li>वो मुसलमान जिसके पास ₹ 1,83,708/- से ज़्यादा का माल मौजूद हो।</li>
+                        <li>माँ-बाप, दादा-दादी, नाना-नीनी, बेटा-बेटी, पोता-पोती, नवासा-नवासी</li>
+                        <li>मियाँ-बीवी</li>
+                        <li>मस्जिद, स्कूल, कॉलेज, अस्पताल वगैरह की तामीर (Construction) में।</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded border mt-2">
+                <h5 class="fw-bold"><i class="bi bi-info-circle me-2 text-primary"></i>नोट (Important Notes)</h5>
+                <div class="small mt-3 text-secondary">
+                    <p><strong>(1)</strong> ज़कात सिर्फ चार चीज़ों पर फ़र्ज़ है। रहने के घर, घर का सामान, गाड़ी, खेती की
+                        ज़मीन (अगर बेचने की निय्यत ना हो) पर ज़कात नहीं है।</p>
+                    <p><strong>(2)</strong> चांदी के रेट पर हिसाब लगाया जाता है। इस फ़ॉर्म में 23/02/2026 के रेट का
+                        हिसाब है।</p>
+                    <p><strong>(3)</strong> जो रक़म क़र्ज़ के तौर पर दूसरों को दी है, उसकी ज़कात रक़म वापस मिलने के बाद
+                        पिछले सालों की भी देना ज़रूरी होगा।</p>
+                    <p><strong>(4)</strong> मौजूदा तमाम माल पर ज़कात निकाली जाएगी, चाहे उस पर मुकम्मल साल गुज़रा हो या
+                        ना हो।</p>
+                    <p><strong>(5)</strong> खरीदे हुए शेअर्स पर आज की मार्केट वैल्यू के हिसाब से ज़कात फ़र्ज़ होगी।</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

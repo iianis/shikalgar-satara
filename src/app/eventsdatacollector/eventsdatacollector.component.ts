@@ -139,6 +139,25 @@ export class EventsDataCollectorComponent {
         this.firebaseService.exportCollectionToCsv(this.masterdata);
     }
 
+    // 1. Define the flag
+    canImport: boolean = false;
+
+    // 2. Handle the manual click
+    onImportClick(fileInput: HTMLInputElement) {
+        // Final safety check
+        if (this.canImport && fileInput.files && fileInput.files.length > 0) {
+            // Pass the dummy event object or modify goImportData to accept FileList
+            const mockEvent = { target: fileInput };
+            this.goImportData(mockEvent);
+
+            // Optional: Reset after import
+            this.canImport = false;
+            fileInput.value = '';
+        } else {
+            alert("Please select a file and confirm the checkbox.");
+        }
+    }
+
     goImportData(event: any): void {
         console.log("importing into master data: " + this.masterdata);
         const file: File = event.target.files[0];

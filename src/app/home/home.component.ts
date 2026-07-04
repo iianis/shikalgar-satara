@@ -1,7 +1,10 @@
 import { Component, ElementRef, inject, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirebaseService } from '../../app/services/firebase.service';
-import { AdsPopupComponent } from '../advertisement/ads-popup/ads-popup.component';
+//import { AdsPopupComponent } from '../advertisement/ads-popup/ads-popup.component';
+// Flash marque news
+//इयत्ता दहावीच्या परीक्षेत यशस्वी सर्व विद्यार्थी व पालकांना अनेक शुभेच्छा ।
+
 
 @Component({
   selector: 'app-home',
@@ -17,7 +20,7 @@ export class HomeComponent implements OnInit {
   firebaseService = inject(FirebaseService);
   appsettings: any = [];
   masterdata: any = [];
-  charityCount = 42;
+  charityCount = 68;
   isTesting: boolean = false;
 
   ngOnInit(): void {
@@ -87,4 +90,6 @@ export class HomeComponent implements OnInit {
       }, 2000); // Hide the message after 3 seconds
     }
   }
+
 }
+

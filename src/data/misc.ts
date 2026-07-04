@@ -51,7 +51,7 @@ export const directors = [
     { name: "ज. दिलावर शिकलगार", village: "उंब्रज", taluka: "कराड", designation: "ख़ज़िनदार", phone: 9975140777, order: 4 },
     { name: "ज. गुलामनबी शिकलगार", village: "मलकापुर", taluka: "कराड", designation: "सदस्य", phone: 9822091497, order: 5 },
     { name: "ज. दस्तगीर शिकलगार", village: "कोरेगांव", taluka: "कोरेगांव", designation: "सदस्य", phone: 9922137676, order: 6 },
-    { name: "म. ज. नसीम शिकलगार", village: "वर्धनगड", taluka: "खटाव", designation: "सदस्य", phone: 9923876637, order: 99 },
+    { name: "म. ज. नसीम शिकलगार", village: "वर्धनगड", taluka: "खटाव", designation: "सदस्य", phone: 0, order: 99 },
     { name: "ज. मौलाअली शिकलगार", village: "शेणोली", taluka: "कराड", designation: "सदस्य", phone: 9730934326, order: 8 },
     { name: "ज. आज़म शिकलगार", village: "सातारा", taluka: "सातारा", designation: "सदस्य", phone: 7875714541, order: 9 },
     { name: "ज. दस्तगीर शिकलगार", village: "कराड", taluka: "कराड", designation: "सदस्य", phone: 9021017511, order: 10 },
@@ -76,10 +76,12 @@ export const scholarships = [
 export const
     charities = [
         {
-            name: "शैक्षणिक मदत", village: "सातारा", desc: "1. एक विद्यार्थीनी D. Pharm चे शिक्षण घेत आहे जिच्या पालकांची आमदनी बेताची आहे. 2. एक जोडप ज्यांचं हातावरचं पोट, दोन शाळकरी मुलींचे संगोपन करत आहेत", donations: 5, order: 1, familiesByTaluka: [
-                { taluka: "सातारा", count: 2 },
+            // name: "शैक्षणिक मदत", village: "सातारा", desc: "1. एक विद्यार्थीनी D. Pharm चे शिक्षण घेत आहे जिच्या पालकांची आमदनी बेताची आहे. 2. एक जोडप ज्यांचं हातावरचं पोट, दोन शाळकरी मुलींचे संगोपन करत आहेत", donations: 5, order: 1, familiesByTaluka: [
+            name: "शैक्षणिक मदत", village: "सातारा", desc: "होतकरू आणि गरजु विद्यार्थी यांना मदत करून, आपल्या समाजाचा पाया भक्कम करण्याचा निर्धार.", donations: 5, order: 1,
+            familiesByTaluka: [
+                { taluka: "सातारा", count: 2 + 2 },
                 //{ taluka: "कराड", count: 0 },
-                { taluka: "खटाव ", count: 2 },
+                { taluka: "खटाव ", count: 2 + 2 },
                 //{ taluka: "कोरेगांव", count: 0 },
                 //{ taluka: "माण", count: 0 },
                 //{ taluka: "फलटण", count: 0 },
@@ -89,10 +91,12 @@ export const
             ]
         },
         {
-            name: "वैद्यकीय मदत", village: "नागठाणे", desc: "1. एक कुटूंब प्रमुख ह्रदयविकार रूग्ण, ४-६ महिने दवाखाना, कमावण्याच्या स्थितीत नाही. 2. एक कुटुंब ज्यांचा तरूण मुलगा मणक्यांच्या विकाराने त्रस्त आहे. 3. कुटूंब प्रमुख आणि पत्नी दोघं अपघातग्रस्त, काही महिने घरातच रहाव लागले.", donations: 5, order: 2, familiesByTaluka: [
+            //name: "वैद्यकीय मदत", village: "नागठाणे", desc: "1. एक कुटूंब प्रमुख ह्रदयविकार रूग्ण, ४-६ महिने दवाखाना, कमावण्याच्या स्थितीत नाही. 2. एक कुटुंब ज्यांचा तरूण मुलगा मणक्यांच्या विकाराने त्रस्त आहे. 3. कुटूंब प्रमुख आणि पत्नी दोघं अपघातग्रस्त, काही महिने घरातच रहाव लागले.", donations: 5, order: 2, familiesByTaluka: [
+            name: "वैद्यकीय मदत", village: "नागठाणे", desc: "जेष्ठ नागरिक / गरजू कुटूंबांना वैद्यकीय मदत.", donations: 5, order: 2,
+            familiesByTaluka: [
                 { taluka: "सातारा", count: 2 },
                 { taluka: "कराड", count: 1 },
-                { taluka: "खटाव ", count: 1 },
+                { taluka: "खटाव ", count: 1 + 1 },
                 { taluka: "कोरेगांव", count: 0 },
                 { taluka: "माण", count: 2 },
                 //{ taluka: "फलटण", count: 0 },
@@ -102,12 +106,28 @@ export const
             ]
         },
         {
-            name: "आर्थिक मदत", village: "विरळी", desc: "1. जेष्ठ नागरिक आपल्या पत्नी व सुने बरोबर राहतात, ज्यांचा तरूण मुलगा स्वर्गवासी झाला. 2. विधवा महिला आपल्या प्रौढ मुलीची शुश्रुषा करत आहे.", donations: 6, order: 3, familiesByTaluka: [
-                { taluka: "सातारा", count: 8 },
-                { taluka: "कराड", count: 11 },
-                { taluka: "खटाव ", count: 6 },
-                { taluka: "कोरेगांव", count: 6 },
-                { taluka: "माण", count: 2 },
+            //name: "आर्थिक मदत", village: "विरळी", desc: "1. जेष्ठ नागरिक आपल्या पत्नी व सुने बरोबर राहतात, ज्यांचा तरूण मुलगा स्वर्गवासी झाला. 2. विधवा महिला आपल्या प्रौढ मुलीची शुश्रुषा करत आहे.", donations: 6, order: 3, familiesByTaluka: [
+            name: "आर्थिक मदत", village: "विरळी", desc: "जेष्ठ नागरिक / विधवा महिला / गरजू कुटूंबांना आर्थिक मदत.", donations: 6, order: 3,
+            familiesByTaluka: [
+                { taluka: "सातारा", count: 8 + 3 },
+                { taluka: "कराड", count: 11 + 5 },
+                { taluka: "खटाव ", count: 6 + 5 },
+                { taluka: "कोरेगांव", count: 6 + 3 },
+                { taluka: "माण", count: 2 + 1 },
+                //{ taluka: "फलटण", count: 0 },
+                //{ taluka: "वाई", count: 0 },
+                //{ taluka: "खंडाळा", count: 0 },
+                //{ taluka: "पाटण", count: 0 },
+            ]
+        },
+        {
+            name: "लघुउद्योग मदत", village: "कराड", desc: "तरूण होतकरू गरजु लघुउद्योजकांना मदत करण्याचा, तसेच सहकारी तत्वावर लघु उद्योग प्रकल्प विचाराधीन.", donations: 6, order: 4,
+            familiesByTaluka: [
+                { taluka: "सातारा", count: 0 },
+                { taluka: "कराड", count: 0 },
+                { taluka: "खटाव ", count: 0 },
+                { taluka: "कोरेगांव", count: 0 },
+                { taluka: "माण", count: 0 },
                 //{ taluka: "फलटण", count: 0 },
                 //{ taluka: "वाई", count: 0 },
                 //{ taluka: "खंडाळा", count: 0 },

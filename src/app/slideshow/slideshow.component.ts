@@ -10,32 +10,24 @@ import { setThrowInvalidWriteToSignalError } from '@angular/core/primitives/sign
 export class SlideshowComponent {
     slides = [
         { title: "", image: "/assets/images/slide1.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/gallery/2026/61.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide7.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/gallery/2026/62.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/gallery/2026/4.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/gallery/2026/9.JPG", header1: "", header2: "" },
-        { title: "", image: "/assets/gallery/2026/11.JPG", header1: "", header2: "" },
-        { title: "", image: "/assets/gallery/2026/57.jpg", header1: "", header2: "" },
-
-        { title: "", image: "/assets/gallery/2026/55.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/gallery/2026/60.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/gallery/2026/63.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/gallery/2026/8.JPG", header1: "", header2: "" },
-
-        //{ title: "", image: "/assets/images/slide10.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide11.jpeg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide2.jpg", header1: "", header2: "" },
-        //{ title: "", image: "/assets/images/slide3.jpg", header1: "", header2: "" },
-        //{ title: "", image: "/assets/images/slide4.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide5.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide6.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide8.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide9.jpg", header1: "", header2: "" },
-        { title: "", image: "/assets/images/slide12.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/0.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/9.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/11.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/1.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/2.jpeg", header1: "", header2: "" },
+        //{ title: "", image: "/assets/gallery/2026-27/14.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/4.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/5.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/6.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/7.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/8.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/10.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/12.jpeg", header1: "", header2: "" },
+        { title: "", image: "/assets/gallery/2026-27/13.jpeg", header1: "", header2: "" },
+        //{ title: "", image: "/assets/images/slide9.jpeg", header1: "", header2: "" },
+        //{ title: "", image: "/assets/gallery/2026-27/62.jpg", header1: "", header2: "" },
     ];
 }
-
 
 // slide 1 - dharwala
 // slide 2 - karishma

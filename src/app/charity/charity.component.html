@@ -10,8 +10,65 @@
     </div>
 </div>
 <div class="container mt-3">
+
+    <div class="card shadow border-0 mt-4">
+        <div class="card-header bg-primary text-white py-3 text-center">
+            <h5 class="mb-0">गरजू कुटुंबांची मदत ( वार्षिक अहवाल )</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light text-center">
+                        <tr>
+                            <th>वर्ष</th>
+                            <th>मदत</th>
+                            <th>लाभार्थी</th>
+                            <th>वाटप</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Outer Loop: For each Year -->
+                        <ng-container *ngFor="let group of groupedByYear">
+                            <!-- Inner Loop: For each Type within that year -->
+                            <tr *ngFor="let item of group.data; let first = first">
+                                <!-- Only show the Year cell on the first row of the group -->
+                                <td *ngIf="first" [attr.rowspan]="group.data.length + 1"
+                                    class="text-center fw-bold bg-light">
+                                    {{ group.year }}
+                                </td>
+                                <td>
+                                    <span [ngClass]="{
+                  'badge rounded-pill bg-info text-dark': item.type === 'आर्थिक',
+                  'badge rounded-pill bg-success': item.type === 'शैक्षणिक',
+                  'badge rounded-pill bg-danger': item.type === 'वैद्यकीय',
+                  'badge rounded-pill bg-warning text-dark': item.type === 'लघुउद्योग',
+                  'badge rounded-pill bg-secondary': item.type === 'इतर'
+                }" class="px-3">
+                                        {{ item.type }}
+                                    </span>
+                                </td>
+                                <td class="text-center">{{ item.charityCount || 0 }}</td>
+                                <td class="text-end pe-4 fw-semibold">₹{{ item.charityAmount | number }}
+                                </td>
+                            </tr>
+
+                            <!-- Summary Row for the specific year -->
+                            <tr class="table-light">
+                                <td class="text-end fw-bold italic">एकूण:</td>
+                                <td class="text-center fw-bold">{{ group.totalCount }}</td>
+                                <td class="text-end pe-4 fw-bold text-primary">₹{{ group.totalAmount |
+                                    number }}</td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <br>
+    <hr>
     <div class="card mt-2">
-        <div class="card-header fs-4">तालुका निहाय लाभार्थी कुटुंब</div>
+        <div class="card-header fs-4 text-center">तालुका निहाय लाभार्थी कुटुंब</div>
     </div>
     <div *ngFor="let item of charities">
         <div class="card mt-2">
