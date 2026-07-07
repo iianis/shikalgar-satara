@@ -1,11 +1,17 @@
 <div class="container mt-3">
 
+    <div class="d-flex justify-content-center mb-4">
+        <div class="overflow-hidden rounded shadow-sm" style="max-width: 380px; width: 100%;">
+            <img src="assets/images/banner.jpeg" alt="Annual Report Banner" class="img-fluid w-100 h-auto d-block">
+        </div>
+    </div>
     <div class="card shadow border-0 mt-4">
         <div class="card-header bg-primary text-white py-3 text-center">
             <h5 class="mb-0">गरजू कुटुंबांची मदत ( वार्षिक अहवाल )</h5>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
+                <!-- Added .table-separate to allow independent body spacing if needed -->
                 <table class="table table-bordered align-middle mb-0">
                     <thead class="table-light text-center">
                         <tr>
@@ -15,40 +21,43 @@
                             <th>वाटप</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Outer Loop: For each Year -->
-                        <ng-container *ngFor="let group of groupedByYear">
-                            <!-- Inner Loop: For each Type within that year -->
-                            <tr *ngFor="let item of group.data; let first = first">
-                                <!-- Only show the Year cell on the first row of the group -->
-                                <td *ngIf="first" [attr.rowspan]="group.data.length + 1"
-                                    class="text-center fw-bold bg-light">
-                                    {{ group.year }}
-                                </td>
-                                <td>
-                                    <span [ngClass]="{
-                  'badge rounded-pill bg-info text-dark': item.type === 'आर्थिक',
-                  'badge rounded-pill bg-success': item.type === 'शैक्षणिक',
-                  'badge rounded-pill bg-danger': item.type === 'वैद्यकीय',
-                  'badge rounded-pill bg-warning text-dark': item.type === 'लघुउद्योग',
-                  'badge rounded-pill bg-secondary': item.type === 'इतर'
-                }" class="px-3">
-                                        {{ item.type }}
-                                    </span>
-                                </td>
-                                <td class="text-center">{{ item.charityCount || 0 }}</td>
-                                <td class="text-end pe-4 fw-semibold">₹{{ item.charityAmount | number }}
-                                </td>
-                            </tr>
 
-                            <!-- Summary Row for the specific year -->
-                            <tr class="table-light">
-                                <td class="text-end fw-bold italic">एकूण:</td>
-                                <td class="text-center fw-bold">{{ group.totalCount }}</td>
-                                <td class="text-end pe-4 fw-bold text-primary">₹{{ group.totalAmount |
-                                    number }}</td>
-                            </tr>
-                        </ng-container>
+                    <!-- Loop the entire <tbody> tag for each year group -->
+                    <!-- The 'border-bottom-custom' adds separation between different year groups -->
+                    <tbody *ngFor="let group of groupedByYear; let last = last" [class.border-bottom-spacer]="!last">
+
+                        <!-- Inner Loop: Items for this specific year -->
+                        <tr *ngFor="let item of group.data; let idx = index"
+                            [style.display]="item.charityAmount === 0 ? 'none' : 'table-row'">
+
+                            <!-- Year Cell -->
+                            <td *ngIf="isFirstVisible(group.data, idx)" [attr.rowspan]="getVisibleCount(group.data) + 1"
+                                class="text-center fw-bold bg-light">
+                                {{ group.year }}
+                            </td>
+
+                            <td>
+                                <span [ngClass]="{
+                                  'badge rounded-pill bg-info text-dark': item.type === 'आर्थिक' || item.type === 'oldvalue',
+                                  'badge rounded-pill bg-success': item.type === 'शैक्षणिक',
+                                  'badge rounded-pill bg-danger': item.type === 'वैद्यकीय',
+                                  'badge rounded-pill bg-warning text-dark': item.type === 'लघुउद्योग',
+                                  'badge rounded-pill bg-secondary': item.type === 'इतर'
+                                }" class="px-3 text-wrap text-start text-sm-center d-inline-block"
+                                    style="max-width: 150px;">
+                                    {{ item.type === 'इतर' ? 'नैसर्गिक आपत्ती' : item.type }}
+                                </span>
+                            </td>
+                            <td class="text-center">{{ item.charityCount || 0 }}</td>
+                            <td class="text-end pe-4 fw-semibold">₹{{ item.charityAmount | number }}</td>
+                        </tr>
+
+                        <!-- Summary Row for this specific year -->
+                        <tr class="table-light">
+                            <td class="text-end fw-bold italic">एकूण:</td>
+                            <td class="text-center fw-bold">{{ group.totalCount }}</td>
+                            <td class="text-end pe-4 fw-bold text-primary">₹{{ group.totalAmount | number }}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

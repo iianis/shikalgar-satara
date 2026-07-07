@@ -206,6 +206,12 @@ export class FlashnewsComponent {
   }
 
   charityChart: CharityRecord[] = [
+    { year: "2026-27", type: "आर्थिक", charityCount: 2, charityAmount: 10000 },
+    { year: "2026-27", type: "शैक्षणिक", charityCount: 1, charityAmount: 10000 },
+    { year: "2026-27", type: "वैद्यकीय", charityCount: 1, charityAmount: 5000 },
+    { year: "2026-27", type: "लघुउद्योग", charityCount: 0, charityAmount: 0 },
+    { year: "2026-27", type: "इतर", charityCount: 1, charityAmount: 0 },
+
     { year: "2025-26", type: "आर्थिक", charityCount: 22, charityAmount: 110000 },
     { year: "2025-26", type: "शैक्षणिक", charityCount: 4, charityAmount: 40000 },
     { year: "2025-26", type: "वैद्यकीय", charityCount: 1, charityAmount: 5000 },
@@ -245,6 +251,16 @@ export class FlashnewsComponent {
       totalAmount: groups[year].reduce((sum, current) => sum + current.charityAmount, 0),
       totalCount: groups[year].reduce((sum, current) => sum + (current.charityCount || 0), 0)
     }));
+  }
+  // Checks if this index is the first row that actually has an amount > 0
+  isFirstVisible(data: any[], currentIndex: number): boolean {
+    const firstVisibleIndex = data.findIndex(item => item.charityAmount !== 0);
+    return currentIndex === firstVisibleIndex;
+  }
+
+  // Dynamically scales down the rowspan box so it matches only the rows showing up
+  getVisibleCount(data: any[]): number {
+    return data.filter(item => item.charityAmount !== 0).length;
   }
 }
 

@@ -20,7 +20,7 @@ export class HomeComponent implements OnInit {
   firebaseService = inject(FirebaseService);
   appsettings: any = [];
   masterdata: any = [];
-  charityCount = 68;
+  charityCount = 72;
   isTesting: boolean = false;
 
   ngOnInit(): void {
