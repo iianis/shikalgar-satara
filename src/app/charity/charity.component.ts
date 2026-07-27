@@ -54,6 +54,12 @@ export class CharityComponent {
     }
 
     charityChart: CharityRecord[] = [
+        { year: "2026-27", type: "आर्थिक", charityCount: 3, charityAmount: 15000 },
+        { year: "2026-27", type: "शैक्षणिक", charityCount: 3, charityAmount: 30000 },
+        { year: "2026-27", type: "वैद्यकीय", charityCount: 1, charityAmount: 5000 },
+        { year: "2026-27", type: "लघुउद्योग", charityCount: 0, charityAmount: 0 },
+        { year: "2026-27", type: "इतर", charityCount: 0, charityAmount: 0 },
+
         { year: "2025-26", type: "आर्थिक", charityCount: 22, charityAmount: 110000 },
         { year: "2025-26", type: "शैक्षणिक", charityCount: 4, charityAmount: 40000 },
         { year: "2025-26", type: "वैद्यकीय", charityCount: 1, charityAmount: 5000 },

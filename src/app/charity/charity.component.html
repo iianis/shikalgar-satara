@@ -38,13 +38,14 @@
                                 </td>
                                 <td>
                                     <span [ngClass]="{
-                  'badge rounded-pill bg-info text-dark': item.type === 'आर्थिक',
-                  'badge rounded-pill bg-success': item.type === 'शैक्षणिक',
-                  'badge rounded-pill bg-danger': item.type === 'वैद्यकीय',
-                  'badge rounded-pill bg-warning text-dark': item.type === 'लघुउद्योग',
-                  'badge rounded-pill bg-secondary': item.type === 'इतर'
-                }" class="px-3">
-                                        {{ item.type }}
+                                  'badge rounded-pill bg-info text-dark': item.type === 'आर्थिक' || item.type === 'oldvalue',
+                                  'badge rounded-pill bg-success': item.type === 'शैक्षणिक',
+                                  'badge rounded-pill bg-danger': item.type === 'वैद्यकीय',
+                                  'badge rounded-pill bg-warning text-dark': item.type === 'लघुउद्योग',
+                                  'badge rounded-pill bg-secondary': item.type === 'इतर'
+                                }" class="px-3 text-wrap text-start text-sm-center d-inline-block"
+                                        style="max-width: 150px;">
+                                        {{ item.type === 'इतर' ? 'नैसर्गिक आपत्ती' : item.type }}
                                     </span>
                                 </td>
                                 <td class="text-center">{{ item.charityCount || 0 }}</td>
