@@ -1,0 +1,256 @@
+<div class="farm-container container-fluid p-4">
+    <header class="mb-4">
+        <h1 class="h3 fw-bold text-dark">कुळकजाई फार्म - अकाउंटिंग</h1>
+        <p class="text-muted">पशूपालन, कुक्कुटपालन, पिके आणि मजुरी आदी खर्चाची नोंद.</p>
+    </header>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col">
+            <div class="card border shadow-sm p-3">
+                <span class="text-muted small fw-medium">भांडवल (गुंतवणूक)</span>
+                <span class="fs-4 fw-bold text-primary">₹{{ ownerCapitalInjected() | number:'1.2-2' }}</span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border shadow-sm p-3">
+                <span class="text-muted small fw-medium">शेताचे उत्पन्न (विक्री)</span>
+                <span class="fs-4 fw-bold text-success">₹{{ operationalCredit() | number:'1.2-2' }}</span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border shadow-sm p-3">
+                <span class="text-muted small fw-medium">एकूण खर्च</span>
+                <span class="fs-4 fw-bold text-danger">₹{{ totalDebit() | number:'1.2-2' }}</span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border shadow-sm p-3">
+                <span class="text-muted small fw-medium">निव्वळ नफा / तोटा</span>
+                <span class="fs-4 fw-bold" [ngClass]="netOperatingProfit() < 0 ? 'text-danger' : 'text-success'">
+                    ₹{{ netOperatingProfit() | number:'1.2-2' }}
+                </span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border shadow-sm p-3">
+                <span class="text-muted small fw-medium">एकूण शिल्लक रक्कम (कॅश)</span>
+                <span class="fs-4 fw-bold text-dark">₹{{ totalCashOnHand() | number:'1.2-2' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Accordion Container -->
+    <div class="accordion d-flex flex-column gap-3" id="farmAccordion">
+
+        <!-- Accordion Item 1: Add New Account & Add Transaction (Forms) -->
+        <div class="accordion-item shadow-sm rounded border">
+            <h2 class="accordion-header" id="dataentryForms">
+                <button class="accordion-button fw-bold fs-6" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseForms" aria-expanded="true" aria-controls="collapseForms">
+                    जमा / खर्च नोंदणी (Data Entry Forms)
+                </button>
+            </h2>
+            <div id="collapseForms" class="accordion-collapse collapse show" aria-labelledby="headingForms">
+                <div class="accordion-body bg-light">
+                    <div class="row g-4">
+
+                        <!-- Form 2: Add Daily Transaction -->
+                        <div class="col-md-7">
+                            <div class="card h-100 border-0 shadow-sm p-3">
+                                <h6 class="fw-bold mb-3 border-bottom pb-2">व्यवहाराची नोंद करा (Daily Transaction
+                                    Entry)</h6>
+                                <form (ngSubmit)="addTransaction()" class="d-flex flex-column gap-3">
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold">खाते निवडा</label>
+                                            <select class="form-select" [(ngModel)]="newTxAccountId" name="txAccount"
+                                                required>
+                                                <option value="" disabled>खाते निवडा</option>
+                                                <option *ngFor="let acc of accounts()" [value]="acc.id">
+                                                    {{ acc.name }} ({{ acc.category }})
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold">जमा / खर्च</label>
+                                            <select class="form-select" [(ngModel)]="newTxType" name="txType">
+                                                <option value="CREDIT">जमा (Credit - उत्पन्न / विक्री)</option>
+                                                <option value="DEBIT">नावे (Debit - खर्च / खरेदी)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold">दिनांक</label>
+                                            <input type="date" class="form-control" [(ngModel)]="newTxDate"
+                                                name="txDate" required />
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small fw-bold">रक्कम (₹)</label>
+                                            <input type="number" class="form-control" [(ngModel)]="newTxAmount"
+                                                name="txAmount" placeholder="0.00" min="1" required />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label small fw-bold">तपशील</label>
+                                        <input type="text" class="form-control" [(ngModel)]="newTxTitle" name="txTitle"
+                                            placeholder="उदा. २० पोती खत खरेदी, जनावरांचा चारा" required />
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label small fw-bold">अधिक माहिती</label>
+                                        <input type="text" class="form-control" [(ngModel)]="newTxNotes" name="txNotes"
+                                            placeholder="इतर तपशील..." />
+                                    </div>
+
+                                    <button type="submit" class="btn btn-success w-100">नोंद करा</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item shadow-sm rounded border">
+            <h2 class="accordion-header" id="headingAccts">
+                <button class="accordion-button fw-bold fs-6 collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseAccts" aria-expanded="false" aria-controls="collapseAccts">
+                    नवीन खाते नोंद
+                </button>
+            </h2>
+            <div id="collapseAccts" class="accordion-collapse collapse" aria-labelledby="headingAccts">
+                <div class="accordion-body bg-light">
+                    <div class="row g-4">
+                        <!-- Form 1: Add Account Head -->
+                        <div class="col-md-5">
+                            <div class="card h-100 border-0 shadow-sm p-3">
+                                <h6 class="fw-bold mb-3 border-bottom pb-2">नवीन खाते (Account Head) जोडा</h6>
+                                <form (ngSubmit)="addAccount()" class="d-flex flex-column gap-3">
+                                    <div>
+                                        <label class="form-label small fw-bold">खात्याचे नाव</label>
+                                        <input type="text" class="form-control" [(ngModel)]="newAccountName"
+                                            name="accName" placeholder="उदा. शेळीपालन, गहू पेरा २०२६" required />
+                                    </div>
+                                    <div>
+                                        <label class="form-label small fw-bold">वर्गवारी (Category)</label>
+                                        <select class="form-select" [(ngModel)]="newAccountCategory" name="accCategory">
+                                            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary w-100">खाते तयार करा</button>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion Item 2: Account Breakdown Report -->
+        <div class="accordion-item shadow-sm rounded border">
+            <h2 class="accordion-header" id="headingReport">
+                <button class="accordion-button fw-bold fs-6 collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseReport" aria-expanded="false" aria-controls="collapseReport">
+                    खातेनिहाय अहवाल (Account Report)
+                </button>
+            </h2>
+            <div id="collapseReport" class="accordion-collapse collapse" aria-labelledby="headingReport">
+                <div class="accordion-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>खात्याचे नाव</th>
+                                    <th>वर्गवारी</th>
+                                    <th>एकूण जमा (उत्पन्न)</th>
+                                    <th>एकूण नावे (खर्च)</th>
+                                    <th>निव्वळ शिल्लक</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let report of accountReports()">
+                                    <td><strong>{{ report.accountName }}</strong></td>
+                                    <td><span class="badge bg-secondary">{{ report.category }}</span></td>
+                                    <td class="text-success">₹{{ report.totalCredit | number:'1.2-2' }}</td>
+                                    <td class="text-danger">₹{{ report.totalDebit | number:'1.2-2' }}</td>
+                                    <td [ngClass]="report.netBalance >= 0 ? 'text-success' : 'text-danger'">
+                                        ₹{{ report.netBalance | number:'1.2-2' }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion Item 3: Transaction Ledger -->
+        <div class="accordion-item shadow-sm rounded border">
+            <h2 class="accordion-header d-flex align-middle" id="headingLedger">
+                <button class="accordion-button fw-bold fs-6 collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseLedger" aria-expanded="false" aria-controls="collapseLedger">
+                    खाते वही (Transaction Ledger)
+                </button>
+            </h2>
+            <div id="collapseLedger" class="accordion-collapse collapse" aria-labelledby="headingLedger">
+                <div class="accordion-body p-0">
+                    <!-- Filter Toolbar inside body -->
+                    <div
+                        class="p-3 bg-light border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <span class="small fw-bold text-muted">सर्व नोंदवलेले व्यवहार:</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="small text-nowrap fw-bold mb-0">वर्गवारीनुसार फिल्टर:</label>
+                            <select class="form-select form-select-sm" [ngModel]="selectedCategoryFilter()"
+                                (ngModelChange)="selectedCategoryFilter.set($event)">
+                                <option value="ALL">सर्व वर्गवारी (All Categories)</option>
+                                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>दिनांक</th>
+                                    <th>खाते</th>
+                                    <th>तपशील</th>
+                                    <th>प्रकार</th>
+                                    <th>रक्कम (₹)</th>
+                                    <!-- <th>टीप</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let tx of filteredTransactions()">
+                                    <td>{{ tx.date }}</td>
+                                    <td>{{ getAccountName(tx.accountId) }}</td>
+                                    <td><strong>{{ tx.title }}</strong></td>
+                                    <td>
+                                        <span class="badge"
+                                            [ngClass]="tx.type === 'CREDIT' ? 'bg-success' : 'bg-danger'">
+                                            {{ tx.type === 'CREDIT' ? 'जमा' : 'नावे' }}
+                                        </span>
+                                    </td>
+                                    <td [ngClass]="tx.type === 'CREDIT' ? 'text-success' : 'text-danger'">
+                                        ₹{{ tx.amount | number:'1.2-2' }}
+                                    </td>
+                                    <!-- <td class="text-muted">{{ tx.notes || '-' }}</td> -->
+                                </tr>
+                                <tr *ngIf="filteredTransactions().length === 0">
+                                    <td colspan="6" class="text-center text-muted p-3">या फिल्टरसाठी कोणत्याही नोंदी
+                                        आढळल्या नाहीत.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
