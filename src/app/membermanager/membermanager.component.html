@@ -1,0 +1,403 @@
+<div class="container mt-2 mb-4">
+    <div class="header-banner mb-4 text-center">
+        <img src="assets/images/banner.jpg" class="img-fluid" alt="Header Banner">
+    </div>
+</div>
+<div class="container my-4">
+
+    <!-- STEP 1: Phone Search -->
+    <div *ngIf="step === 'search'" class="row justify-content-center">
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">सभासद शोधा</h5>
+                    <button class="btn btn-sm btn-light" (click)="goBack()">मागे जा</button>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">मोबाईल नंबरचा वापर करा</label>
+                        <div class="input-group">
+                            <span class="input-group-text">+91</span>
+                            <input type="tel" class="form-control" [formControl]="searchPhoneControl"
+                                [class.is-invalid]="searchPhoneControl.touched && searchPhoneControl.invalid"
+                                placeholder="10 अंकी मोबाईल नंबर" (keyup.enter)="searchMember()" />
+                        </div>
+                        <div *ngIf="searchPhoneControl.touched && searchPhoneControl.invalid"
+                            class="text-danger small mt-1">
+                            कृपया वैध 10 अंकी नंबर टाका.
+                        </div>
+                    </div>
+                    <button class="btn btn-primary w-100 fw-semibold" (click)="searchMember()" [disabled]="isLoading">
+                        {{ isLoading ? 'शोधत आहे...' : 'शोधा' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 2: Results Found -->
+    <div *ngIf="step === 'results'" class="row justify-content-center">
+        <div class="col-12 col-md-8">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-success text-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">सभासद सापडले</h5>
+                    <button class="btn btn-sm btn-light" (click)="resetSearch()">नवीन शोध</button>
+                </div>
+                <div class="card-body p-3">
+                    <div class="list-group">
+                        <button *ngFor="let member of foundMembers" type="button"
+                            class="list-group-item list-group-item-action p-3 d-flex justify-content-between align-items-center"
+                            [ngClass]="{
+        'bg-light text-muted border-start border-danger border-4': (member.active ?? true) === false,
+        'border-start border-success border-4': (member.active ?? true) === true
+    }" (click)="selectMemberToEdit(member)">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <h6 class="mb-0 fw-bold" [class.text-dark]="member.active ?? true">
+                                        {{ member.initial }} {{ member.fname }} {{ member.lname }}
+                                    </h6>
+                                    <!-- Status Badges -->
+                                    <span *ngIf="member.active ?? true" class="badge bg-success">सक्रिय</span>
+                                    <span *ngIf="(member.active ?? true) === false"
+                                        class="badge bg-danger">निष्क्रिय</span>
+                                    <span *ngIf="member.alive === false" class="badge bg-secondary">मरहूम</span>
+                                </div>
+                                <p class="mb-0 small text-muted">
+                                    {{ member.designation }}
+                                </p>
+                                <p class="mb-0 small text-muted">
+                                    {{ member.address ? member.address + ', ' : '' }}{{ member.village }} - {{
+                                    member.taluka }}
+                                </p>
+                                <small class="text-muted">फोन: +91 {{ member.phone }}</small>
+                            </div>
+                            <span class="btn btn-sm"
+                                [ngClass]="(member.active ?? true) ? 'btn-outline-primary' : 'btn-outline-secondary'">
+                                निवडा & संपादित करा
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 3: Not Found Prompt -->
+    <div *ngIf="step === 'not-found'" class="row justify-content-center">
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm border-0 text-center p-4">
+                <h5 class="text-warning fw-bold mb-3">सभासद सापडला नाही</h5>
+                <p class="text-muted mb-4">
+                    '{{ searchPhoneControl.value }}' या नंबरवर कोणतीही नोंद आढळली नाही. आपण नवीन सभासद नोंदणी करू
+                    इच्छिता?
+                </p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-outline-secondary" (click)="resetSearch()">रद्द करा</button>
+                    <button class="btn btn-primary fw-semibold" (click)="startNewMemberCreation()">+ नवीन सभासद
+                        जोडा</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 4: Member Form (Create / Edit) -->
+    <div *ngIf="step === 'form'" class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 fw-bold">
+                {{ isEditMode ? 'सभासद माहिती संपादित करा' : 'नवीन सभासद नोंदणी' }}
+            </h4>
+            <button class="btn btn-sm btn-light" (click)="resetSearch()">मागे जा</button>
+        </div>
+
+        <div class="card-body p-3 p-md-4">
+            <form [formGroup]="memberForm" (ngSubmit)="onSubmit()">
+
+                <!-- Primary Info -->
+                <div class="card mb-4 border-light-subtle">
+                    <div class="card-header bg-light fw-semibold text-secondary">
+                        सभासद माहिती
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-6 col-sm-4 col-md-2">
+                                <label class="form-label small text-muted"> <span class="text-danger">*</span></label>
+                                <select class="form-select form-select-sm" formControlName="initial">
+                                    <option value="ज.">जनाब</option>
+                                    <option value="मो.">मोहतरमा</option>
+                                    <option value="म.">मरहूम</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-sm-8 col-md-5">
+                                <label class="form-label small text-muted">नाव <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control"
+                                    [class.is-invalid]="memberForm.get('fname')?.touched && memberForm.get('fname')?.invalid"
+                                    formControlName="fname" placeholder="सभासद आणि वडीलांचे नाव" />
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-md-5">
+                                <label class="form-label small text-muted">आडनाव <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" formControlName="lname" />
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <label class="form-label small text-muted">फोन <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">+91</span>
+                                    <input type="tel" class="form-control"
+                                        [class.is-invalid]="memberForm.get('phone')?.touched && memberForm.get('phone')?.invalid"
+                                        formControlName="phone" placeholder="10 अंकी नंबर" />
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <label class="form-label small text-muted">पद <span class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="designation">
+                                    <option value="सभासद">सभासद</option>
+                                    <option value="कार्यकारणी सदस्य">कार्यकारणी सदस्य</option>
+                                    <option value="खजिनदार">खजिनदार</option>
+                                    <option value="सचिव">सचिव</option>
+                                    <option value="उपाध्यक्ष">उपाध्यक्ष</option>
+                                    <option value="अध्यक्ष">अध्यक्ष</option>
+                                    <option value="तालुका समिती सदस्य">तालुका समिती सदस्य</option>
+                                    <option value="संस्थापक">संस्थापक</option>
+                                    <option value="संस्थापक सदस्य">संस्थापक सदस्य</option>
+                                    <option value="आजिव सदस्य">आजिव सदस्य</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <label class="form-label small text-muted">सभासद झालेली तारीख <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" class="form-control" formControlName="joinedOn" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address & Location -->
+                <div class="card mb-4 border-light-subtle">
+                    <div class="card-header bg-light fw-semibold text-secondary">
+                        पत्ता
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small text-muted"></label>
+                                <input type="text" class="form-control" formControlName="address"
+                                    placeholder="घर क्रमांक - बिल्डींगच नाव - रस्ता इ." />
+                            </div>
+
+                            <div class="col-12 col-sm-4 col-md-2">
+                                <label class="form-label small text-muted">तालुका <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="taluka"
+                                    [class.is-invalid]="memberForm.get('taluka')?.touched && memberForm.get('taluka')?.invalid">
+                                    <option value="">तालुका निवडा</option>
+                                    <option *ngFor="let t of talukaList" [value]="t.name">{{ t.name }}</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-sm-4 col-md-2">
+                                <label class="form-label small text-muted">गावाचे नाव <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="village"
+                                    [class.is-invalid]="memberForm.get('village')?.touched && memberForm.get('village')?.invalid">
+                                    <option value="">गावं निवडा</option>
+                                    <option *ngFor="let v of filteredVillages" [value]="v.name">{{ v.name }}</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-sm-4 col-md-2">
+                                <label class="form-label small text-muted">जिल्हा <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" formControlName="district" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Switches -->
+                <div class="card mb-4 border-light-subtle">
+                    <div class="card-body d-flex gap-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="aliveSwitch" formControlName="alive" />
+                            <label class="form-check-label fw-medium" for="aliveSwitch">हयात</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="activeSwitch"
+                                formControlName="active" />
+                            <label class="form-check-label fw-medium" for="activeSwitch">सक्रिय</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Section: Family Members -->
+                <div class="card mb-4 border-light-subtle" formArrayName="familyMembers">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold text-secondary">कुटुंबतील सदस्य</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addFamilyMember()">
+                            + सदस्य जोडा
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div *ngFor="let member of familyMembers.controls; let i = index" [formGroupName]="i"
+                            class="p-3 mb-3 bg-light rounded border">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-6 col-sm-4 col-md-2">
+                                    <select class="form-select form-select-sm" formControlName="relation">
+                                        <option value="">नाते</option>
+                                        <option value="पत्नी">पत्नी</option>
+                                        <option value="आई">आई</option>
+                                        <option value="वडील">वडील</option>
+                                        <option value="मुलगा">मुलगा</option>
+                                        <option value="मुलगी">मुलगी</option>
+                                        <option value="पति">पति</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <input type="text" class="form-control form-control-sm" formControlName="name"
+                                        placeholder="नाव *" />
+                                </div>
+                                <div class="col-6 col-sm-6 col-md-2">
+                                    <input type="text" class="form-control form-control-sm" formControlName="education"
+                                        placeholder="शिक्षण" />
+                                </div>
+                                <div class="col-6 col-sm-4 col-md-2">
+                                    <input type="number" class="form-control form-control-sm" formControlName="age"
+                                        placeholder="वय" />
+                                </div>
+                                <div class="col-6 col-sm-4 col-md-2">
+                                    <select class="form-select form-select-sm" formControlName="gender">
+                                        <option value="">लिंग</option>
+                                        <option value="पुरुष">पुरुष</option>
+                                        <option value="स्त्री">स्त्री</option>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-sm-4 col-md-2">
+                                    <input type="text" class="form-control form-control-sm" formControlName="occupation"
+                                        placeholder="व्यवसाय" />
+                                </div>
+                                <div class="col-12 col-md-1 text-end mt-2 mt-md-0">
+                                    <button type="button" class="btn btn-sm btn-outline-danger w-100"
+                                        (click)="removeFamilyMember(i)">
+                                        रद्द करा
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="familyMembers.length === 0" class="text-muted small text-center py-2">
+                            कौटुंबिक माहितीची नोंद नाही (No record)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Section: Donations -->
+                <div class="card mb-4 border-light-subtle" formArrayName="donations">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold text-secondary">देणगी / वर्गणी</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addDonation()">
+                            + देणगी नोंदवा
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div *ngFor="let donation of donations.controls; let i = index" [formGroupName]="i"
+                            class="p-3 mb-3 bg-light rounded border">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-12 col-sm-4 col-md-3">
+                                    <input type="date" class="form-control form-control-sm" formControlName="date" />
+                                </div>
+                                <div class="col-12 col-sm-4 col-md-3">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" class="form-control" formControlName="amount"
+                                            placeholder="रक्कम" />
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4 col-md-4">
+                                    <select class="form-select form-select-sm" formControlName="contributionType">
+                                        <option value="सभासद वर्गणी">सभासद वर्गणी</option>
+                                        <option value="जकात">जकात</option>
+                                        <option value="सदका">सदका</option>
+                                        <option value="फित्रा">फित्रा</option>
+                                        <option value="शिक्षण नीधी">शिक्षण नीधी</option>
+                                        <option value="इतर">इतर</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-2 text-end mt-2 mt-md-0">
+                                    <button type="button" class="btn btn-sm btn-outline-danger w-100"
+                                        (click)="removeDonation(i)">
+                                        रद्द करा
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="donations.length === 0" class="text-muted small text-center py-2">
+                            देणगीची नोंद नाही (No record)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Section: Help Received -->
+                <div class="card mb-4 border-light-subtle" formArrayName="helpReceived">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold text-secondary">मिळालेली मदत</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addHelp()">
+                            + मदत नोंदवा
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div *ngFor="let help of helpReceived.controls; let i = index" [formGroupName]="i"
+                            class="p-3 mb-3 bg-light rounded border">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-12 col-sm-4 col-md-3">
+                                    <input type="date" class="form-control form-control-sm" formControlName="date" />
+                                </div>
+                                <div class="col-12 col-sm-4 col-md-3">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" class="form-control" formControlName="amount"
+                                            placeholder="रक्कम" />
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-4 col-md-4">
+                                    <select class="form-select form-select-sm" formControlName="helpType">
+                                        <option value="शैक्षणिक">शैक्षणिक</option>
+                                        <option value="वैद्यकिय">वैद्यकिय</option>
+                                        <option value="लघुउदयोग">लघुउदयोग</option>
+                                        <option value="आर्थिक">आर्थिक</option>
+                                        <option value="इतर">इतर</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-2 text-end mt-2 mt-md-0">
+                                    <button type="button" class="btn btn-sm btn-outline-danger w-100"
+                                        (click)="removeHelp(i)">
+                                        काढा
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="helpReceived.length === 0" class="text-muted small text-center py-2">
+                            मदत नोंद नाही (No record)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="d-grid gap-2 d-md-flex justify-md-end mt-4">
+                    <button type="button" class="btn btn-light me-md-2" (click)="resetSearch()">
+                        रद्द करा
+                    </button>
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold"
+                        [disabled]="memberForm.invalid || isLoading">
+                        {{ isEditMode ? 'बदललेली माहिती नोंद करा' : 'माहिती नोंद करा' }}
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

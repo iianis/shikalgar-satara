@@ -30,7 +30,7 @@ export class MemberslistComponent implements OnInit {
     this.location.back();
   }
   goRegister(): void {
-    this.router.navigateByUrl('membersnew');
+    this.router.navigateByUrl('membermanager');
   }
 
   onSearchChange(query: string) {

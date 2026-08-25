@@ -23,6 +23,7 @@ import { AuditsComponent } from './audits/audits.component';
 import { FlashnewsComponent } from './flashnews/flashnews.component';
 import { ZakatcalculatorComponent } from './zakatcalculator/zakatcalculator.component';
 import { KulakjaiComponent } from './kulakjai/kulakjai.component';
+import { MembermanagerComponent } from './membermanager/membermanager.component';
 
 const routes: Routes = [
   {
@@ -72,6 +73,10 @@ const routes: Routes = [
   {
     path: 'zakatcalculator',
     component: ZakatcalculatorComponent
+  },
+  {
+    path: 'membermanager',
+    component: MembermanagerComponent
   },
   {
     path: '',
