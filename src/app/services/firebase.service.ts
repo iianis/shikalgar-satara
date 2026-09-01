@@ -51,6 +51,39 @@ export class FirebaseService {
     return await this.firestore.collection(collectionName + this.checkIfWeAreTesting()).doc(id).set(item);
   }
 
+  // Search by First Name
+  getMemberByFname(fname: string): Observable<any[]> {
+    return this.firestore.collection('members' + this.checkIfWeAreTesting(),
+      ref => ref.where('fname', '==', fname)
+    ).valueChanges({ idField: 'id' });
+  }
+
+  // Pattern search for fname (case-insensitive partial match)
+  getMembersByFnamePattern(pattern: string): Observable<any[]> {
+    const searchRegex = new RegExp(pattern, 'i'); // 'i' for case-insensitive
+    return this.getMembers().pipe(
+      map(members => members.filter(member => member.fname && searchRegex.test(member.fname)))
+    );
+  }
+
+  // Check if a phone number already exists (excluding current member ID if in edit mode)
+  async checkDuplicatePhone(phone: string, currentId?: string | null): Promise<boolean> {
+    const snapshot = await firstValueFrom(
+      this.firestore.collection('members' + this.checkIfWeAreTesting(),
+        ref => ref.where('phone', '==', phone)
+      ).get()
+    );
+
+    if (snapshot.empty) return false;
+
+    // If editing, allow matching the exact same document ID
+    if (currentId) {
+      return snapshot.docs.some(doc => doc.id !== currentId);
+    }
+
+    return true; // Duplicate found
+  }
+
   getMasterData(collectionName: string): Observable<any[]> {
     return this.firestore.collection(collectionName + this.checkIfWeAreTesting()).snapshotChanges().pipe(
       map(actions => actions.map(a => {

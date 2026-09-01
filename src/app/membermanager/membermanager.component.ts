@@ -17,12 +17,14 @@ export interface Donation {
   date: string;
   amount: number;
   contributionType: 'सभासद वर्गणी' | 'जकात' | 'सदका' | 'फित्रा' | 'शैक्षणिक निधी' | 'इतर निधी';
+  description?: string;
 }
 
 export interface HelpReceived {
   date: string;
   amount: number;
   helpType: 'शैक्षणिक' | 'वैद्यकिय' | 'लघुउदयोग' | 'आर्थिक ' | 'इतर';
+  description?: string;
 }
 
 export interface Member {
@@ -35,6 +37,7 @@ export interface Member {
   taluka: string;
   district: string;
   phone: string;
+  age?: number;
   designation: string;
   joinedOn: string;
   alive?: boolean;
@@ -56,14 +59,8 @@ export interface Member {
 })
 export class MembermanagerComponent implements OnInit {
 
-
   firebaseService = inject(FirebaseService);
   private location = inject(Location);
-
-  // Navigation & State flags
-  step: 'search' | 'not-found' | 'results' | 'form' = 'search';
-  isEditMode = false;
-  isLoading = false;
 
   // Search Control & Found Members
   searchPhoneControl = new FormControl('', [Validators.required, Validators.pattern('^[0-9]{10}$')]);
@@ -90,66 +87,37 @@ export class MembermanagerComponent implements OnInit {
   goBack(): void {
     this.location.back();
   }
-  // --- Search Logic ---
-  searchMember(): void {
-    if (this.searchPhoneControl.invalid) {
-      this.searchPhoneControl.markAsTouched();
-      return;
-    }
-
-    const phone = this.searchPhoneControl.value!;
-    this.isLoading = true;
-
-    this.firebaseService.getMemberByPhone(phone).subscribe({
-      next: (members) => {
-        this.isLoading = false;
-        if (members && members.length > 0) {
-          this.foundMembers = members as Member[];
-          this.step = 'results';
-        } else {
-          this.foundMembers = [];
-          this.step = 'not-found';
-        }
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error('Error fetching member by phone:', err);
-      }
-    });
-  }
 
   selectMemberToEdit(member: Member): void {
+    this.isEditMode = true;
     this.initForm(member);
     this.step = 'form';
   }
 
-  startNewMemberCreation(): void {
-    const searchedPhone = this.searchPhoneControl.value || '';
-    this.initForm({ phone: searchedPhone } as Member);
-    this.step = 'form';
-  }
+  // Navigation & State flags
+  step: 'search' | 'not-found' | 'results' | 'form' = 'search';
+  isEditMode = false;
+  isLoading = false;
 
-  resetSearch(): void {
-    this.searchPhoneControl.reset();
-    this.foundMembers = [];
-    this.step = 'search';
-  }
-
-  // --- Form Logic ---
+  // Dedicated property to hold the active document ID when editing
+  editingMemberId: string | null = null;
   initForm(member?: Member): void {
-    this.isEditMode = !!(member && member.fname);
+    // Retain edit mode if explicit editing ID exists or passed member has an ID
+    if (member?.id) {
+      this.editingMemberId = member.id;
+      this.isEditMode = true;
+    } else if (!this.editingMemberId) {
+      this.isEditMode = false;
+    }
 
     const initialTaluka = member?.taluka || this.userTalukaSelection;
     const initialVillage = member?.village || this.userVillageSelection;
 
-    // Fallback to today's date if joinedOn is missing or empty
     const defaultJoinedOn = member?.joinedOn || new Date().toISOString().substring(0, 10);
-
-    // Fallback to true if alive is null or undefined
     const defaultAlive = (member?.alive ?? '') === '' ? true : Boolean(member?.alive);
 
     this.memberForm = this.fb.group({
-      id: [member?.id || null],
+      id: [member?.id || this.editingMemberId || null],
       initial: [member?.initial || 'ज.'],
       fname: [member?.fname || '', Validators.required],
       lname: [member?.lname || 'शिकलगार', Validators.required],
@@ -157,11 +125,16 @@ export class MembermanagerComponent implements OnInit {
       district: [member?.district || 'सातारा', Validators.required],
       taluka: [initialTaluka, Validators.required],
       village: [initialVillage, Validators.required],
-      phone: [member?.phone || '', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-
-      // Set default to 'सभासद' and set disabled: true to make it read-only
-      designation: [{ value: member?.designation || 'सभासद', disabled: false }, Validators.required],
-
+      phone: [member?.phone || '', [Validators.required, Validators.pattern('^[0-9]{10}$')]], age: [
+        member?.age ?? null,
+        [
+          Validators.required,
+          Validators.pattern('^[0-9]+$'),
+          Validators.min(1),
+          Validators.max(99)
+        ]
+      ],
+      designation: [{ value: member?.designation || 'सभासद', disabled: true }, Validators.required],
       joinedOn: [defaultJoinedOn, Validators.required],
       alive: [defaultAlive],
       active: [member?.active ?? true],
@@ -191,6 +164,63 @@ export class MembermanagerComponent implements OnInit {
     });
   }
 
+  async onSubmit(): Promise<void> {
+    if (this.memberForm.invalid) {
+      this.memberForm.markAllAsTouched();
+      return;
+    }
+
+    // Extract raw form values
+    const { id: formId, ...memberData } = this.memberForm.getRawValue();
+    this.isLoading = true;
+
+    try {
+      // Rely explicitly on editingMemberId when editing, falling back to form control id
+      const currentMemberId = this.isEditMode ? (this.editingMemberId || formId) : null;
+
+      // Check duplicate phone excluding current member ID if updating
+      const isDuplicate = await this.firebaseService.checkDuplicatePhone(
+        memberData.phone,
+        currentMemberId
+      );
+
+      if (isDuplicate) {
+        this.isLoading = false;
+        alert(`त्रुटी: '${memberData.phone}' हा मोबाईल नंबर दुसऱ्या सभासदासाठी आधीच नोंदणीकृत आहे!`);
+        return;
+      }
+
+      if (this.isEditMode && currentMemberId) {
+        // Perform Update (excluding the 'id' field from document payload)
+        await this.firebaseService.updateMember(currentMemberId, memberData);
+      } else {
+        // Perform Insert
+        await this.firebaseService.addMember(memberData);
+      }
+
+      this.isLoading = false;
+      this.resetSearch();
+    } catch (error) {
+      this.isLoading = false;
+      console.error('Error saving/updating member:', error);
+      alert('माहिती जतन करताना त्रुटी आली.');
+    }
+  }
+
+  resetSearch(): void {
+    this.isEditMode = false;
+    this.editingMemberId = null; // Reset state tracking
+    this.editingFamilyIndexes.clear();
+    this.editingDonationIndexes.clear();
+    this.editingHelpIndexes.clear();
+    this.newFamilyIndexes.clear();
+    this.newDonationIndexes.clear();
+    this.newHelpIndexes.clear();
+    this.searchQueryControl.reset();
+    this.foundMembers = [];
+    this.step = 'search';
+  }
+
   filterVillages(talukaName: string): void {
     if (talukaName) {
       this.filteredVillages = this.allVillages.filter(v => v.taluka === talukaName);
@@ -203,6 +233,9 @@ export class MembermanagerComponent implements OnInit {
   get familyMembers(): FormArray { return this.memberForm.get('familyMembers') as FormArray; }
   get donations(): FormArray { return this.memberForm.get('donations') as FormArray; }
   get helpReceived(): FormArray { return this.memberForm.get('helpReceived') as FormArray; }
+  get ageControl() {
+    return this.memberForm.get('age');
+  }
 
   // Dynamic Array Creators
   createFamilyGroup(data?: FamilyMember): FormGroup {
@@ -220,7 +253,8 @@ export class MembermanagerComponent implements OnInit {
     return this.fb.group({
       date: [data?.date || new Date().toISOString().substring(0, 10)],
       amount: [data?.amount || null, [Validators.min(0)]],
-      contributionType: [data?.contributionType || 'सभासद वर्गणी']
+      contributionType: [data?.contributionType || 'सभासद वर्गणी'],
+      description: [data?.description || '']
     });
   }
 
@@ -228,46 +262,188 @@ export class MembermanagerComponent implements OnInit {
     return this.fb.group({
       date: [data?.date || new Date().toISOString().substring(0, 10)],
       amount: [data?.amount || null, [Validators.min(0)]],
-      helpType: [data?.helpType || 'आर्थिक']
+      helpType: [data?.helpType || 'आर्थिक'],
+      description: [data?.description || '']
     });
   }
 
-  addFamilyMember(): void { this.familyMembers.push(this.createFamilyGroup()); }
-  removeFamilyMember(i: number): void { this.familyMembers.removeAt(i); }
+  // Update Search Control to accept either 10 digits OR text (fname)
+  searchQueryControl = new FormControl('', [Validators.required, Validators.minLength(2)]);
 
-  addDonation(): void { this.donations.push(this.createDonationGroup()); }
-  removeDonation(i: number): void { this.donations.removeAt(i); }
-
-  addHelp(): void { this.helpReceived.push(this.createHelpGroup()); }
-  removeHelp(i: number): void { this.helpReceived.removeAt(i); }
-
-  async onSubmit(): Promise<void> {
-    if (this.memberForm.invalid) {
-      this.memberForm.markAllAsTouched();
+  // --- Search Logic ---
+  searchMember(): void {
+    if (this.searchQueryControl.invalid) {
+      this.searchQueryControl.markAsTouched();
       return;
     }
 
+    const query = this.searchQueryControl.value!.trim();
     this.isLoading = true;
-    // Includes values from disabled controls like 'designation'
-    const memberData = this.memberForm.getRawValue();
 
-    try {
-      if (this.isEditMode && memberData.id) {
-        // Update existing document instead of creating a new one
-        await this.firebaseService.updateMember(memberData.id, memberData);
-        alert('माहिती यशस्वीरित्या अद्ययावत केली!'); // Successfully updated!
-      } else {
-        // Create new document
-        await this.firebaseService.addMember(memberData); //[cite: 4]
-        alert('माहिती यशस्वीरित्या जतन केली!'); // Successfully saved!
+    // Check if query is 10-digit phone or partial text pattern
+    const isPhone = /^[0-9]{10}$/.test(query);
+    const search$ = isPhone
+      ? this.firebaseService.getMemberByPhone(query)
+      : this.firebaseService.getMembersByFnamePattern(query);
+
+    search$.subscribe({
+      next: (members) => {
+        this.isLoading = false;
+        if (members && members.length > 0) {
+          this.foundMembers = members as Member[];
+          this.step = 'results';
+        } else {
+          this.foundMembers = [];
+          this.step = 'not-found';
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Error fetching members:', err);
       }
+    });
+  }
 
-      this.isLoading = false;
-      this.resetSearch();
-    } catch (error) {
-      this.isLoading = false;
-      console.error('Error saving/updating member:', error);
-      alert('माहिती जतन करताना त्रुटी आली.');
+  startNewMemberCreation(): void {
+    const query = this.searchQueryControl.value || '';
+    const isPhone = /^[0-9]{10}$/.test(query);
+
+    // Auto-fill phone if input was numeric, otherwise auto-fill fname
+    this.initForm({
+      phone: isPhone ? query : '',
+      fname: !isPhone ? query : ''
+    } as Member);
+
+    this.step = 'form';
+  }
+
+  // Track open edit rows by FormArray index
+  editingFamilyIndexes: Set<number> = new Set<number>();
+  editingDonationIndexes: Set<number> = new Set<number>();
+  editingHelpIndexes: Set<number> = new Set<number>();
+
+  // Helper methods to check edit state (New items default to open edit mode)
+  isEditingFamily(index: number): boolean {
+    return this.editingFamilyIndexes.has(index);
+  }
+  toggleEditFamily(index: number): void {
+    if (this.editingFamilyIndexes.has(index)) {
+      this.editingFamilyIndexes.delete(index);
+    } else {
+      this.editingFamilyIndexes.add(index);
     }
   }
+
+  isEditingDonation(index: number): boolean {
+    return this.editingDonationIndexes.has(index);
+  }
+  toggleEditDonation(index: number): void {
+    if (this.editingDonationIndexes.has(index)) {
+      this.editingDonationIndexes.delete(index);
+    } else {
+      this.editingDonationIndexes.add(index);
+    }
+  }
+
+  isEditingHelp(index: number): boolean {
+    return this.editingHelpIndexes.has(index);
+  }
+  toggleEditHelp(index: number): void {
+    if (this.editingHelpIndexes.has(index)) {
+      this.editingHelpIndexes.delete(index);
+    } else {
+      this.editingHelpIndexes.add(index);
+    }
+  }
+
+  removeFamilyMember(i: number): void {
+    this.familyMembers.removeAt(i);
+    this.editingFamilyIndexes.delete(i);
+  }
+
+  removeDonation(i: number): void {
+    this.donations.removeAt(i);
+    this.editingDonationIndexes.delete(i);
+  }
+
+  removeHelp(i: number): void {
+    this.helpReceived.removeAt(i);
+    this.editingHelpIndexes.delete(i);
+  }
+
+  // Track newly created unsaved rows
+  newFamilyIndexes: Set<number> = new Set<number>();
+  newDonationIndexes: Set<number> = new Set<number>();
+  newHelpIndexes: Set<number> = new Set<number>();
+
+  // --- FAMILY MEMBERS ---
+  addFamilyMember(): void {
+    this.familyMembers.insert(0, this.createFamilyGroup());
+    this.shiftIndexesOnInsert(this.editingFamilyIndexes);
+    this.shiftIndexesOnInsert(this.newFamilyIndexes);
+
+    this.editingFamilyIndexes.add(0);
+    this.newFamilyIndexes.add(0); // Mark index 0 as new
+  }
+
+  finishEditFamily(index: number): void {
+    this.editingFamilyIndexes.delete(index);
+    this.newFamilyIndexes.delete(index); // Once marked 'Done', it's no longer considered a brand-new temp row
+  }
+
+  cancelNewFamilyMember(index: number): void {
+    this.familyMembers.removeAt(index);
+    this.editingFamilyIndexes.delete(index);
+    this.newFamilyIndexes.delete(index);
+  }
+
+  // --- DONATIONS ---
+  addDonation(): void {
+    this.donations.insert(0, this.createDonationGroup());
+    this.shiftIndexesOnInsert(this.editingDonationIndexes);
+    this.shiftIndexesOnInsert(this.newDonationIndexes);
+
+    this.editingDonationIndexes.add(0);
+    this.newDonationIndexes.add(0);
+  }
+
+  finishEditDonation(index: number): void {
+    this.editingDonationIndexes.delete(index);
+    this.newDonationIndexes.delete(index);
+  }
+
+  cancelNewDonation(index: number): void {
+    this.donations.removeAt(index);
+    this.editingDonationIndexes.delete(index);
+    this.newDonationIndexes.delete(index);
+  }
+
+  // --- HELP RECEIVED ---
+  addHelp(): void {
+    this.helpReceived.insert(0, this.createHelpGroup());
+    this.shiftIndexesOnInsert(this.editingHelpIndexes);
+    this.shiftIndexesOnInsert(this.newHelpIndexes);
+
+    this.editingHelpIndexes.add(0);
+    this.newHelpIndexes.add(0);
+  }
+
+  finishEditHelp(index: number): void {
+    this.editingHelpIndexes.delete(index);
+    this.newHelpIndexes.delete(index);
+  }
+
+  cancelNewHelp(index: number): void {
+    this.helpReceived.removeAt(index);
+    this.editingHelpIndexes.delete(index);
+    this.newHelpIndexes.delete(index);
+  }
+
+  // Helper method to shift indices when prepending item at index 0
+  private shiftIndexesOnInsert(indexSet: Set<number>): void {
+    const updated = Array.from(indexSet).map(idx => idx + 1);
+    indexSet.clear();
+    updated.forEach(idx => indexSet.add(idx));
+  }
+
 }
