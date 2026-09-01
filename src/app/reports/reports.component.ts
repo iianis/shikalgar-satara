@@ -1,0 +1,113 @@
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { QueryDocumentSnapshot } from '@angular/fire/compat/firestore';
+import { Member } from '../interfaces/interfaces';
+import { FirebaseReportService } from '../services/firebasereport.service';
+import { HeaderComponent } from '../shared/header/header.component';
+
+export type ReportType = 'list' | 'member-audit';
+
+@Component({
+  selector: 'app-reports',
+  standalone: true,
+  imports: [CommonModule, HeaderComponent],
+  templateUrl: './reports.component.html',
+  styleUrls: ['./reports.component.css']
+})
+export class ReportsComponent implements OnInit {
+  private reportService = inject(FirebaseReportService);
+
+  // Active Report State ('list' shows dashboard)
+  selectedReport: ReportType = 'list';
+
+  // Audit Report Data & Pagination State
+  auditRecords: Member[] = [];
+  isLoading = false;
+  pageSize = 50;
+  currentPage = 1;
+  hasNextPage = false;
+
+  private pageSnapshots: (QueryDocumentSnapshot<any> | null)[] = [null];
+  private currentLastDoc: QueryDocumentSnapshot<any> | null = null;
+
+  ngOnInit(): void {
+    // Standard initialization; loads on report selection
+  }
+
+  // Handle Report Selection from Dashboard
+  selectReport(report: ReportType): void {
+    this.selectedReport = report;
+    if (report === 'member-audit' && this.auditRecords.length === 0) {
+      this.loadPage(1);
+    }
+  }
+
+  goBackToList(): void {
+    this.selectedReport = 'list';
+  }
+
+  // Fetch Member Audit Page Data
+  async loadPage(pageNumber: number): Promise<void> {
+    if (pageNumber < 1) return;
+    this.isLoading = true;
+
+    const cursor = this.pageSnapshots[pageNumber - 1] || null;
+
+    try {
+      // Fetch pageSize + 1 to check for next page availability
+      const result = await this.reportService.getMemberAuditReport(this.pageSize + 1, cursor);
+
+      if (result.members.length > this.pageSize) {
+        this.hasNextPage = true;
+        this.auditRecords = result.members.slice(0, this.pageSize);
+        this.currentLastDoc = result.lastVisibleDoc;
+      } else {
+        this.hasNextPage = false;
+        this.auditRecords = result.members;
+        this.currentLastDoc = result.lastVisibleDoc;
+      }
+
+      this.currentPage = pageNumber;
+
+      if (this.currentLastDoc && this.pageSnapshots.length <= pageNumber) {
+        this.pageSnapshots.push(this.currentLastDoc);
+      }
+    } catch (error) {
+      console.error('Error loading report:', error);
+      alert('अहवाल लोड करताना त्रुटी आली.');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  nextPage(): void {
+    if (this.hasNextPage && !this.isLoading) {
+      this.loadPage(this.currentPage + 1);
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1 && !this.isLoading) {
+      this.loadPage(this.currentPage - 1);
+    }
+  }
+  formatDate(timestamp: any): string {
+    if (!timestamp) return 'N/A';
+    const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+    if (isNaN(date.getTime())) return 'N/A';
+
+    // Compact format: DD/MM/YY, hh:mm a (e.g., 02/09/26, 04:15 PM)
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-2);
+
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+
+    const formattedHours = String(hours).padStart(2, '0');
+
+    return `${day}/${month}/${year}, ${formattedHours}:${minutes} ${ampm}`;
+  }
+}

@@ -3,10 +3,9 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { map, switchMap, Observable, of, from, firstValueFrom } from 'rxjs';
 import firebase from 'firebase/compat/app';
-import { IEvent, IMember } from '../interfaces/interfaces';
+import { checkIfWeAreTesting, IEvent, IMember, Member } from '../interfaces/interfaces';
 import { Timestamp } from '@angular/fire/firestore';
 import * as Papa from 'papaparse';
-import { Member } from '../membermanager/membermanager.component';
 
 @Injectable({
   providedIn: 'root'
@@ -16,10 +15,6 @@ export class FirebaseService {
   authService = inject(AngularFireAuth);
   firestore = inject(AngularFirestore);
   isUserAuthenticated = false;
-
-  checkIfWeAreTesting() {
-    return localStorage.getItem("isTesting") == "true" ? "tmp" : "";
-  }
 
   getAuthState() { return this.authService.authState; }
 
@@ -36,7 +31,7 @@ export class FirebaseService {
   }
 
   getMembers(): Observable<any[]> {
-    return this.firestore.collection('members' + this.checkIfWeAreTesting()).snapshotChanges().pipe(
+    return this.firestore.collection('members' + checkIfWeAreTesting()).snapshotChanges().pipe(
       map(actions => actions.map(a => {
         const data = a.payload.doc.data() as any;
         const id = a.payload.doc.id;
@@ -48,12 +43,12 @@ export class FirebaseService {
   async addMasterData(collectionName: string, item: any): Promise<void> {
     const id = this.firestore.createId();
     item.timestamp = Timestamp.now();
-    return await this.firestore.collection(collectionName + this.checkIfWeAreTesting()).doc(id).set(item);
+    return await this.firestore.collection(collectionName + checkIfWeAreTesting()).doc(id).set(item);
   }
 
   // Search by First Name
   getMemberByFname(fname: string): Observable<any[]> {
-    return this.firestore.collection('members' + this.checkIfWeAreTesting(),
+    return this.firestore.collection('members' + checkIfWeAreTesting(),
       ref => ref.where('fname', '==', fname)
     ).valueChanges({ idField: 'id' });
   }
@@ -69,7 +64,7 @@ export class FirebaseService {
   // Check if a phone number already exists (excluding current member ID if in edit mode)
   async checkDuplicatePhone(phone: string, currentId?: string | null): Promise<boolean> {
     const snapshot = await firstValueFrom(
-      this.firestore.collection('members' + this.checkIfWeAreTesting(),
+      this.firestore.collection('members' + checkIfWeAreTesting(),
         ref => ref.where('phone', '==', phone)
       ).get()
     );
@@ -85,7 +80,7 @@ export class FirebaseService {
   }
 
   getMasterData(collectionName: string): Observable<any[]> {
-    return this.firestore.collection(collectionName + this.checkIfWeAreTesting()).snapshotChanges().pipe(
+    return this.firestore.collection(collectionName + checkIfWeAreTesting()).snapshotChanges().pipe(
       map(actions => actions.map(a => {
         const data = a.payload.doc.data() as any;
         const id = a.payload.doc.id;
@@ -95,54 +90,54 @@ export class FirebaseService {
   }
 
   getCollectionCount(collectionName: string): Observable<number> {
-    return from(this.firestore.collection(collectionName + this.checkIfWeAreTesting()).get()).pipe(
+    return from(this.firestore.collection(collectionName + checkIfWeAreTesting()).get()).pipe(
       map(snapshot => snapshot.size)
     );
   }
 
   getMasterDataOrderByField(collectionName: string, fieldName: string): Observable<any[]> {
-    return this.firestore.collection(collectionName + this.checkIfWeAreTesting(),
+    return this.firestore.collection(collectionName + checkIfWeAreTesting(),
       ref => ref.orderBy(fieldName))
       .valueChanges();
   }
 
   getMasterDataOrderByFieldDesc(collectionName: string, fieldName: string): Observable<any[]> {
-    return this.firestore.collection(collectionName + this.checkIfWeAreTesting(),
+    return this.firestore.collection(collectionName + checkIfWeAreTesting(),
       ref => ref.orderBy(fieldName, 'desc'))
       .valueChanges();
   }
 
   getMasterDataOrderByTimestamp(collectionName: string, fieldName: string): Observable<any[]> {
-    return this.firestore.collection(collectionName + this.checkIfWeAreTesting(),
+    return this.firestore.collection(collectionName + checkIfWeAreTesting(),
       ref => ref.orderBy(fieldName, 'desc'))
       .valueChanges();
   }
 
   getSettingById(id: string): Observable<any> {
-    return this.firestore.collection('settings' + this.checkIfWeAreTesting()).doc(id).valueChanges();
+    return this.firestore.collection('settings' + checkIfWeAreTesting()).doc(id).valueChanges();
   }
 
   getMemberByPhone(phone: string): Observable<any[]> {
-    return this.firestore.collection('members' + this.checkIfWeAreTesting(), ref => ref.where('phone', '==', phone)).valueChanges({ idField: 'id' });
+    return this.firestore.collection('members' + checkIfWeAreTesting(), ref => ref.where('phone', '==', phone)).valueChanges({ idField: 'id' });
   }
 
   async getMemberByPhonev2(phone: string): Promise<Observable<any[]>> {
-    return this.firestore.collection('members' + this.checkIfWeAreTesting(), ref => ref.where('phone', '==', phone)).valueChanges({ idField: 'id' });
+    return this.firestore.collection('members' + checkIfWeAreTesting(), ref => ref.where('phone', '==', phone)).valueChanges({ idField: 'id' });
   }
 
   registerUser(phone: string, verificationId: string, verificationCode: string): Promise<void | null> {
     const id = this.firestore.createId();
     const userData = { uid: id, phone: phone, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-    return this.firestore.collection('users' + this.checkIfWeAreTesting()).doc(id).set(userData);
+    return this.firestore.collection('users' + checkIfWeAreTesting()).doc(id).set(userData);
   }
 
   registerEvent(eventData: IEvent): Promise<void | null> {
     const id = this.firestore.createId();
-    return this.firestore.collection('events' + this.checkIfWeAreTesting()).doc(id).set(eventData);
+    return this.firestore.collection('events' + checkIfWeAreTesting()).doc(id).set(eventData);
   }
 
   async addMember(memberData: IMember | Member): Promise<void> {
-    const collectionName = "members" + this.checkIfWeAreTesting();
+    const collectionName = "members" + checkIfWeAreTesting();
     const id = this.firestore.createId();
     (memberData as any).timestamp = Timestamp.now();
     return this.firestore.collection(collectionName).doc(id).set(memberData);
@@ -150,7 +145,7 @@ export class FirebaseService {
 
   // Updated to pure Compat SDK to prevent "Argument of type 'AngularFirestore' is not assignable" error
   async updateMember(id: string, memberData: Partial<Member>): Promise<void> {
-    const collectionName = 'members' + this.checkIfWeAreTesting();
+    const collectionName = 'members' + checkIfWeAreTesting();
     return await this.firestore.collection(collectionName).doc(id).update(memberData);
   }
 
@@ -160,7 +155,7 @@ export class FirebaseService {
       issue: issue,
       timestamp: Timestamp.now(),
     };
-    return this.firestore.collection('memberrequests' + this.checkIfWeAreTesting()).doc(id).set(item);
+    return this.firestore.collection('memberrequests' + checkIfWeAreTesting()).doc(id).set(item);
   }
 
   loginUser(phoneNumber: string, verificationId: string, verificationCode: string): Observable<any> {
@@ -168,7 +163,7 @@ export class FirebaseService {
     return from(this.authService.signInWithCredential(credential).then(userCredential => {
       const user = userCredential.user;
       if (user) {
-        return this.firestore.collection('users' + this.checkIfWeAreTesting()).doc(user.uid).get().toPromise().then(doc => {
+        return this.firestore.collection('users' + checkIfWeAreTesting()).doc(user.uid).get().toPromise().then(doc => {
           if (doc!.exists) {
             return user;
           } else {

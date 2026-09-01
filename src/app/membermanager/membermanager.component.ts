@@ -3,56 +3,16 @@ import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, For
 import { CommonModule, Location } from '@angular/common';
 import { taluka, talukas, village, villages } from '../../data/areas';
 import { FirebaseService } from '../services/firebase.service';
-
-export interface FamilyMember {
-  relation?: 'आई' | 'वडील' | 'मुलगा' | 'मुलगी' | string;
-  name: string;
-  education?: string;
-  age?: number;
-  gender?: string;
-  occupation?: string;
-}
-
-export interface Donation {
-  date: string;
-  amount: number;
-  contributionType: 'सभासद वर्गणी' | 'जकात' | 'सदका' | 'फित्रा' | 'शैक्षणिक निधी' | 'इतर निधी';
-  description?: string;
-}
-
-export interface HelpReceived {
-  date: string;
-  amount: number;
-  helpType: 'शैक्षणिक' | 'वैद्यकिय' | 'लघुउदयोग' | 'आर्थिक ' | 'इतर';
-  description?: string;
-}
-
-export interface Member {
-  id?: string;
-  initial?: string;
-  fname: string;
-  lname: string;
-  address?: string;
-  village: string;
-  taluka: string;
-  district: string;
-  phone: string;
-  age?: number;
-  designation: string;
-  joinedOn: string;
-  alive?: boolean;
-  active?: boolean;
-  familyMembers?: FamilyMember[];
-  donations?: Donation[];
-  helpReceived?: HelpReceived[];
-}
+import { Donation, FamilyMember, HelpReceived, Member } from '../interfaces/interfaces';
+import { HeaderComponent } from '../shared/header/header.component';
 
 @Component({
   selector: 'app-membermanager',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HeaderComponent
   ],
   templateUrl: './membermanager.component.html',
   styleUrl: './membermanager.component.css'

@@ -24,6 +24,7 @@ import { FlashnewsComponent } from './flashnews/flashnews.component';
 import { ZakatcalculatorComponent } from './zakatcalculator/zakatcalculator.component';
 import { KulakjaiComponent } from './kulakjai/kulakjai.component';
 import { MembermanagerComponent } from './membermanager/membermanager.component';
+import { ReportsComponent } from './reports/reports.component';
 
 const routes: Routes = [
   {
@@ -61,6 +62,10 @@ const routes: Routes = [
   {
     path: 'audits',
     component: AuditsComponent
+  },
+  {
+    path: 'reports',
+    component: ReportsComponent
   },
   {
     path: 'flashnews',
