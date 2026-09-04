@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, For
 import { CommonModule, Location } from '@angular/common';
 import { taluka, talukas, village, villages } from '../../data/areas';
 import { FirebaseService } from '../services/firebase.service';
-import { Donation, FamilyMember, HelpReceived, Member } from '../interfaces/interfaces';
+import { Donation, FamilyMember, HelpReceived, Member, RecommendationLetter } from '../interfaces/interfaces';
 import { HeaderComponent } from '../shared/header/header.component';
 
 @Component({
@@ -61,7 +61,11 @@ export class MembermanagerComponent implements OnInit {
 
   // Dedicated property to hold the active document ID when editing
   editingMemberId: string | null = null;
+
   initForm(member?: Member): void {
+
+    this.activeSection = 'personal';
+
     // Retain edit mode if explicit editing ID exists or passed member has an ID
     if (member?.id) {
       this.editingMemberId = member.id;
@@ -86,7 +90,7 @@ export class MembermanagerComponent implements OnInit {
       taluka: [initialTaluka, Validators.required],
       village: [initialVillage, Validators.required],
       phone: [member?.phone || '', [Validators.required, Validators.pattern('^[0-9]{10}$')]], age: [
-        member?.age ?? null,
+        member?.age ?? 21,
         [
           Validators.required,
           Validators.pattern('^[0-9]+$'),
@@ -106,6 +110,9 @@ export class MembermanagerComponent implements OnInit {
       ),
       helpReceived: this.fb.array(
         member?.helpReceived ? member.helpReceived.map(h => this.createHelpGroup(h)) : []
+      ),
+      recommendationLetters: this.fb.array(
+        member?.recommendationLetters ? member.recommendationLetters.map(r => this.createRecommendationGroup(r)) : []
       )
     });
 
@@ -165,20 +172,6 @@ export class MembermanagerComponent implements OnInit {
       console.error('Error saving/updating member:', error);
       alert('माहिती जतन करताना त्रुटी आली.');
     }
-  }
-
-  resetSearch(): void {
-    this.isEditMode = false;
-    this.editingMemberId = null; // Reset state tracking
-    this.editingFamilyIndexes.clear();
-    this.editingDonationIndexes.clear();
-    this.editingHelpIndexes.clear();
-    this.newFamilyIndexes.clear();
-    this.newDonationIndexes.clear();
-    this.newHelpIndexes.clear();
-    this.searchQueryControl.reset();
-    this.foundMembers = [];
-    this.step = 'search';
   }
 
   filterVillages(talukaName: string): void {
@@ -348,9 +341,10 @@ export class MembermanagerComponent implements OnInit {
 
   finishEditFamily(index: number): void {
     this.editingFamilyIndexes.delete(index);
-    this.newFamilyIndexes.delete(index); // Once marked 'Done', it's no longer considered a brand-new temp row
+    this.newFamilyIndexes.delete(index);
+    this.memberForm.markAsDirty(); // Explicitly set form as dirty
+    this.memberForm.updateValueAndValidity();
   }
-
   cancelNewFamilyMember(index: number): void {
     this.familyMembers.removeAt(index);
     this.editingFamilyIndexes.delete(index);
@@ -370,6 +364,8 @@ export class MembermanagerComponent implements OnInit {
   finishEditDonation(index: number): void {
     this.editingDonationIndexes.delete(index);
     this.newDonationIndexes.delete(index);
+    this.memberForm.markAsDirty();
+    this.memberForm.updateValueAndValidity();
   }
 
   cancelNewDonation(index: number): void {
@@ -391,6 +387,8 @@ export class MembermanagerComponent implements OnInit {
   finishEditHelp(index: number): void {
     this.editingHelpIndexes.delete(index);
     this.newHelpIndexes.delete(index);
+    this.memberForm.markAsDirty();
+    this.memberForm.updateValueAndValidity();
   }
 
   cancelNewHelp(index: number): void {
@@ -406,4 +404,94 @@ export class MembermanagerComponent implements OnInit {
     updated.forEach(idx => indexSet.add(idx));
   }
 
+  // 3. Add getter
+  get recommendationLetters(): FormArray { return this.memberForm.get('recommendationLetters') as FormArray; }
+
+  // 4. Add Group Creator
+  createRecommendationGroup(data?: RecommendationLetter): FormGroup {
+    return this.fb.group({
+      date: [data?.date || new Date().toISOString().substring(0, 10)],
+      name: [data?.name || '', Validators.required],
+      description: [data?.description || '']
+    });
+  }
+
+  // 5. Add Index Tracking Sets
+  editingRecommendationIndexes: Set<number> = new Set<number>();
+  newRecommendationIndexes: Set<number> = new Set<number>();
+
+  // 6. Add Helper Methods & Handlers
+  isEditingRecommendation(index: number): boolean {
+    return this.editingRecommendationIndexes.has(index);
+  }
+
+  toggleEditRecommendation(index: number): void {
+    if (this.editingRecommendationIndexes.has(index)) {
+      this.editingRecommendationIndexes.delete(index);
+    } else {
+      this.editingRecommendationIndexes.add(index);
+    }
+  }
+
+  removeRecommendation(i: number): void {
+    this.recommendationLetters.removeAt(i);
+    this.editingRecommendationIndexes.delete(i);
+  }
+
+  addRecommendation(): void {
+    this.recommendationLetters.insert(0, this.createRecommendationGroup());
+    this.shiftIndexesOnInsert(this.editingRecommendationIndexes);
+    this.shiftIndexesOnInsert(this.newRecommendationIndexes);
+
+    this.editingRecommendationIndexes.add(0);
+    this.newRecommendationIndexes.add(0);
+  }
+
+  finishEditRecommendation(index: number): void {
+    this.editingRecommendationIndexes.delete(index);
+    this.newRecommendationIndexes.delete(index);
+    this.memberForm.markAsDirty();
+    this.memberForm.updateValueAndValidity();
+  }
+
+  cancelNewRecommendation(index: number): void {
+    this.recommendationLetters.removeAt(index);
+    this.editingRecommendationIndexes.delete(index);
+    this.newRecommendationIndexes.delete(index);
+  }
+
+  // 7. Update resetSearch()
+  resetSearch(): void {
+    this.isEditMode = false;
+    this.editingMemberId = null;
+    this.editingFamilyIndexes.clear();
+    this.editingDonationIndexes.clear();
+    this.editingHelpIndexes.clear();
+    this.editingRecommendationIndexes.clear(); // Added
+    this.newFamilyIndexes.clear();
+    this.newDonationIndexes.clear();
+    this.newHelpIndexes.clear();
+    this.newRecommendationIndexes.clear(); // Added
+    this.searchQueryControl.reset();
+    this.foundMembers = [];
+    this.step = 'search';
+  }
+
+  activeSection: string | null = 'personal';
+
+  toggleSection(sectionKey: string): void {
+    this.activeSection = this.activeSection === sectionKey ? null : sectionKey;
+  }
+
+  expandAllSections(): void {
+    this.activeSection = 'all';
+  }
+
+  collapseAllSections(): void {
+    this.activeSection = null;
+  }
+
+  isSectionOpen(sectionKey: string): boolean {
+    return this.activeSection === sectionKey || this.activeSection === 'all';
+  }
 }

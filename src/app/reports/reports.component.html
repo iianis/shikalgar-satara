@@ -1,160 +1,227 @@
 <app-header></app-header>
-<div class="container my-3 my-md-4">
+<div class="container my-2 my-md-3">
 
     <!-- ========================================== -->
     <!-- 1. REPORT SELECTION DASHBOARD (List View)  -->
     <!-- ========================================== -->
     <div *ngIf="selectedReport === 'list'">
-        <!-- Header -->
-        <div class="mb-4">
-            <h2 class="fw-bold text-primary fs-3 fs-md-2">अहवाल केंद्र (Reports)</h2>
-            <p class="text-muted small fs-6">खालील यादीतून आवश्यक तो अहवाल निवडा.</p>
+        <div class="mb-3">
+            <h2 class="fw-bold text-primary fs-5 fs-md-4 mb-0">अहवाल केंद्र (Reports)</h2>
+            <p class="text-muted small mb-0" style="font-size: 0.8rem;">खालील यादीतून आवश्यक तो अहवाल निवडा.</p>
         </div>
 
-        <!-- Reports Cards Grid -->
-        <div class="row g-3 g-md-4">
-
-            <!-- Member Audit Report Card (Fully Clickable) -->
+        <div class="row g-2 g-md-3">
+            <!-- 1. Member Audit -->
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm border-primary border-opacity-25 role-button report-card-hover"
-                    tabindex="0" role="button" aria-label="सभासद ऑडिट अहवाल पहा" (click)="selectReport('member-audit')"
+                    tabindex="0" role="button" (click)="selectReport('member-audit')"
                     (keydown.enter)="selectReport('member-audit')"
                     (keydown.space)="selectReport('member-audit'); $event.preventDefault()">
-                    <div class="card-body d-flex flex-column justify-content-between p-3 p-md-4">
-                        <div>
-                            <div class="d-flex align-items-center mb-3">
-                                <div
-                                    class="p-2 p-md-3 bg-primary text-white rounded-3 me-3 d-inline-flex align-items-center justify-content-center">
-                                    <span class="fs-4">📋</span>
-                                </div>
-                                <h5 class="card-title mb-0 fw-bold fs-6 fs-md-5">सभासद ऑडिट</h5>
-                            </div>
-                            <p class="card-text text-secondary small mb-0">
-                                तारखेनुसार नवीन व बदल झालेल्या सभासदांची यादी.
-                            </p>
-                        </div>
+                    <div class="card-body p-2 p-md-3">
+                        <h5 class="card-title mb-1 fw-bold fs-6">सभासद ऑडिट</h5>
+                        <p class="card-text text-secondary small mb-0" style="font-size: 0.78rem;">
+                            तारखेनुसार नवीन व बदल झालेल्या सभासदांची यादी.
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Placeholder / Future Report Card (Disabled View) -->
+            <!-- 2. Recommendation Letters -->
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm border-0 bg-light text-muted opacity-75">
-                    <div class="card-body p-3 p-md-4 d-flex flex-column justify-content-between">
-                        <div>
-                            <div class="d-flex align-items-center mb-3">
-                                <div
-                                    class="p-2 p-md-3 bg-secondary text-white rounded-3 me-3 d-inline-flex align-items-center justify-content-center">
-                                    <span class="fs-4">📍</span>
-                                </div>
-                                <h5 class="card-title mb-0 fw-bold fs-6 fs-md-5">गाव/तालुका निहाय सभासद यादी</h5>
-                            </div>
-                            <p class="card-text small mb-0">
-                                गावानुसार सभासदांचा तपशील.
-                            </p>
-                        </div>
+                <div class="card h-100 shadow-sm border-primary border-opacity-25 role-button report-card-hover"
+                    tabindex="0" role="button" (click)="selectReport('recommendation-letter')"
+                    (keydown.enter)="selectReport('recommendation-letter')"
+                    (keydown.space)="selectReport('recommendation-letter'); $event.preventDefault()">
+                    <div class="card-body p-2 p-md-3">
+                        <h5 class="card-title mb-1 fw-bold fs-6">शिफारस पत्र वाटप</h5>
+                        <p class="card-text text-secondary small mb-0" style="font-size: 0.78rem;">
+                            देण्यात आलेल्या शिफारस पत्रांचा सविस्तर तपशील.
+                        </p>
                     </div>
                 </div>
             </div>
 
+            <!-- 3. Charity / Needy Family Fund -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-primary border-opacity-25 role-button report-card-hover"
+                    tabindex="0" role="button" (click)="selectReport('needy-family-fund')"
+                    (keydown.enter)="selectReport('needy-family-fund')"
+                    (keydown.space)="selectReport('needy-family-fund'); $event.preventDefault()">
+                    <div class="card-body p-2 p-md-3">
+                        <h5 class="card-title mb-1 fw-bold fs-6">गरजु कुटुंब नीधी वाटप</h5>
+                        <p class="card-text text-secondary small mb-0" style="font-size: 0.78rem;">
+                            गरजू कुटुंबांना वाटप केलेल्या निधीची नोंद.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Donors List -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-primary border-opacity-25 role-button report-card-hover"
+                    tabindex="0" role="button" (click)="selectReport('donors')" (keydown.enter)="selectReport('donors')"
+                    (keydown.space)="selectReport('donors'); $event.preventDefault()">
+                    <div class="card-body p-2 p-md-3">
+                        <h5 class="card-title mb-1 fw-bold fs-6">देणगीदारांची यादी</h5>
+                        <p class="card-text text-secondary small mb-0" style="font-size: 0.78rem;">
+                            प्राप्त झालेल्या सर्व देणग्या व वर्गणीदारांचा सविस्तर अहवाल.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
 
     <!-- ========================================== -->
-    <!-- 2. ACTUAL REPORT DETAILS VIEW              -->
+    <!-- 2. REPORT DETAILS VIEW                     -->
     <!-- ========================================== -->
-    <div *ngIf="selectedReport === 'member-audit'">
+    <div *ngIf="selectedReport !== 'list'">
 
-        <!-- Top Action Bar (Back Button + Page Indicator) -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-            <button class="btn btn-outline-secondary btn-sm btn-md-base" (click)="goBackToList()">
-                &larr; मागे जा
-            </button>
-            <span class="badge bg-primary fs-6 px-3 py-2">पान क्र. {{ currentPage }}</span>
+        <!-- Header Bar -->
+        <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+            <div>
+                <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'member-audit'">सभासद ऑडिट अहवाल</h3>
+                <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'recommendation-letter'">शिफारस पत्र वाटप अहवाल
+                </h3>
+                <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'needy-family-fund'">गरजु कुटुंब नीधी वाटप अहवाल
+                </h3>
+                <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'donors'">देणगीदारांची यादी अहवाल</h3>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary px-2 py-1" style="font-size: 0.75rem;">पान {{ currentPage }}</span>
+                <button class="btn btn-outline-secondary btn-sm py-0 px-2" (click)="goBackToList()">
+                    &larr; मागे जा
+                </button>
+            </div>
         </div>
 
-        <!-- Report Header -->
-        <div class="mb-3">
-            <h3 class="fw-bold fs-4 fs-md-3 mb-1">सभासद ऑडिट अहवाल</h3>
-            <p class="text-muted small mb-0">नवीन/अपडेट केलेल्या सर्व सभासद नोंदी</p>
-        </div>
-
-        <!-- TOP PAGINATION CONTROLS -->
-        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mb-3 bg-light p-2 rounded border"
-            *ngIf="!isLoading && auditRecords.length > 0">
-            <button class="btn btn-outline-primary btn-sm w-100 w-sm-auto order-2 order-sm-1" (click)="previousPage()"
-                [disabled]="currentPage === 1 || isLoading">
-                &laquo; मागील (Previous {{ pageSize }})
+        <!-- TOP PAGINATION -->
+        <div class="d-flex justify-content-between align-items-center gap-2 mb-2 bg-light py-1 px-2 rounded border"
+            *ngIf="!isLoading && records.length > 0">
+            <button class="btn btn-outline-primary btn-sm py-0 px-2" (click)="previousPage()"
+                [disabled]="currentPage === 1 || isLoading" style="font-size: 0.78rem;">
+                &laquo; मागील ({{ pageSize }})
             </button>
-
-            <span class="text-muted small fw-semibold order-1 order-sm-2">पान क्र. {{ currentPage }}</span>
-
-            <button class="btn btn-outline-primary btn-sm w-100 w-sm-auto order-3" (click)="nextPage()"
-                [disabled]="!hasNextPage || isLoading">
-                पुढील (Next {{ pageSize }}) &raquo;
+            <span class="text-muted small fw-semibold" style="font-size: 0.78rem;">पान {{ currentPage }}</span>
+            <button class="btn btn-outline-primary btn-sm py-0 px-2" (click)="nextPage()"
+                [disabled]="!hasNextPage || isLoading" style="font-size: 0.78rem;">
+                पुढील ({{ pageSize }}) &raquo;
             </button>
         </div>
 
         <!-- Loading State -->
-        <div *ngIf="isLoading" class="text-center my-5 py-4">
-            <div class="spinner-border text-primary" role="status">
+        <div *ngIf="isLoading" class="text-center my-3 py-2">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
                 <span class="visually-hidden">लोड होत आहे...</span>
             </div>
-            <p class="mt-2 text-muted small">अहवाल लोड होत आहे...</p>
+            <p class="mt-1 text-muted small mb-0" style="font-size: 0.75rem;">अहवाल लोड होत आहे...</p>
         </div>
 
         <!-- Empty State -->
-        <div *ngIf="!isLoading && auditRecords.length === 0" class="alert alert-info small text-center my-4">
+        <div *ngIf="!isLoading && records.length === 0" class="alert alert-info small text-center my-2 py-2">
             कोणतीही नोंद आढळली नाही.
         </div>
 
-        <!-- Audit Data Table View -->
-        <div *ngIf="!isLoading && auditRecords.length > 0" class="table-responsive shadow-sm rounded-3 border">
-            <table class="table table-striped table-hover align-middle mb-0 text-nowrap">
-                <thead class="table-dark small">
+        <!-- Data Table -->
+        <div *ngIf="!isLoading && records.length > 0" class="table-responsive shadow-sm rounded-2 border">
+            <table class="table table-sm table-striped table-hover align-middle mb-0 text-nowrap"
+                style="font-size: 0.82rem;">
+                <thead class="table-dark">
                     <tr>
-                        <th scope="col" class="py-3">#</th>
-                        <th scope="col" class="py-3">तारीख-वेळ</th>
-                        <th scope="col" class="py-3">नाव</th>
-                        <th scope="col" class="py-3">मोबाईल</th>
+                        <th scope="col" class="py-1 px-2">#</th>
+                        <th scope="col" class="py-1 px-2">तारीख</th>
+                        <th scope="col" class="py-1 px-2">नाव / तपशील</th>
+                        <th scope="col" class="py-1 px-2"
+                            *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'recommendation-letter'">
+                            रक्कम
+                        </th>
                     </tr>
                 </thead>
-                <tbody class="small">
-                    <tr *ngFor="let member of auditRecords; let i = index">
-                        <td class="fw-bold text-secondary">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-                        <td class="font-monospace text-nowrap">
-                            <small class="text-muted">{{ formatDate(member.timestamp) }}</small>
+                <tbody>
+                    <tr *ngFor="let item of records; let i = index">
+                        <td class="fw-bold text-secondary py-1 px-2">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                        <td class="font-monospace text-nowrap py-1 px-2">
+                            <span class="text-muted" style="font-size: 0.78rem;">
+                                {{ formatDate(item.timestamp || item.date, false) }}
+                            </span>
                         </td>
-                        <td class="fw-semibold text-dark">{{ member.initial }} {{ member.fname }} {{ member.lname }}, {{
-                            member.village }}
+
+                        <!-- Combined Name, Phone, and Details Column -->
+                        <td class="py-1 px-2">
+                            <div class="fw-semibold text-dark">
+                                <!-- Member Audit -->
+                                <ng-container *ngIf="selectedReport === 'member-audit'">
+                                    {{ item.initial }} {{ item.fname }} {{ item.lname }}
+                                    <span class="text-muted fw-normal" *ngIf="item.designation">, {{ item.designation
+                                        }}</span>
+                                    <span class="text-muted fw-normal" *ngIf="item.village">, {{ item.village }}</span>
+                                </ng-container>
+
+                                <!-- Needy Family Fund -->
+                                <ng-container *ngIf="selectedReport === 'needy-family-fund'">
+                                    {{ item.recipientName || 'N/A' }}
+                                    <span class="text-muted fw-normal" *ngIf="item.village">, {{ item.village }}</span>
+                                </ng-container>
+
+                                <!-- Recommendation Letters & Donors -->
+                                <ng-container
+                                    *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'needy-family-fund'">
+                                    {{ item.donorName || item.fname || item.name || item.title || item.recipient ||
+                                    'N/A' }}
+                                    <span class="text-muted fw-normal" *ngIf="item.lname"> {{ item.lname }}</span>
+                                </ng-container>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div *ngIf="item.phone" style="font-size: 0.75rem;">
+                                <a [href]="'tel:' + item.phone" class="text-decoration-none text-muted font-monospace">
+                                    📞 {{ item.phone }}
+                                </a>
+                            </div>
+
+                            <!-- Help Type and Details (Moved here under Column 3) -->
+                            <div *ngIf="item.details || item.helpType" class="text-secondary small fw-normal mt-1"
+                                style="font-size: 0.75rem;">
+                                <span class="badge bg-light text-dark border me-1 align-baseline fw-normal"
+                                    style="font-size: inherit;" *ngIf="item.helpType">
+                                    {{ item.helpType }}
+                                </span>
+                                <span>{{ item.details }}</span>
+                            </div>
+
+                            <!-- Contribution Type / Description for Donors or Recommendation Letters -->
+                            <div *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'needy-family-fund' && (item.contributionType || item.description)"
+                                class="text-muted small fw-normal" style="font-size: 0.75rem;">
+                                <span *ngIf="item.contributionType">({{ item.contributionType }}) </span>
+                                <span *ngIf="item.description">{{ item.description }}</span>
+                            </div>
                         </td>
-                        <td>
-                            <a [href]="'tel:' + member.phone" class="text-decoration-none text-dark">
-                                {{ member.phone }}
-                            </a>
+
+                        <!-- Amount & Ref Column (Hidden for member-audit) -->
+                        <td class="py-1 px-2"
+                            *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'recommendation-letter'">
+                            <strong class="text-success" *ngIf="item.amount">₹{{ item.amount }}</strong>
+                            <span *ngIf="!item.amount" class="text-muted small">{{ item.refNo || 'N/A' }}</span>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- BOTTOM PAGINATION CONTROLS -->
-        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mt-3 bg-light p-2 rounded border"
-            *ngIf="!isLoading && auditRecords.length > 0">
-            <button class="btn btn-outline-primary btn-sm w-100 w-sm-auto order-2 order-sm-1" (click)="previousPage()"
-                [disabled]="currentPage === 1 || isLoading">
-                &laquo; मागील (Previous {{ pageSize }})
+        <!-- BOTTOM PAGINATION -->
+        <div class="d-flex justify-content-between align-items-center gap-2 mt-2 bg-light py-1 px-2 rounded border"
+            *ngIf="!isLoading && records.length > 0">
+            <button class="btn btn-outline-primary btn-sm py-0 px-2" (click)="previousPage()"
+                [disabled]="currentPage === 1 || isLoading" style="font-size: 0.78rem;">
+                &laquo; मागील ({{ pageSize }})
             </button>
-
-            <span class="text-muted small fw-semibold order-1 order-sm-2">पृष्ठ {{ currentPage }}</span>
-
-            <button class="btn btn-outline-primary btn-sm w-100 w-sm-auto order-3" (click)="nextPage()"
-                [disabled]="!hasNextPage || isLoading">
-                पुढील (Next {{ pageSize }}) &raquo;
+            <span class="text-muted small fw-semibold" style="font-size: 0.78rem;">पान {{ currentPage }}</span>
+            <button class="btn btn-outline-primary btn-sm py-0 px-2" (click)="nextPage()"
+                [disabled]="!hasNextPage || isLoading" style="font-size: 0.78rem;">
+                पुढील ({{ pageSize }}) &raquo;
             </button>
         </div>
 
     </div>
-
 </div>

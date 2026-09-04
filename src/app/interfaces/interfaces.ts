@@ -65,6 +65,12 @@ export interface HelpReceived {
     description?: string;
 }
 
+export interface RecommendationLetter {
+    date: string;
+    name: string;
+    description?: string;
+}
+
 export interface Member {
     id?: string;
     initial?: string;
@@ -83,5 +89,6 @@ export interface Member {
     familyMembers?: FamilyMember[];
     donations?: Donation[];
     helpReceived?: HelpReceived[];
+    recommendationLetters?: RecommendationLetter[]; // Added
     timestamp?: Date;
 }

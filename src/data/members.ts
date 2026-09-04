@@ -42,12 +42,12 @@ export const directorsEx = [
     { name: "ज. सिराज बाळभाई शिकलगार", village: "वडूज", taluka: "खटाव", dist: "सातारा", phone: "9421177272", joinedOn: "12/12/2000", userLevel: 1, designation: "आजीव सदस्य" },
     { name: "म. ज. बाळभाई लालभाई शिकलगार", village: "महिमानगड", taluka: "माण", dist: "सातारा", phone: "", joinedOn: "12/12/1996", userLevel: 1, designation: "आजीव सदस्य" },
     { name: "ज. अमीर युसूफ शिकलगार", village: "रेठरे बु।", taluka: "कराड", dist: "सातारा", phone: "9764643023", joinedOn: "12/12/1996", userLevel: 1, designation: "आजीव सदस्य" },
-    { name: "ज. जाकीरहूसेन इब्राहिम शिकलगार", village: "मलकापूर", taluka: "कराड", dist: "सातारा", phone: "8390381731", joinedOn: "12/12/2005", userLevel: 1, designation: "आजीव सदस्य" },
-    //more ex-directors
     { name: "म. ज. जैनुद्दीन-मास्तर कासम शिकलगार", village: "वडगाव हवेली", taluka: "कराड", dist: "सातारा", phone: "", joinedOn: "12/12/1996", userLevel: 1, designation: "आजीव सदस्य" },
     { name: "म. ज. बाबूभाई मिस्त्री शिकलगार", village: "कराड", taluka: "कराड", dist: "सातारा", phone: "", joinedOn: "12/12/1996", userLevel: 1, designation: "आजीव सदस्य" },
     { name: "ज. शब्बीर भाई शिकलगार", village: "सातारा", taluka: "सातारा", dist: "सातारा", phone: "9822534715", joinedOn: "12/12/2000", userLevel: 1, designation: "आजीव सदस्य" },
-    { name: "ज. रफीक भाई शिकलगार", village: "कोरेगांव", taluka: "कोरेगांव", dist: "सातारा", phone: "7709608080", joinedOn: "12/12/2000", userLevel: 1, designation: "आजीव सदस्य" },
-    { name: "ज. हाजराबी शिकलगार", village: "वाठार", taluka: "कराड", dist: "सातारा", phone: "9763129746", joinedOn: "12/12/2000", userLevel: 1, designation: "आजीव सदस्य" },
-    { name: "ज. नझीर भाई शिकलगार", village: "विरळी", taluka: "माण", dist: "सातारा", phone: "9767877380", joinedOn: "12/12/2000", userLevel: 1, designation: "आजीव सदस्य" },
+    //more ex-directors (not updated via change report)
+    { name: "ज. जाकीरहूसेन इब्राहिम शिकलगार", village: "मलकापूर", taluka: "कराड", dist: "सातारा", phone: "8390381731", joinedOn: "12/12/2005", userLevel: 1, designation: "सदस्य" },
+    { name: "ज. रफीक भाई शिकलगार", village: "कोरेगांव", taluka: "कोरेगांव", dist: "सातारा", phone: "7709608080", joinedOn: "12/12/2000", userLevel: 1, designation: "सदस्य" },
+    { name: "ज. हाजराबी शिकलगार", village: "वाठार", taluka: "कराड", dist: "सातारा", phone: "9763129746", joinedOn: "12/12/2000", userLevel: 1, designation: "सदस्य" },
+    { name: "ज. नझीर भाई शिकलगार", village: "विरळी", taluka: "माण", dist: "सातारा", phone: "9767877380", joinedOn: "12/12/2000", userLevel: 1, designation: "सदस्य" },
 ]

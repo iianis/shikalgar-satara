@@ -107,6 +107,9 @@
                 <p class="text-muted small mb-1" style="font-size: 0.8rem;">
                     आपण पुन्हा शोधण्याचा प्रयत्न करा.
                 </p>
+                <p class="text-dark mb-2">
+                    'शोधताना मोबाईल नंबर, किंवा नाव, किंवा वडीलांचे नांव याचा वापर करावा. अचुक व्यकरणाने शोध सोपा होईल.
+                </p>
                 <p class="text-muted small mb-4" style="font-size: 0.8rem;">
                     अन्यथा नवीन सभासद नोंदणी करू शकता.
                 </p>
@@ -114,7 +117,7 @@
                 <div class="d-flex gap-2 justify-content-center">
                     <button class="btn btn-outline-secondary" (click)="resetSearch()">रद्द करा</button>
                     <button class="btn btn-primary fw-semibold" (click)="startNewMemberCreation()">+ नवीन सभासद
-                        जोडा</button>
+                        नोंद</button>
                 </div>
             </div>
         </div>
@@ -132,410 +135,496 @@
         <div class="card-body p-3 p-md-4">
             <form [formGroup]="memberForm" (ngSubmit)="onSubmit()">
 
-                <!-- Primary Info -->
-                <div class="card mb-4 border-light-subtle">
-                    <div class="card-header bg-light fw-semibold text-secondary">
-                        वैयक्तिक माहिती
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-6 col-sm-4 col-md-2">
-                                <label class="form-label small text-muted"> <span class="text-danger">*</span></label>
-                                <select class="form-select form-select-sm" formControlName="initial">
-                                    <option value="ज.">जनाब</option>
-                                    <option value="मो.">मोहतरमा</option>
-                                    <option value="म.">मरहूम</option>
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-sm-8 col-md-5">
-                                <label class="form-label small text-muted">नाव <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control"
-                                    [class.is-invalid]="memberForm.get('fname')?.touched && memberForm.get('fname')?.invalid"
-                                    formControlName="fname" placeholder="सभासद आणि वडीलांचे नाव" />
-                            </div>
-
-                            <div class="col-12 col-sm-6 col-md-5">
-                                <label class="form-label small text-muted">आडनाव <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" formControlName="lname" />
-                            </div>
-
-                            <div class="col-12 col-sm-6 col-md-4">
-                                <label class="form-label small text-muted">फोन <span
-                                        class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text">+91</span>
-                                    <input type="tel" class="form-control"
-                                        [class.is-invalid]="memberForm.get('phone')?.touched && memberForm.get('phone')?.invalid"
-                                        formControlName="phone" placeholder="10 अंकी नंबर" />
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="age">वय <span class="text-danger">*</span></label>
-                                <input type="text" inputmode="numeric" id="age" formControlName="age"
-                                    class="form-control" placeholder="वय नमूद करा (१ ते ९९)" maxlength="2" />
-
-                                <div *ngIf="ageControl?.invalid && (ageControl?.touched || ageControl?.dirty)"
-                                    class="error-message text-danger mt-1">
-                                    <small *ngIf="ageControl?.errors?.['required']">वय प्रविष्ट करणे आवश्यक आहे.</small>
-                                    <small *ngIf="ageControl?.errors?.['pattern']">वय फक्त अंकांमध्ये असणे आवश्यक
-                                        आहे.</small>
-                                    <small *ngIf="ageControl?.errors?.['min'] || ageControl?.errors?.['max']">वय ९९
-                                        पेक्षा कमी (१ ते ९९) असणे आवश्यक आहे.</small>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-md-4">
-                                <label class="form-label small text-muted">पद <span class="text-danger">*</span></label>
-                                <select class="form-select" formControlName="designation">
-                                    <option value="सभासद">सभासद</option>
-                                    <option value="कार्यकारणी सदस्य">कार्यकारणी सदस्य</option>
-                                    <option value="खजिनदार">खजिनदार</option>
-                                    <option value="सचिव">सचिव</option>
-                                    <option value="उपाध्यक्ष">उपाध्यक्ष</option>
-                                    <option value="अध्यक्ष">अध्यक्ष</option>
-                                    <option value="तालुका समिती सदस्य">तालुका समिती सदस्य</option>
-                                    <option value="संस्थापक">संस्थापक</option>
-                                    <option value="संस्थापक सदस्य">संस्थापक सदस्य</option>
-                                    <option value="आजिव सदस्य">आजिव सदस्य</option>
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-sm-6 col-md-4">
-                                <label class="form-label small text-muted">सभासद झालेली तारीख <span
-                                        class="text-danger">*</span></label>
-                                <input type="date" class="form-control" formControlName="joinedOn" />
-                            </div>
-                        </div>
-                    </div>
+                <!-- Quick Section Controls -->
+                <div class="d-flex justify-content-end gap-2 mb-3">
+                    <button type="button" class="btn btn-xs btn-outline-secondary" (click)="expandAllSections()">
+                        सर्व उघडा (Expand All)
+                    </button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary" (click)="collapseAllSections()">
+                        सर्व बंद करा (Collapse All)
+                    </button>
                 </div>
 
-                <!-- Address & Location -->
-                <div class="card mb-4 border-light-subtle">
-                    <div class="card-header bg-light fw-semibold text-secondary">
-                        पत्ता
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6">
-                                <label class="form-label small text-muted"></label>
-                                <input type="text" class="form-control" formControlName="address"
-                                    placeholder="घर क्रमांक - बिल्डींगच नाव - रस्ता इ." />
-                            </div>
+                <div class="accordion" id="memberFormAccordion">
 
-                            <div class="col-12 col-sm-4 col-md-2">
-                                <label class="form-label small text-muted">तालुका <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" formControlName="taluka"
-                                    [class.is-invalid]="memberForm.get('taluka')?.touched && memberForm.get('taluka')?.invalid">
-                                    <option value="">तालुका निवडा</option>
-                                    <option *ngFor="let t of talukaList" [value]="t.name">{{ t.name }}</option>
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-sm-4 col-md-2">
-                                <label class="form-label small text-muted">गावाचे नाव <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select" formControlName="village"
-                                    [class.is-invalid]="memberForm.get('village')?.touched && memberForm.get('village')?.invalid">
-                                    <option value="">गावं निवडा</option>
-                                    <option *ngFor="let v of filteredVillages" [value]="v.name">{{ v.name }}</option>
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-sm-4 col-md-2">
-                                <label class="form-label small text-muted">जिल्हा <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" formControlName="district" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Status Switches -->
-                <div class="card mb-4 border-light-subtle">
-                    <div class="card-body d-flex gap-4">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="aliveSwitch" formControlName="alive" />
-                            <label class="form-check-label fw-medium" for="aliveSwitch">हयात</label>
-                        </div>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="activeSwitch"
-                                formControlName="active" />
-                            <label class="form-check-label fw-medium" for="activeSwitch">सक्रिय</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dynamic Section: Family Members -->
-                <div class="card mb-4 border-light-subtle" formArrayName="familyMembers">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                        <span class="fw-semibold text-secondary">कुटुंबतील सदस्य</span>
-                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addFamilyMember()">
-                            + सदस्य जोडा
-                        </button>
-                    </div>
-                    <div class="card-body p-3">
-                        <div *ngFor="let member of familyMembers.controls; let i = index" [formGroupName]="i"
-                            class="p-2 mb-2 bg-light rounded border">
-
-                            <!-- READ-ONLY SUMMARY VIEW -->
-                            <div *ngIf="!isEditingFamily(i)"
-                                class="d-flex justify-content-between align-items-center px-2 py-1">
-                                <div class="small">
-                                    <span class="badge bg-secondary me-2">{{ member.get('relation')?.value || 'नाते
-                                        नाही' }}</span>
-                                    <strong class="text-dark">{{ member.get('name')?.value || 'नाव दिलेले नाही'
-                                        }}</strong>
-                                    <span class="text-muted ms-2" *ngIf="member.get('age')?.value">({{
-                                        member.get('age')?.value }} वर्षे)</span>
-                                    <span class="text-muted ms-2" *ngIf="member.get('gender')?.value">• {{
-                                        member.get('gender')?.value }}</span>
-                                    <span class="text-muted ms-2" *ngIf="member.get('education')?.value">• {{
-                                        member.get('education')?.value }}</span>
-                                    <span class="text-muted ms-2" *ngIf="member.get('occupation')?.value">• {{
-                                        member.get('occupation')?.value }}</span>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
-                                        (click)="toggleEditFamily(i)" title="संपादन करा">
-                                        ✏️
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
-                                        (click)="removeFamilyMember(i)" title="रद्द करा">
-                                        🗑️
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- EDITABLE FORM VIEW -->
-                            <div *ngIf="isEditingFamily(i)" class="pt-2">
-                                <div class="row g-2 align-items-center">
+                    <!-- SECTION 1: Personal & Address Info (Merged) -->
+                    <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden">
+                        <h2 class="accordion-header" id="headingPersonal">
+                            <button class="accordion-button fw-semibold text-secondary"
+                                [class.collapsed]="!isSectionOpen('personal')" type="button"
+                                (click)="toggleSection('personal')">
+                                <span class="me-2">👤 वैयक्तिक माहिती</span>
+                                <span class="badge bg-light text-dark border ms-auto me-3"
+                                    *ngIf="memberForm.get('fname')?.value">
+                                    {{ memberForm.get('fname')?.value }} {{ memberForm.get('lname')?.value }}
+                                </span>
+                            </button>
+                        </h2>
+                        <div [class.show]="isSectionOpen('personal')" [class.collapsed]="!isSectionOpen('personal')"
+                            class="accordion-collapse collapse">
+                            <div class="accordion-body bg-white">
+                                <div class="row g-3">
+                                    <!-- Personal Details -->
                                     <div class="col-6 col-sm-4 col-md-2">
-                                        <select class="form-select form-select-sm" formControlName="relation">
-                                            <option value="">नाते</option>
-                                            <option value="पत्नी">पत्नी</option>
-                                            <option value="आई">आई</option>
-                                            <option value="वडील">वडील</option>
-                                            <option value="मुलगा">मुलगा</option>
-                                            <option value="मुलगी">मुलगी</option>
-                                            <option value="पति">पति</option>
+                                        <label class="form-label small text-muted">आदरार्थी <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select form-select-sm" formControlName="initial">
+                                            <option value="ज.">जनाब</option>
+                                            <option value="मो.">मोहतरमा</option>
+                                            <option value="म.">मरहूम</option>
                                         </select>
                                     </div>
-                                    <div class="col-6 col-sm-8 col-md-3">
-                                        <input type="text" class="form-control form-control-sm" formControlName="name"
-                                            placeholder="नाव *" />
-                                    </div>
-                                    <div class="col-6 col-sm-4 col-md-2">
-                                        <input type="text" class="form-control form-control-sm"
-                                            formControlName="education" placeholder="शिक्षण" />
-                                    </div>
-                                    <div class="col-6 col-sm-4 col-md-1">
-                                        <input type="number" class="form-control form-control-sm" formControlName="age"
-                                            placeholder="वय" />
-                                    </div>
-                                    <div class="col-6 col-sm-4 col-md-2">
-                                        <select class="form-select form-select-sm" formControlName="gender">
-                                            <option value="">लिंग</option>
-                                            <option value="पुरुष">पुरुष</option>
-                                            <option value="स्त्री">स्त्री</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-6 col-sm-4 col-md-2">
-                                        <input type="text" class="form-control form-control-sm"
-                                            formControlName="occupation" placeholder="व्यवसाय" />
-                                    </div>
-                                    <!-- Action Buttons inside Edit Mode -->
-                                    <div class="col-12 d-flex justify-content-end gap-2 mt-2">
-                                        <button *ngIf="newFamilyIndexes.has(i)" type="button"
-                                            class="btn btn-sm btn-outline-secondary" (click)="cancelNewFamilyMember(i)">
-                                            रद्द करा (Cancel)
-                                        </button>
 
-                                        <!-- Done button saves edits and collapses view -->
-                                        <button type="button" class="btn btn-sm btn-success px-4"
-                                            (click)="finishEditFamily(i)">
-                                            पूर्ण झाले (Done)
-                                        </button>
+                                    <div class="col-12 col-sm-8 col-md-5">
+                                        <label class="form-label small text-muted">नाव <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control"
+                                            [class.is-invalid]="memberForm.get('fname')?.touched && memberForm.get('fname')?.invalid"
+                                            formControlName="fname" placeholder="सभासद आणि वडीलांचे नाव" />
                                     </div>
-                                </div>
-                            </div>
 
-                        </div>
-                        <div *ngIf="familyMembers.length === 0" class="text-muted small text-center py-2">
-                            कौटुंबिक माहितीची नोंद नाही (No record)
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dynamic Section: Donations -->
-                <div class="card mb-4 border-light-subtle" formArrayName="donations">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                        <span class="fw-semibold text-secondary">देणगी / वर्गणी</span>
-                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addDonation()">
-                            + देणगी नोंदवा
-                        </button>
-                    </div>
-                    <div class="card-body p-3">
-                        <div *ngFor="let donation of donations.controls; let i = index" [formGroupName]="i"
-                            class="p-2 mb-2 bg-light rounded border">
-
-                            <!-- READ-ONLY SUMMARY VIEW -->
-                            <div *ngIf="!isEditingDonation(i)"
-                                class="d-flex justify-content-between align-items-center px-2 py-1">
-                                <div class="small">
-                                    <span class="badge bg-primary me-2">{{ donation.get('contributionType')?.value
-                                        }}</span>
-                                    <strong class="text-success">₹{{ donation.get('amount')?.value || 0 }}</strong>
-                                    <span class="text-muted ms-2" *ngIf="donation.get('date')?.value">• {{
-                                        donation.get('date')?.value }}</span>
-                                    <span class="text-muted ms-2" *ngIf="donation.get('description')?.value">({{
-                                        donation.get('description')?.value }})</span>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
-                                        (click)="toggleEditDonation(i)" title="संपादन करा">
-                                        ✏️
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
-                                        (click)="removeDonation(i)" title="रद्द करा">
-                                        🗑️
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- EDITABLE FORM VIEW -->
-                            <div *ngIf="isEditingDonation(i)" class="pt-2">
-                                <div class="row g-2 align-items-center">
-                                    <div class="col-12 col-sm-4 col-md-2">
-                                        <input type="date" class="form-control form-control-sm"
-                                            formControlName="date" />
+                                    <div class="col-12 col-sm-6 col-md-5">
+                                        <label class="form-label small text-muted">आडनाव <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" formControlName="lname" />
                                     </div>
-                                    <div class="col-12 col-sm-4 col-md-2">
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text">₹</span>
-                                            <input type="number" class="form-control" formControlName="amount"
-                                                placeholder="रक्कम" />
+
+                                    <div class="col-12 col-sm-6 col-md-4">
+                                        <label class="form-label small text-muted">फोन <span
+                                                class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">+91</span>
+                                            <input type="tel" class="form-control"
+                                                [class.is-invalid]="memberForm.get('phone')?.touched && memberForm.get('phone')?.invalid"
+                                                formControlName="phone" placeholder="10 अंकी नंबर" />
                                         </div>
                                     </div>
-                                    <div class="col-12 col-sm-4 col-md-3">
-                                        <select class="form-select form-select-sm" formControlName="contributionType">
-                                            <option value="सभासद वर्गणी">सभासद वर्गणी</option>
-                                            <option value="जकात">जकात</option>
-                                            <option value="सदका">सदका</option>
-                                            <option value="फित्रा">फित्रा</option>
-                                            <option value="शिक्षण नीधी">शिक्षण नीधी</option>
-                                            <option value="इतर">इतर</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12 col-sm-8 col-md-3">
-                                        <input type="text" class="form-control form-control-sm"
-                                            formControlName="description" placeholder="तपशील / विवरण" />
-                                    </div>
-                                    <!-- Action Buttons inside Edit Mode -->
-                                    <div class="col-12 d-flex justify-content-end gap-2 mt-2">
-                                        <button *ngIf="newDonationIndexes.has(i)" type="button"
-                                            class="btn btn-sm btn-outline-secondary" (click)="cancelNewDonation(i)">
-                                            रद्द करा (Cancel)
-                                        </button>
 
-                                        <button type="button" class="btn btn-sm btn-success px-4"
-                                            (click)="finishEditDonation(i)">
-                                            पूर्ण झाले (Done)
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div *ngIf="donations.length === 0" class="text-muted small text-center py-2">
-                            देणगीची नोंद नाही (No record)
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dynamic Section: Help Received -->
-                <div class="card mb-4 border-light-subtle" formArrayName="helpReceived">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                        <span class="fw-semibold text-secondary">मिळालेली मदत</span>
-                        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addHelp()">
-                            + मदत नोंदवा
-                        </button>
-                    </div>
-                    <div class="card-body p-3">
-                        <div *ngFor="let help of helpReceived.controls; let i = index" [formGroupName]="i"
-                            class="p-2 mb-2 bg-light rounded border">
-
-                            <!-- READ-ONLY SUMMARY VIEW -->
-                            <div *ngIf="!isEditingHelp(i)"
-                                class="d-flex justify-content-between align-items-center px-2 py-1">
-                                <div class="small">
-                                    <span class="badge bg-info text-dark me-2">{{ help.get('helpType')?.value }}</span>
-                                    <strong class="text-primary">₹{{ help.get('amount')?.value || 0 }}</strong>
-                                    <span class="text-muted ms-2" *ngIf="help.get('date')?.value">• {{
-                                        help.get('date')?.value }}</span>
-                                    <span class="text-muted ms-2" *ngIf="help.get('description')?.value">({{
-                                        help.get('description')?.value }})</span>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
-                                        (click)="toggleEditHelp(i)" title="संपादन करा">
-                                        ✏️
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
-                                        (click)="removeHelp(i)" title="रद्द करा">
-                                        🗑️
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- EDITABLE FORM VIEW -->
-                            <div *ngIf="isEditingHelp(i)" class="pt-2">
-                                <div class="row g-2 align-items-center">
-                                    <div class="col-12 col-sm-4 col-md-2">
-                                        <input type="date" class="form-control form-control-sm"
-                                            formControlName="date" />
-                                    </div>
-                                    <div class="col-12 col-sm-4 col-md-2">
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text">₹</span>
-                                            <input type="number" class="form-control" formControlName="amount"
-                                                placeholder="रक्कम" />
+                                    <div class="col-12 col-sm-6 col-md-4">
+                                        <label class="form-label small text-muted">वय <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" inputmode="numeric" id="age" formControlName="age"
+                                            class="form-control" placeholder="वय नमूद करा (१ ते ९९)" maxlength="2" />
+                                        <div *ngIf="ageControl?.invalid && (ageControl?.touched || ageControl?.dirty)"
+                                            class="error-message text-danger mt-1">
+                                            <small *ngIf="ageControl?.errors?.['required']">वय प्रविष्ट करणे आवश्यक
+                                                आहे.</small>
+                                            <small *ngIf="ageControl?.errors?.['pattern']">वय फक्त अंकांमध्ये असणे
+                                                आवश्यक आहे.</small>
+                                            <small *ngIf="ageControl?.errors?.['min'] || ageControl?.errors?.['max']">वय
+                                                ९९ पेक्षा कमी (१ ते ९९) असणे आवश्यक आहे.</small>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-sm-4 col-md-3">
-                                        <select class="form-select form-select-sm" formControlName="helpType">
-                                            <option value="वैद्यकीय मदत">वैद्यकीय मदत</option>
-                                            <option value="शैक्षणिक मदत">शैक्षणिक मदत</option>
-                                            <option value="आर्थिक मदत">आर्थिक मदत</option>
-                                            <option value="इतर मदत">इतर मदत</option>
+
+                                    <div class="col-12 col-sm-6 col-md-4">
+                                        <label class="form-label small text-muted">पद <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" formControlName="designation">
+                                            <option value="सभासद">सभासद</option>
+                                            <option value="कार्यकारणी सदस्य">कार्यकारणी सदस्य</option>
+                                            <option value="खजिनदार">खजिनदार</option>
+                                            <option value="सचिव">सचिव</option>
+                                            <option value="उपाध्यक्ष">उपाध्यक्ष</option>
+                                            <option value="अध्यक्ष">अध्यक्ष</option>
+                                            <option value="तालुका समिती सदस्य">तालुका समिती सदस्य</option>
+                                            <option value="संस्थापक">संस्थापक</option>
+                                            <option value="संस्थापक सदस्य">संस्थापक सदस्य</option>
+                                            <option value="आजिव सदस्य">आजिव सदस्य</option>
                                         </select>
                                     </div>
-                                    <div class="col-12 col-sm-8 col-md-3">
-                                        <input type="text" class="form-control form-control-sm"
-                                            formControlName="description" placeholder="तपशील / विवरण" />
-                                    </div>
-                                    <!-- Action Buttons inside Edit Mode -->
-                                    <div class="col-12 d-flex justify-content-end gap-2 mt-2">
-                                        <button *ngIf="newHelpIndexes.has(i)" type="button"
-                                            class="btn btn-sm btn-outline-secondary" (click)="cancelNewHelp(i)">
-                                            रद्द करा (Cancel)
-                                        </button>
 
-                                        <button type="button" class="btn btn-sm btn-success px-4"
-                                            (click)="finishEditHelp(i)">
-                                            पूर्ण झाले (Done)
-                                        </button>
+                                    <div class="col-12 col-sm-6 col-md-4">
+                                        <label class="form-label small text-muted">सभासद झालेली तारीख <span
+                                                class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" formControlName="joinedOn" />
                                     </div>
+
+                                    <!-- Address Details -->
+                                    <div class="col-12 col-md-8">
+                                        <label class="form-label small text-muted">गल्ली / रस्ता / घर क्र.</label>
+                                        <input type="text" class="form-control" formControlName="address"
+                                            placeholder="घर क्रमांक - बिल्डींगचे नाव - रस्ता इ." />
+                                    </div>
+
+                                    <div class="col-12 col-sm-4 col-md-4">
+                                        <label class="form-label small text-muted">तालुका <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" formControlName="taluka"
+                                            [class.is-invalid]="memberForm.get('taluka')?.touched && memberForm.get('taluka')?.invalid">
+                                            <option value="">तालुका निवडा</option>
+                                            <option *ngFor="let t of talukaList" [value]="t.name">{{ t.name }}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 col-sm-4 col-md-4">
+                                        <label class="form-label small text-muted">गावाचे नाव <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" formControlName="village"
+                                            [class.is-invalid]="memberForm.get('village')?.touched && memberForm.get('village')?.invalid">
+                                            <option value="">गावं निवडा</option>
+                                            <option *ngFor="let v of filteredVillages" [value]="v.name">{{ v.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 col-sm-4 col-md-4">
+                                        <label class="form-label small text-muted">जिल्हा <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" formControlName="district" />
+                                    </div>
+
+                                    <!-- Switches -->
+                                    <div class="col-12 mt-3">
+                                        <div class="d-flex gap-4 p-2 bg-light rounded border">
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" id="aliveSwitch"
+                                                    formControlName="alive" />
+                                                <label class="form-check-label fw-medium" for="aliveSwitch">हयात</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" id="activeSwitch"
+                                                    formControlName="active" />
+                                                <label class="form-check-label fw-medium"
+                                                    for="activeSwitch">सक्रिय</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
-
-                        </div>
-                        <div *ngIf="helpReceived.length === 0" class="text-muted small text-center py-2">
-                            मदतीची नोंद नाही (No record)
                         </div>
                     </div>
+
+                    <!-- SECTION 3: Family Members -->
+                    <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden"
+                        formArrayName="familyMembers">
+                        <h2 class="accordion-header d-flex align-items-center bg-light">
+                            <button class="accordion-button fw-semibold text-secondary flex-grow-1"
+                                [class.collapsed]="!isSectionOpen('family')" type="button"
+                                (click)="toggleSection('family')">
+                                <span class="me-2">👨‍👩‍👧‍👦 कुटुंबतील सदस्य</span>
+                                <span class="badge bg-secondary ms-auto me-3">{{ familyMembers.length }} नोंदी</span>
+                            </button>
+                        </h2>
+                        <div [class.show]="isSectionOpen('family')" [class.collapsed]="!isSectionOpen('family')"
+                            class="accordion-collapse collapse">
+                            <div class="accordion-body bg-white p-3">
+                                <div class="d-flex justify-content-end mb-3">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                        (click)="addFamilyMember()">
+                                        + सदस्य नोंद
+                                    </button>
+                                </div>
+                                <div *ngFor="let member of familyMembers.controls; let i = index" [formGroupName]="i"
+                                    class="p-2 mb-2 bg-light rounded border">
+                                    <!-- READ-ONLY SUMMARY VIEW -->
+                                    <div *ngIf="!isEditingFamily(i)"
+                                        class="d-flex justify-content-between align-items-center px-2 py-1">
+                                        <div class="small">
+                                            <span class="badge bg-secondary me-2">{{ member.get('relation')?.value ||
+                                                'नाते नाही' }}</span>
+                                            <strong class="text-dark">{{ member.get('name')?.value || 'नाव दिलेले नाही'
+                                                }}</strong>
+                                            <span class="text-muted ms-2" *ngIf="member.get('age')?.value">({{
+                                                member.get('age')?.value }} वर्षे)</span>
+                                            <span class="text-muted ms-2" *ngIf="member.get('gender')?.value">• {{
+                                                member.get('gender')?.value }}</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                                (click)="toggleEditFamily(i)">✏️</button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
+                                                (click)="removeFamilyMember(i)">🗑️</button>
+                                        </div>
+                                    </div>
+                                    <!-- EDITABLE FORM VIEW -->
+                                    <div *ngIf="isEditingFamily(i)" class="pt-2">
+                                        <div class="row g-2 align-items-center">
+                                            <div class="col-6 col-sm-4 col-md-2">
+                                                <select class="form-select form-select-sm" formControlName="relation">
+                                                    <option value="">नाते</option>
+                                                    <option value="पत्नी">पत्नी</option>
+                                                    <option value="आई">आई</option>
+                                                    <option value="वडील">वडील</option>
+                                                    <option value="मुलगा">मुलगा</option>
+                                                    <option value="मुलगी">मुलगी</option>
+                                                    <option value="पति">पति</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6 col-sm-8 col-md-3">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="name" placeholder="नाव *" />
+                                            </div>
+                                            <div class="col-6 col-sm-4 col-md-2">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="education" placeholder="शिक्षण" />
+                                            </div>
+                                            <div class="col-6 col-sm-4 col-md-1">
+                                                <input type="number" class="form-control form-control-sm"
+                                                    formControlName="age" placeholder="वय" />
+                                            </div>
+                                            <div class="col-6 col-sm-4 col-md-2">
+                                                <select class="form-select form-select-sm" formControlName="gender">
+                                                    <option value="">लिंग</option>
+                                                    <option value="पुरुष">पुरुष</option>
+                                                    <option value="स्त्री">स्त्री</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6 col-sm-4 col-md-2">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="occupation" placeholder="व्यवसाय" />
+                                            </div>
+                                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                                <button *ngIf="newFamilyIndexes.has(i)" type="button"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    (click)="cancelNewFamilyMember(i)">रद्द करा</button>
+                                                <button type="button" class="btn btn-sm btn-success px-4"
+                                                    (click)="finishEditFamily(i)">पूर्ण झाले</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="familyMembers.length === 0" class="text-muted small text-center py-2">
+                                    कौटुंबिक माहितीची नोंद नाही
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: Donations -->
+                    <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden"
+                        formArrayName="donations">
+                        <h2 class="accordion-header d-flex align-items-center bg-light">
+                            <button class="accordion-button fw-semibold text-secondary flex-grow-1"
+                                [class.collapsed]="!isSectionOpen('donations')" type="button"
+                                (click)="toggleSection('donations')">
+                                <span class="me-2">💰 वर्गणी / देणगी</span>
+                                <span class="badge bg-primary ms-auto me-3">{{ donations.length }} नोंदी</span>
+                            </button>
+                        </h2>
+                        <div [class.show]="isSectionOpen('donations')" [class.collapsed]="!isSectionOpen('donations')"
+                            class="accordion-collapse collapse">
+                            <div class="accordion-body bg-white p-3">
+                                <div class="d-flex justify-content-end mb-3">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                        (click)="addDonation()">
+                                        + देणगी नोंद
+                                    </button>
+                                </div>
+                                <div *ngFor="let donation of donations.controls; let i = index" [formGroupName]="i"
+                                    class="p-2 mb-2 bg-light rounded border">
+                                    <div *ngIf="!isEditingDonation(i)"
+                                        class="d-flex justify-content-between align-items-center px-2 py-1">
+                                        <div class="small">
+                                            <span class="badge bg-primary me-2">{{
+                                                donation.get('contributionType')?.value }}</span>
+                                            <strong class="text-success">₹{{ donation.get('amount')?.value || 0
+                                                }}</strong>
+                                            <span class="text-muted ms-2" *ngIf="donation.get('date')?.value">• {{
+                                                donation.get('date')?.value }}</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                                (click)="toggleEditDonation(i)">✏️</button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
+                                                (click)="removeDonation(i)">🗑️</button>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="isEditingDonation(i)" class="pt-2">
+                                        <div class="row g-2 align-items-center">
+                                            <div class="col-12 col-sm-4 col-md-2">
+                                                <input type="date" class="form-control form-control-sm"
+                                                    formControlName="date" />
+                                            </div>
+                                            <div class="col-12 col-sm-4 col-md-2">
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text">₹</span>
+                                                    <input type="number" class="form-control" formControlName="amount"
+                                                        placeholder="रक्कम" />
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-4 col-md-3">
+                                                <select class="form-select form-select-sm"
+                                                    formControlName="contributionType">
+                                                    <option value="सभासद वर्गणी">सभासद वर्गणी</option>
+                                                    <option value="जकात">जकात</option>
+                                                    <option value="सदका">सदका</option>
+                                                    <option value="फित्रा">फित्रा</option>
+                                                    <option value="शिक्षण नीधी">शिक्षण नीधी</option>
+                                                    <option value="इतर">इतर</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-12 col-sm-8 col-md-3">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="description" placeholder="तपशील / विवरण" />
+                                            </div>
+                                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                                <button *ngIf="newDonationIndexes.has(i)" type="button"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    (click)="cancelNewDonation(i)">रद्द करा</button>
+                                                <button type="button" class="btn btn-sm btn-success px-4"
+                                                    (click)="finishEditDonation(i)">पूर्ण झाले</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="donations.length === 0" class="text-muted small text-center py-2">
+                                    देणगीची नोंद नाही
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 5: Help Received -->
+                    <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden"
+                        formArrayName="helpReceived">
+                        <h2 class="accordion-header d-flex align-items-center bg-light">
+                            <button class="accordion-button fw-semibold text-secondary flex-grow-1"
+                                [class.collapsed]="!isSectionOpen('help')" type="button"
+                                (click)="toggleSection('help')">
+                                <span class="me-2">🤝 मिळालेली मदत</span>
+                                <span class="badge bg-info text-dark ms-auto me-3">{{ helpReceived.length }}
+                                    नोंदी</span>
+                            </button>
+                        </h2>
+                        <div [class.show]="isSectionOpen('help')" [class.collapsed]="!isSectionOpen('help')"
+                            class="accordion-collapse collapse">
+                            <div class="accordion-body bg-white p-3">
+                                <div class="d-flex justify-content-end mb-3">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="addHelp()">
+                                        + मदत नोंद
+                                    </button>
+                                </div>
+                                <div *ngFor="let help of helpReceived.controls; let i = index" [formGroupName]="i"
+                                    class="p-2 mb-2 bg-light rounded border">
+                                    <div *ngIf="!isEditingHelp(i)"
+                                        class="d-flex justify-content-between align-items-center px-2 py-1">
+                                        <div class="small">
+                                            <span class="badge bg-info text-dark me-2">{{ help.get('helpType')?.value
+                                                }}</span>
+                                            <strong class="text-primary">₹{{ help.get('amount')?.value || 0 }}</strong>
+                                            <span class="text-muted ms-2" *ngIf="help.get('date')?.value">• {{
+                                                help.get('date')?.value }}</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                                (click)="toggleEditHelp(i)">✏️</button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
+                                                (click)="removeHelp(i)">🗑️</button>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="isEditingHelp(i)" class="pt-2">
+                                        <div class="row g-2 align-items-center">
+                                            <div class="col-12 col-sm-4 col-md-2">
+                                                <input type="date" class="form-control form-control-sm"
+                                                    formControlName="date" />
+                                            </div>
+                                            <div class="col-12 col-sm-4 col-md-2">
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text">₹</span>
+                                                    <input type="number" class="form-control" formControlName="amount"
+                                                        placeholder="रक्कम" />
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-sm-4 col-md-3">
+                                                <select class="form-select form-select-sm" formControlName="helpType">
+                                                    <option value="वैद्यकीय मदत">वैद्यकीय मदत</option>
+                                                    <option value="शैक्षणिक मदत">शैक्षणिक मदत</option>
+                                                    <option value="आर्थिक मदत">आर्थिक मदत</option>
+                                                    <option value="इतर मदत">इतर मदत</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-12 col-sm-8 col-md-3">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="description" placeholder="तपशील / विवरण" />
+                                            </div>
+                                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                                <button *ngIf="newHelpIndexes.has(i)" type="button"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    (click)="cancelNewHelp(i)">रद्द करा</button>
+                                                <button type="button" class="btn btn-sm btn-success px-4"
+                                                    (click)="finishEditHelp(i)">पूर्ण झाले</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="helpReceived.length === 0" class="text-muted small text-center py-2">
+                                    मदतीची नोंद नाही
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 6: Recommendation Letters -->
+                    <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden"
+                        formArrayName="recommendationLetters">
+                        <h2 class="accordion-header d-flex align-items-center bg-light">
+                            <button class="accordion-button fw-semibold text-secondary flex-grow-1"
+                                [class.collapsed]="!isSectionOpen('recommendations')" type="button"
+                                (click)="toggleSection('recommendations')">
+                                <span class="me-2">📄 शिफारस पत्र</span>
+                                <span class="badge bg-secondary ms-auto me-3">{{ recommendationLetters.length }}
+                                    नोंदी</span>
+                            </button>
+                        </h2>
+                        <div [class.show]="isSectionOpen('recommendations')"
+                            [class.collapsed]="!isSectionOpen('recommendations')" class="accordion-collapse collapse">
+                            <div class="accordion-body bg-white p-3">
+                                <div class="d-flex justify-content-end mb-3">
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                        (click)="addRecommendation()">
+                                        + शिफारस पत्र नोंद
+                                    </button>
+                                </div>
+                                <div *ngFor="let rec of recommendationLetters.controls; let i = index"
+                                    [formGroupName]="i" class="p-2 mb-2 bg-light rounded border">
+                                    <div *ngIf="!isEditingRecommendation(i)"
+                                        class="d-flex justify-content-between align-items-center px-2 py-1">
+                                        <div class="small">
+                                            <strong class="text-dark">{{ rec.get('name')?.value || 'नाव दिलेले नाही'
+                                                }}</strong>
+                                            <span class="text-muted ms-2" *ngIf="rec.get('date')?.value">• {{
+                                                rec.get('date')?.value }}</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                                (click)="toggleEditRecommendation(i)">✏️</button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
+                                                (click)="removeRecommendation(i)">🗑️</button>
+                                        </div>
+                                    </div>
+                                    <div *ngIf="isEditingRecommendation(i)" class="pt-2">
+                                        <div class="row g-2 align-items-center">
+                                            <div class="col-12 col-sm-4 col-md-3">
+                                                <input type="date" class="form-control form-control-sm"
+                                                    formControlName="date" />
+                                            </div>
+                                            <div class="col-12 col-sm-8 col-md-4">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="name" placeholder="शिफारस पत्राचे नाव *" />
+                                            </div>
+                                            <div class="col-12 col-sm-12 col-md-5">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="description" placeholder="तपशील / विवरण" />
+                                            </div>
+                                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                                <button *ngIf="newRecommendationIndexes.has(i)" type="button"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    (click)="cancelNewRecommendation(i)">रद्द करा</button>
+                                                <button type="button" class="btn btn-sm btn-success px-4"
+                                                    (click)="finishEditRecommendation(i)">पूर्ण झाले</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="recommendationLetters.length === 0"
+                                    class="text-muted small text-center py-2">
+                                    शिफारस पत्राची नोंद नाही
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- Action Bar -->
