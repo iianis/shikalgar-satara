@@ -153,11 +153,7 @@
                             <button class="accordion-button fw-semibold text-secondary"
                                 [class.collapsed]="!isSectionOpen('personal')" type="button"
                                 (click)="toggleSection('personal')">
-                                <span class="me-2">👤 वैयक्तिक माहिती</span>
-                                <span class="badge bg-light text-dark border ms-auto me-3"
-                                    *ngIf="memberForm.get('fname')?.value">
-                                    {{ memberForm.get('fname')?.value }} {{ memberForm.get('lname')?.value }}
-                                </span>
+                                <span class="me-2">👤 वैयक्तिक</span>
                             </button>
                         </h2>
                         <div [class.show]="isSectionOpen('personal')" [class.collapsed]="!isSectionOpen('personal')"
@@ -601,11 +597,11 @@
                                             </div>
                                             <div class="col-12 col-sm-8 col-md-4">
                                                 <input type="text" class="form-control form-control-sm"
-                                                    formControlName="name" placeholder="शिफारस पत्राचे नाव *" />
+                                                    formControlName="name" placeholder="नाव *" />
                                             </div>
                                             <div class="col-12 col-sm-12 col-md-5">
                                                 <input type="text" class="form-control form-control-sm"
-                                                    formControlName="description" placeholder="तपशील / विवरण" />
+                                                    formControlName="description" placeholder="तपशील" />
                                             </div>
                                             <div class="col-12 d-flex justify-content-end gap-2 mt-2">
                                                 <button *ngIf="newRecommendationIndexes.has(i)" type="button"
