@@ -201,4 +201,49 @@ export class FirebaseReportService {
 
     return { records: paginatedRecords, totalCount };
   }
+
+  /**
+ * TEMPORARY ONE-TIME MIGRATION FUNCTION
+ * Updates members where alive === '' to set alive = true.
+ */
+  async migrateAliveFieldOneTime(): Promise<number> {
+    const collectionName = 'members' + checkIfWeAreTesting();
+    const snapshot = await firstValueFrom(this.firestore.collection(collectionName).get());
+
+    if (snapshot.empty) {
+      console.log('No members found for migration.');
+      return 0;
+    }
+
+    // Use a batch for efficiency (Firestore batch limit is 500 operations per batch)
+    let batch = this.firestore.firestore.batch();
+    let operationCount = 0;
+    let totalUpdated = 0;
+
+    for (const doc of snapshot.docs) {
+      const data = doc.data() as any;
+
+      // Target documents where 'alive' is explicitly an empty string ''
+      if (data.alive === true) {
+        batch.update(doc.ref, { active: true });
+        operationCount++;
+        totalUpdated++;
+
+        // Commit batch if it reaches the 500 limit
+        if (operationCount === 500) {
+          await batch.commit();
+          batch = this.firestore.firestore.batch();
+          operationCount = 0;
+        }
+      }
+    }
+
+    // Commit remaining operations
+    if (operationCount > 0) {
+      await batch.commit();
+    }
+
+    console.log(`Migration complete! Successfully updated ${totalUpdated} member documents.`);
+    return totalUpdated;
+  }
 }

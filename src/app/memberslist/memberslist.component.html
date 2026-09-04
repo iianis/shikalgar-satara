@@ -56,7 +56,7 @@
     <div *ngFor="let member of filteredMembers">
         <div class="card mt-2">
             <div class="card-header fs-4">
-                <span [ngClass]="{ 'bg-light text-danger': member.alive }">
+                <span [ngClass]="{ 'bg-light text-danger': member.alive == false }">
                     {{ member.fname || member.name }}
                     {{ member.lname }}, {{ member.village }}
                 </span>

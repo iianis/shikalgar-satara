@@ -139,14 +139,26 @@ export class FirebaseService {
   async addMember(memberData: IMember | Member): Promise<void> {
     const collectionName = "members" + checkIfWeAreTesting();
     const id = this.firestore.createId();
-    (memberData as any).timestamp = Timestamp.now();
-    return this.firestore.collection(collectionName).doc(id).set(memberData);
+
+    // Attach server timestamp for reliable creation ordering
+    const payload = {
+      ...memberData,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    return this.firestore.collection(collectionName).doc(id).set(payload);
   }
 
-  // Updated to pure Compat SDK to prevent "Argument of type 'AngularFirestore' is not assignable" error
   async updateMember(id: string, memberData: Partial<Member>): Promise<void> {
     const collectionName = 'members' + checkIfWeAreTesting();
-    return await this.firestore.collection(collectionName).doc(id).update(memberData);
+
+    // Refresh timestamp on update so edited members rise to top of audit report
+    const payload = {
+      ...memberData,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    return await this.firestore.collection(collectionName).doc(id).update(payload);
   }
 
   async addUserIssues(issue: string): Promise<void> {

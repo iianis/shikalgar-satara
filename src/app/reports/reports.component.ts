@@ -30,7 +30,16 @@ export class ReportsComponent implements OnInit {
   private pageSnapshots: (QueryDocumentSnapshot<any> | null)[] = [null];
   private currentLastDoc: QueryDocumentSnapshot<any> | null = null;
 
-  ngOnInit(): void { }
+  // In membermanager.component.ts or reports.component.ts
+  async ngOnInit(): Promise<void> {
+    // Call the temporary migration function once
+    // try {
+    //   const count = await this.reportService.migrateAliveFieldOneTime();
+    //   console.log(`Migration completed for ${count} records.`);
+    // } catch (err) {
+    //   console.error('Migration failed:', err);
+    // }
+  }
 
   // Handle Report Selection from Dashboard
   selectReport(report: ReportType): void {
