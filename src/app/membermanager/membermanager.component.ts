@@ -148,6 +148,24 @@ export class MembermanagerComponent implements OnInit {
     this.location.back();
   }
 
+  goBackFromForm(): void {
+    // 1. Came from MemberslistComponent (or external route via state)
+    // Or if we came straight into form mode without searching first
+    if (history.state?.memberToEdit || (this.foundMembers.length === 0 && this.step === 'form')) {
+      this.location.back();
+      return;
+    }
+
+    // 2. Came from search results within MembermanagerComponent
+    if (this.foundMembers.length > 0) {
+      this.step = 'results';
+      return;
+    }
+
+    // 3. Fallback to initial search view
+    this.resetSearch();
+  }
+
   isLoading = false;
 
   // Dedicated property to hold the active document ID when editing
@@ -257,7 +275,12 @@ export class MembermanagerComponent implements OnInit {
       }
 
       this.isLoading = false;
-      this.resetSearch();
+      // Replace this.resetSearch() inside onSubmit() with:
+      if (this.foundMembers.length > 0) {
+        this.step = 'results';
+      } else {
+        this.resetSearch();
+      }
     } catch (error) {
       this.isLoading = false;
       console.error('Error saving/updating member:', error);
@@ -551,18 +574,22 @@ export class MembermanagerComponent implements OnInit {
     this.newRecommendationIndexes.delete(index);
   }
 
-  // 7. Update resetSearch()
   resetSearch(): void {
+    // Clear router state reference if it exists
+    if (history.state?.memberToEdit) {
+      history.state.memberToEdit = null;
+    }
+
     this.isEditMode = false;
     this.editingMemberId = null;
     this.editingFamilyIndexes.clear();
     this.editingDonationIndexes.clear();
     this.editingHelpIndexes.clear();
-    this.editingRecommendationIndexes.clear(); // Added
+    this.editingRecommendationIndexes.clear();
     this.newFamilyIndexes.clear();
     this.newDonationIndexes.clear();
     this.newHelpIndexes.clear();
-    this.newRecommendationIndexes.clear(); // Added
+    this.newRecommendationIndexes.clear();
     this.searchQueryControl.reset();
     this.foundMembers = [];
     this.step = 'search';
