@@ -33,16 +33,22 @@ export class LoginComponent implements OnInit {
       setTimeout(() => { this.router.navigateByUrl("home"); }, 1500);
     }
   }
+  // Add these variables inside LoginComponent
+  showPassword = false;
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   async onLogin() {
     if (!this.credentials.phone || !this.credentials.password) {
-      this.errorMessage = 'कृपया मोबाईल नंबर आणि पासवर्ड प्रविष्ट करा.';
+      this.errorMessage = 'कृपया मोबाईल नंबर आणि पासवर्ड अशी माहिती भरा.';
       return;
     }
 
     const cleanPhone = this.credentials.phone.trim();
     if (!/^[0-9]{10}$/.test(cleanPhone)) {
-      this.errorMessage = 'कृपया योग्य १० अंकी मोबाईल नंबर प्रविष्ट करा.';
+      this.errorMessage = 'कृपया १० अंकी योग्य मोबाईल नंबरचा वापर करा.';
       return;
     }
 
@@ -61,7 +67,7 @@ export class LoginComponent implements OnInit {
       },
       error: (error) => {
         console.error('Login error:', error);
-        this.errorMessage = 'लॉगिन अयशस्वी. मोबाईल नंबर किंवा पासवर्ड चुकला आहे.';
+        this.errorMessage = 'लॉगिन अयशस्वी. मोबाईल नंबर किंवा पासवर्ड चुकीचा आहे.';
         this.isLoading = false;
       }
     });

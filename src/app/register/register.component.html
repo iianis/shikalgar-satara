@@ -1,17 +1,15 @@
 <app-header></app-header>
 <div class="container my-4">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-12 col-md-8 col-lg-7">
             <div class="card shadow-sm border-0">
 
-                <!-- Card Header with Centered Logo & Title -->
+                <!-- Card Header with Centered Title -->
                 <div class="card-header bg-primary text-white text-center py-3">
-                    <div class="d-flex flex-column align-items-center justify-content-center gap-2">
-                        <h4 class="mb-0 fw-bold">पहिलीच वेळ आहे? खाते तयार करा / नोंदणी करा</h4>
-                    </div>
+                    <h5 class="mb-0 fw-bold">पहिलीच वेळ आहे / पासवर्ड माहित नाही? अशा वेळेस नोंदणी करा</h5>
                 </div>
 
-                <div class="card-body p-4">
+                <div class="card-body p-3 p-md-4">
 
                     <!-- Error Alert -->
                     <div *ngIf="errorMessage" class="alert alert-danger py-2 mb-3">
@@ -24,49 +22,158 @@
                     </div>
 
                     <form (ngSubmit)="onRegister()">
-                        <!-- Phone Number / User ID -->
+                        <!-- Account Credentials Section -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold">मोबाईल नंबर (User ID)</label>
-                            <input type="tel" class="form-control form-control-lg" [(ngModel)]="registrationData.phone"
-                                name="phone" maxlength="10" required placeholder="९८८६१७४६०७">
-                            <small class="text-muted d-block mt-1">अगोदरच नाव नोंदवले असल्यास तोच मोबाईल नंबर
-                                टाका.</small>
+                            <label class="form-label fw-bold small">मोबाईल नंबर <span
+                                    class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">+91</span>
+                                <input type="tel" class="form-control" [(ngModel)]="registrationData.phone" name="phone"
+                                    maxlength="10" required placeholder="१० अंकी नंबर">
+                            </div>
+                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                अगोदरच नाव नोंदवले असल्यास तोच मोबाईल नंबर टाका.
+                            </small>
                         </div>
 
-                        <!-- New Password -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">नवीन पासवर्ड तयार करा</label>
-                            <input type="password" class="form-control form-control-lg"
-                                [(ngModel)]="registrationData.password" name="password" required placeholder="******">
-                        </div>
-
-                        <!-- Confirm Password -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">पासवर्ड पुन्हा टाका (Confirm Password)</label>
-                            <input type="password" class="form-control form-control-lg"
-                                [(ngModel)]="registrationData.confirmPassword" name="confirmPassword" required
-                                placeholder="******">
-                        </div>
-
-                        <!-- Basic Profile Information for New Members -->
-                        <div class="border-top pt-3 mt-3">
-                            <p class="text-secondary small mb-2">नवीन सभासदांसाठी (नवी नोंदणी असल्यास):</p>
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" [(ngModel)]="registrationData.fname"
-                                        name="fname" placeholder="पहिले नाव">
+                        <div class="row g-2 mb-3">
+                            <!-- Password -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold small">नवीन पासवर्ड <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                                        [(ngModel)]="registrationData.password" name="password" required
+                                        placeholder="******">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        (click)="togglePasswordVisibility()">
+                                        {{ showPassword ? 'Hide' : 'Show' }}
+                                    </button>
                                 </div>
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" [(ngModel)]="registrationData.lname"
-                                        name="lname" placeholder="आडनाव">
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold small">नवीन पासवर्डची खात्री करा<span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control"
+                                        [(ngModel)]="registrationData.confirmPassword" name="confirmPassword" required
+                                        placeholder="******">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        (click)="toggleConfirmPasswordVisibility()">
+                                        {{ showConfirmPassword ? 'Hide' : 'Show' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Toggle Switch for Personal Information -->
+                        <div class="border-top pt-3 mt-3">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="profileToggle"
+                                    [(ngModel)]="showProfileFields" name="showProfileFields">
+                                <label class="form-check-label fw-bold small text-primary ms-1" for="profileToggle">
+                                    👤 वैयक्तिक माहिती भरा (पर्यायी) - फक्त नवीन सभासदां साठी.
+                                </label>
+                            </div>
+
+                            <!-- Conditional Profile Information Fields -->
+                            <div *ngIf="showProfileFields" class="row g-3 border rounded p-2 bg-light">
+                                <!-- Initial -->
+                                <div class="col-6 col-sm-4 col-md-3">
+                                    <label class="form-label small text-muted">आदरार्थी <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select form-select-sm" [(ngModel)]="registrationData.initial"
+                                        name="initial" [required]="showProfileFields">
+                                        <option value="ज.">जनाब</option>
+                                        <option value="मो.">मोहतरमा</option>
+                                    </select>
+                                </div>
+
+                                <!-- First Name -->
+                                <div class="col-12 col-sm-8 col-md-5">
+                                    <label class="form-label small text-muted">नाव <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        [(ngModel)]="registrationData.fname" name="fname" [required]="showProfileFields"
+                                        placeholder="सभासद आणि वडीलांचे नाव">
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">आडनाव <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        [(ngModel)]="registrationData.lname" name="lname" [required]="showProfileFields"
+                                        placeholder="आडनाव">
+                                </div>
+
+                                <!-- Age -->
+                                <div class="col-6 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">वय <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" class="form-control form-control-sm"
+                                        [(ngModel)]="registrationData.age" name="age" min="1" max="99"
+                                        [required]="showProfileFields" placeholder="१ ते ९९">
+                                </div>
+
+                                <!-- Designation (Disabled) -->
+                                <div class="col-6 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">पद <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-sm bg-light"
+                                        [(ngModel)]="registrationData.designation" name="designation" disabled>
+                                </div>
+
+                                <!-- District -->
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">जिल्हा <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        [(ngModel)]="registrationData.district" name="district"
+                                        [required]="showProfileFields" placeholder="जिल्हा">
+                                </div>
+
+                                <!-- Taluka -->
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">तालुका <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select form-select-sm" [(ngModel)]="registrationData.taluka"
+                                        (ngModelChange)="onTalukaChange($event)" name="taluka"
+                                        [required]="showProfileFields">
+                                        <option value="">तालुका निवडा</option>
+                                        <option *ngFor="let t of talukaList" [value]="t.name">{{ t.name }}</option>
+                                    </select>
+                                </div>
+
+                                <!-- Village -->
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">गावाचे नाव <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select form-select-sm" [(ngModel)]="registrationData.village"
+                                        name="village" [required]="showProfileFields">
+                                        <option value="">गावं निवडा</option>
+                                        <option *ngFor="let v of filteredVillages" [value]="v.name">{{ v.name }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Address (Optional) -->
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">गल्ली / रस्ता / घर क्र.</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        [(ngModel)]="registrationData.address" name="address"
+                                        placeholder="घर क्र. - रस्ता इ.">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Action Buttons -->
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">
-                                {{ isLoading ? 'नोंदणी होत आहे...' : 'खाते तयार करा' }}
+                            <button type="submit" class="btn btn-primary fw-semibold" [disabled]="isLoading">
+                                {{ isLoading ? 'प्रक्रिया होत आहे...' : (showProfileFields ? 'सभासद माहिती नोंद करा'
+                                : 'पासवर्डची नोंद करा') }}
                             </button>
                             <button type="button" class="btn btn-outline-secondary" (click)="onBack()">
                                 लॉगिन कडे जा

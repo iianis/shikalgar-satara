@@ -3,11 +3,12 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { map, Observable, from } from 'rxjs';
 
 export const ADMIN_DESIGNATIONS = [
-  //'अध्यक्ष',
+  'अध्यक्ष',
   'उपाध्यक्ष',
   'सचिव',
   'खजीनदार',
-  'कार्यकारणी सदस्य'
+  'कार्यकारणी सदस्य',
+  'तालुका समिती सदस्य'
 ];
 
 @Injectable({

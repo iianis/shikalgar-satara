@@ -5,7 +5,7 @@
             <div class="card shadow-sm border-0 position-relative overflow-hidden">
 
                 <div class="card-header bg-primary text-white text-center py-3 position-relative z-1">
-                    <h4 class="mb-0 fw-bold">सभासद लॉगिन (Login)</h4>
+                    <h4 class="mb-0 fw-bold">सभासद पडताळणी</h4>
                 </div>
 
                 <div class="card-body p-4 position-relative">
@@ -25,16 +25,28 @@
 
                         <form (ngSubmit)="onLogin()">
                             <div class="mb-3">
-                                <label for="phone" class="form-label fw-bold">मोबाईल नंबर (User ID)</label>
+                                <label for="phone" class="form-label fw-bold">
+                                    मोबाईल नंबर <span class="text-danger">*</span>
+                                </label>
                                 <input type="tel" class="form-control form-control-lg" id="phone"
                                     [(ngModel)]="credentials.phone" name="phone" maxlength="10" required
                                     placeholder="उदा. ९८८६१७४६०७">
                             </div>
 
                             <div class="mb-3">
-                                <label for="password" class="form-label fw-bold">पासवर्ड (Password)</label>
-                                <input type="password" class="form-control form-control-lg" id="password"
-                                    [(ngModel)]="credentials.password" name="password" required placeholder="******">
+                                <label for="password" class="form-label fw-bold">
+                                    पासवर्ड (Password) <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input [type]="showPassword ? 'text' : 'password'"
+                                        class="form-control form-control-lg" id="password"
+                                        [(ngModel)]="credentials.password" name="password" required
+                                        placeholder="******">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        (click)="togglePasswordVisibility()">
+                                        {{ showPassword ? 'Hide' : 'Show' }}
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="d-grid gap-2 mt-4">
@@ -49,10 +61,10 @@
 
                         <!-- First-time / New User Registration Prompt -->
                         <div class="mt-4 text-center border-top pt-3">
-                            <p class="mb-2 text-muted small">पहिलीच वेळ भेट दिली आहे किंवा पासवर्ड नाही?</p>
+                            <p class="mb-2 text-muted small">पहिल्याच वेळी भेट दिली आहे किंवा पासवर्ड माहित नाही?</p>
                             <button type="button" class="btn btn-outline-success btn-sm w-100 fw-bold"
                                 (click)="onRegister()">
-                                नवीन नोंदणी / खाते तयार करा
+                                नवीन नोंदणी / पासवर्ड बदला
                             </button>
                         </div>
                     </div>

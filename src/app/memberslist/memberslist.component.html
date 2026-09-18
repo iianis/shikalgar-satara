@@ -19,7 +19,8 @@
     </div>
 </div>
 
-<app-search placeholder="सभासद नांव शोधा..." (searchChange)="onSearchChange($event)"></app-search>
+<app-search placeholder="मोबाईल नंबर, किंवा सभासदाचे नाव, किंवा वडीलांचे नांव याचा वापर करावा.."
+    (searchChange)="onSearchChange($event)"></app-search>
 
 <div class="container">
     <div class="row mb-3">
@@ -84,6 +85,7 @@
 
         <!-- Extended Information Section -->
         <div *ngIf="selectedMemberId === member.id" class="card-footer bg-white border-top">
+
             <!-- Personal Details List -->
             <div class="row mb-3">
                 <div class="col-12">
@@ -105,15 +107,24 @@
                             </div>
                         </li>
 
-                        <!-- Member Status Badges / Text in Details -->
-                        <li class="list-group-item px-0 py-1">
-                            <span class="badge me-1" [ngClass]="member.alive !== false ? 'bg-success' : 'bg-danger'">
-                                {{ member.alive !== false ? 'हयात' : 'स्वर्गीय' }}
-                            </span>
-                            <span class="badge"
-                                [ngClass]="member.active !== false ? 'bg-info text-dark' : 'bg-secondary'">
-                                {{ member.active !== false ? 'सक्रिय' : 'निष्क्रिय' }}
-                            </span>
+                        <!-- Member Status Badges & Right-Aligned Edit Button -->
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge me-1"
+                                    [ngClass]="member.alive !== false ? 'bg-success' : 'bg-danger'">
+                                    {{ member.alive !== false ? 'हयात' : 'स्वर्गीय' }}
+                                </span>
+                                <span class="badge"
+                                    [ngClass]="member.active !== false ? 'bg-info text-dark' : 'bg-secondary'">
+                                    {{ member.active !== false ? 'सक्रिय' : 'निष्क्रिय' }}
+                                </span>
+                            </div>
+
+                            <!-- Edit Button aligned to the right of the badges -->
+                            <button *ngIf="canEdit(member)" type="button"
+                                class="btn btn-sm btn-warning text-dark fw-bold shadow-sm" (click)="editMember(member)">
+                                ✏️ माझी माहिती अपडेट करा
+                            </button>
                         </li>
                     </ul>
                 </div>

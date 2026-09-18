@@ -1,11 +1,12 @@
-import { Component, ElementRef, inject, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { of, switchMap } from 'rxjs';
 import { FirebaseService } from '../../app/services/firebase.service';
 import { AuthService } from '../services/auth.service';
 //import { AdsPopupComponent } from '../advertisement/ads-popup/ads-popup.component';
 // Flash marque news
 //इयत्ता दहावीच्या परीक्षेत यशस्वी सर्व विद्यार्थी व पालकांना अनेक शुभेच्छा ।
-import { map, switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -16,17 +17,22 @@ import { map, switchMap, of } from 'rxjs';
 })
 export class HomeComponent implements OnInit {
 
-  renderer = inject(Renderer2);
-  router = inject(Router);
-  firebaseService = inject(FirebaseService);
-  authService = inject(AuthService);
+  private router = inject(Router);
+  private firebaseService = inject(FirebaseService);
+  private authService = inject(AuthService);
+  private destroyRef = inject(DestroyRef);
+
   appsettings: any = [];
   masterdata: any = [];
   charityCount = 72;
   isTesting: boolean = false;
   isLoggedIn: boolean = false;
-
   isAdmin = false;
+
+  userIssue: string = "";
+  needHelp: boolean = false;
+  requestSentSuccess: boolean = false;
+  requestSentFailure: boolean = false;
 
   ngOnInit(): void {
     // Fetch by Document ID
@@ -34,22 +40,27 @@ export class HomeComponent implements OnInit {
 
     localStorage.setItem("isTesting", String(this.isTesting));
 
-    this.firebaseService.getSettingById(
-      "eG52d1h6Gt0ON3n0ZgRx"
-    ).subscribe(data => {
-      this.appsettings = data;
-    });
+    // Fetch Application Settings with automatic unsubscription
+    this.firebaseService.getSettingById("eG52d1h6Gt0ON3n0ZgRx")
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => {
+        this.appsettings = data;
+      });
 
     const charityCountString = localStorage.getItem('charityCount');
     if (charityCountString) {
       this.charityCount = parseInt(charityCountString, 10);
     }
 
-    this.firebaseService.getMasterDataOrderByField("guides", "timestamp").subscribe(data => {
-      //debugger;
-      this.masterdata = data;
-    });
+    // Fetch Master Data with automatic unsubscription
+    this.firebaseService.getMasterDataOrderByField("guides", "timestamp")
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => {
+        //debugger;
+        this.masterdata = data || [];
+      });
 
+    // Unified Authentication & Admin Designation pipeline
     this.authService.getLoggedInPhone().pipe(
       switchMap(phone => {
         if (phone) {
@@ -58,7 +69,8 @@ export class HomeComponent implements OnInit {
         }
         this.isLoggedIn = false;
         return of(null);
-      })
+      }),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe(result => {
       const member = Array.isArray(result) ? result[0] : result;
       this.isAdmin = !!member && this.authService.isAdminDesignation(member.designation);
@@ -68,48 +80,46 @@ export class HomeComponent implements OnInit {
   jumpTo(section: string): void {
     const element = document.getElementById(section);
     if (element) {
-      this.renderer.setStyle(element, 'display', 'block');
       element.focus();
-      // Bring the element into focus without scrolling
     }
   }
 
-  async logout() {
-    localStorage.removeItem("loggedInUser");
-    this.isLoggedIn = false;
-    this.router.navigateByUrl("login");
+  async logout(): Promise<void> {
+    try {
+      await this.authService.logout();
+    } catch (e) {
+      // Ignore fallback if firebase logout encounters non-critical warnings
+    } finally {
+      localStorage.removeItem("loggedInUser");
+      this.isLoggedIn = false;
+      this.isAdmin = false;
+      this.router.navigateByUrl("login");
+    }
   }
 
-  showList() {
+  showList(): void {
     this.router.navigateByUrl('charity');
   }
 
-  userIssue: string = "";
-  needHelp: boolean = false;
-  requestSentSuccess: boolean = false;
-  requestSentFailure: boolean = false;
-
-  onHelpChange() {
+  onHelpChange(): void {
     //console.log('Need Help:', this.needHelp);
   }
 
-  goSendRequest() {
+  goSendRequest(): void {
     this.requestSentFailure = false;
     this.requestSentSuccess = false;
 
-    if (this.userIssue == "" || this.userIssue.length < 20) {
+    if (this.userIssue == "" || this.userIssue.trim().length < 20) {
       //console.log("please enter atleast 30 characters");
       this.requestSentFailure = true;
     } else {
-      this.firebaseService.addUserIssues(this.userIssue);
+      this.firebaseService.addUserIssues(this.userIssue.trim());
       this.requestSentSuccess = true;
       setTimeout(() => {
         this.requestSentSuccess = false;
         this.userIssue = "";
         this.needHelp = false;
-      }, 2000); // Hide the message after 3 seconds
+      }, 2000); // Hide the message after 2 seconds
     }
   }
-
 }
-

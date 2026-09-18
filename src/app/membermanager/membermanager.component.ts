@@ -44,6 +44,74 @@ export class MembermanagerComponent implements OnInit {
 
   userTalukaSelection = '';
   userVillageSelection = '';
+  step: 'search' | 'results' | 'not-found' | 'form' = 'search';
+  isEditMode = false;
+  isReadOnly = false;
+  //loggedInPhone = '';   // Adjust based on your logged-in user state
+
+  // Section visibility flags
+  showPersonalSection = true;
+  showDonationsSection = true;
+  showRecommendationsSection = true;
+  showHelpReceivedSection = true;
+
+  /**
+   * Opens member details in Read-Only Mode (All sections visible, inputs disabled)
+   */
+  viewMemberDetails(member: Member): void {
+    this.isReadOnly = true;
+    this.isEditMode = true;
+
+    // Enable visibility for all sections during view mode
+    this.canEditOtherSections = true;
+
+    this.initForm(member);
+    this.memberForm.disable(); // Fully disables all form fields/controls
+
+    this.applySectionPermissions(); // Ensures all section flags remain true
+    this.step = 'form';
+  }
+
+  /**
+   * Applies section visibility & edit permissions
+   */
+  applySectionPermissions(): void {
+    // If in Read-Only view mode, show all sections regardless of user role
+    if (this.isReadOnly) {
+      this.showPersonalSection = true;
+      this.showDonationsSection = true;
+      this.showRecommendationsSection = true;
+      this.showHelpReceivedSection = true;
+      return;
+    }
+
+    // Edit Mode Permissions
+    const isOwnRecord = this.loggedInPhone === this.memberForm.get('phone')?.value;
+    this.showPersonalSection = true; // Always visible
+    this.showDonationsSection = this.isAdminUser || isOwnRecord;
+    this.showRecommendationsSection = this.isAdminUser || isOwnRecord;
+    this.showHelpReceivedSection = this.isAdminUser || isOwnRecord;
+  }
+
+  /**
+   * Opens member details in Edit Mode
+   */
+  selectMemberToEdit(member: any): void {
+    const isOwnRecord = this.loggedInPhone === member.phone;
+
+    if (!isOwnRecord && !this.isAdminUser) {
+      alert('तुम्हाला फक्त स्वतःची माहिती अपडेट करण्याची परवानगी आहे.');
+      return;
+    }
+
+    this.isReadOnly = false;
+    this.isEditMode = true;
+
+    this.initForm(member);
+    this.memberForm.enable(); // Re-enables form controls
+    this.applySectionPermissions();
+    this.step = 'form';
+  }
 
   constructor(
     private fb: FormBuilder, private router: Router
@@ -68,46 +136,18 @@ export class MembermanagerComponent implements OnInit {
       const currentMemberData = matchingMemberSnapshot[0];
       this.isAdminUser = this.authService.isAdminDesignation(currentMemberData.designation);
     }
-  }
 
-  selectMemberToEdit(member: Member): void {
-    // Authorization Check 1: Prevent editing someone else's profile unless Admin
-    const isOwnRecord = this.loggedInPhone === member.phone;
-
-    if (!isOwnRecord && !this.isAdminUser) {
-      alert('तुम्हाला फक्त स्वतःची माहिती अपडेट करण्याची परवानगी आहे.');
-      return;
-    }
-
-    // Authorization Check 2: Determine section privileges
-    // Admins can edit donations/help/recommendations; regular members cannot.
-    this.canEditOtherSections = this.isAdminUser;
-
-    this.isEditMode = true;
-    this.initForm(member);
-    this.applySectionPermissions();
-    this.step = 'form';
-  }
-
-  applySectionPermissions(): void {
-    // Disable restricted sub-arrays if user is not an admin
-    if (!this.canEditOtherSections) {
-      this.donations.disable();
-      this.helpReceived.disable();
-      this.recommendationLetters.disable();
-    } else {
-      this.donations.enable();
-      this.helpReceived.enable();
-      this.recommendationLetters.enable();
+    // 3. Check router state for member passed from MemberslistComponent
+    const stateMember = history.state?.memberToEdit as Member | undefined;
+    if (stateMember) {
+      this.selectMemberToEdit(stateMember);
     }
   }
+
   goBack(): void {
     this.location.back();
   }
 
-  // Navigation & State flags
-  step: 'search' | 'not-found' | 'results' | 'form' = 'search';
-  isEditMode = false;
   isLoading = false;
 
   // Dedicated property to hold the active document ID when editing

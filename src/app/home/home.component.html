@@ -14,7 +14,7 @@
 
         <!-- Navigation Menu Links -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-3">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-3 fw-semibold">
                 <li class="nav-item">
                     <a class="nav-link active" href="home">मुख्यपृष्ठ</a>
                 </li>
@@ -53,6 +53,7 @@
         </div>
     </div>
 </nav>
+
 <!-- <app-ads-popup></app-ads-popup> -->
 <app-logo></app-logo>
 
@@ -69,135 +70,170 @@
 <app-members></app-members>
 <app-events></app-events>
 
-<!-- <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-6" (click)="showList()">
-            <div class="card bg-info mb-3">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">गरजू कुटुंबांची मदत</span>
-                    <span class="badge bg-success rounded-pill">{{charityCount}}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
-
+<!-- Charity Statistics Card -->
 <div class="container mt-3">
     <div class="row">
-        <div class="col-12" (click)="showList()">
-            <div class="card light-blue-background">
+        <div class="col-12" (click)="showList()" style="cursor: pointer;">
+            <div class="card light-blue-background shadow-sm">
                 <div class="card-body">
-                    <h2 class="card-title">गरजू कुटुंबांची मदत</h2>
-                    <p class="card-text"> एकूण: {{charityCount}}</p>
+                    <h2 class="card-title fluid-title text-dark">गरजू कुटुंबांची मदत</h2>
+                    <p class="card-text fs-5 fw-semibold mb-0"> एकूण: {{charityCount}}</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Recommendation Statistics Card -->
 <div class="container mt-3">
     <div class="row">
         <div class="col-12">
-            <div class="card">
+            <div class="card shadow-sm">
                 <div class="card-body">
-                    <h2 class="card-title">शिफारस पत्र वितरण</h2>
+                    <h2 class="card-title fluid-title text-dark">शिफारस पत्र वितरण</h2>
                     <!-- <p class="card-text"> एकूण: 210</p> -->
-                    <p> एकूण: {{appsettings?.shifaraspatra}}+</p>
+                    <p class="fs-5 fw-semibold mb-0"> एकूण: {{appsettings?.shifaraspatra}}+</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <!-- <app-recommendation></app-recommendation> -->
 <app-activities></app-activities>
+
+<!-- Founder Section -->
 <div class="container mt-4">
     <div class="row">
         <div class="col-12 text-center">
-            <img src="/assets/images/founder.jpg" alt="community logo" class="col-7 rounded-circle"
-                style="width: 350px; height: 200px;">
+            <img src="/assets/images/founder.jpg" alt="community logo" class="img-fluid rounded-4 shadow-sm"
+                style="max-width: 220px; width: 100%; height: auto; object-fit: contain;">
         </div>
     </div><br>
     <div class="row">
         <div class="col-12 text-center">
-            <h1>संस्थापक - प्रेरणा स्त्रोत</h1>
-            <h2>मरहूम ज. निजामभाई शिकलगार</h2>
+            <h1 class="fluid-header fw-bold text-dark">संस्थापक - प्रेरणा स्त्रोत</h1>
+            <h2 class="fluid-title text-secondary">मरहूम ज. निजामभाई शिकलगार</h2>
         </div>
     </div>
 </div>
-<div class="container mt-4 w-100 text-center fs-5">
+
+<div class="container mt-4 w-100 text-center fs-5 fw-bold text-uppercase">
     मार्गदर्शक
 </div>
 
+<!-- Master Data Guides List -->
 <div class="container mt-2">
     <div class="card custom-card bg-transparent text-center" *ngFor="let item of masterdata; let i=index">
         <div class="card-body py-1">
-            <h2 class="card-title fs-6 mb-1">{{item.name}}, {{item.village}}</h2>
+            <h2 class="card-title fs-6 mb-1 fw-semibold text-dark">{{item.name}}, {{item.village}}</h2>
         </div>
     </div>
 </div>
+
 <app-upipayment></app-upipayment>
 
-<hr>
+<hr class="my-4">
+
+<!-- Feedback & Request Section -->
 <div class="px-2 mx-2">
     <div class="container d-flex align-items-center">
-        <div class="section-header display-6 fw-bold">
+        <div class="section-header fluid-header fw-bold">
             मदतीची हाक.. {{ needHelp? "/ अभिप्राय लिहा" :""}}
         </div>
     </div>
     <div class="form-group mt-3" *ngIf="needHelp">
-        <label for="userIssue">
+        <label for="userIssue" class="fw-semibold mb-2">
             सविस्तर माहिती द्या. आम्ही यथावकाश तुमच्याशी संपर्क करू - धन्यवाद!
         </label>
-        <!-- Success message div -->
-        <div *ngIf="requestSentFailure" class="alert alert-error alert-custom-error mt-3 mt-3" role="alert">
+
+        <!-- Error Message Div -->
+        <div *ngIf="requestSentFailure" class="alert alert-custom-error mt-3 rounded shadow-sm" role="alert">
             कमीत कमी २० शब्दात आपली अभिप्राय/अडचण सांगा!
         </div>
-        <!-- Success message div -->
-        <div *ngIf="requestSentSuccess" class="alert alert-error alert-custom-success mt-3" role="alert">
+
+        <!-- Success Message Div -->
+        <div *ngIf="requestSentSuccess" class="alert alert-custom-success mt-3 rounded shadow-sm" role="alert">
             आपण दिलेल्या माहितीचा लवकरच विचार केला जाईल - धन्यवाद!
         </div>
-        <textarea class="form-control" id="userIssue" [ngModelOptions]="{standalone: true}" [(ngModel)]="userIssue"
-            rows="10"
+
+        <textarea class="form-control mt-2" id="userIssue" [ngModelOptions]="{standalone: true}" [(ngModel)]="userIssue"
+            rows="6"
             placeholder="आपल्या अभिप्राय/अडचणी सोबत नाव, गावं, फोन आणि आपण काय करता याची सविस्तर माहिती द्या..."></textarea>
 
-        <button type="submit" class="btn btn-primary mt-3" (click)="goSendRequest()">नोंद पाठवा</button>
+        <button type="submit" class="btn btn-primary mt-3 px-4 fw-bold" (click)="goSendRequest()">नोंद पाठवा</button>
     </div>
 
     <div class="form-group form-check mt-4 mb-4">
         <input type="checkbox" class="form-check-input" id="needHelp" [ngModelOptions]="{standalone: true}"
             [(ngModel)]="needHelp" (change)="onHelpChange()">
-        <label class="form-check-label" for="needHelp">आपल्या काही मदत हवी आहे का? अथवा अभिप्राय पाठवा.</label>
+        <label class="form-check-label fw-semibold" for="needHelp">आपल्या काही मदत हवी आहे का? अथवा अभिप्राय
+            पाठवा.</label>
     </div>
 </div>
-<hr>
-<footer class="mt-2 py-2">
+
+<hr class="my-4">
+
+<!-- Clean Crisp Footer -->
+<footer class="bg-forest-light text-light mt-4 pt-4 pb-3 border-top border-success-subtle">
     <div class="container">
-        <div class="row">
-            <!-- About Section -->
-            <!-- <div class="col-lg-4 col-md-6 mb-4">
-                <h2>About Us</h2>
-                <p class="text-muted">
-                    Your Angular application footer can include information about your app, your organization, or
-                    contact details.
+        <div class="row gy-4">
+            <!-- Contact Details Column -->
+            <div class="col-lg-4 col-md-6">
+                <h5 class="text-white fw-bold mb-3 border-bottom pb-2 border-success-subtle">
+                    <i class="bi bi-telephone-fill me-2 text-warning"></i>संपर्क
+                </h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <span class="text-muted-custom">ई-मेल:</span>
+                        <a href="mailto:satarashikalgar@gmail.com"
+                            class="text-light text-decoration-none ms-1 fw-semibold">
+                            satarashikalgar&#64;gmail.com
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <span class="text-muted-custom">फोन:</span>
+                        <a href="tel:+919886174607" class="text-light text-decoration-none ms-1 fw-semibold">
+                            ९८८६१७४६०७
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Address Column -->
+            <div class="col-lg-4 col-md-6">
+                <h5 class="text-white fw-bold mb-3 border-bottom pb-2 border-success-subtle">
+                    <i class="bi bi-geo-alt-fill me-2 text-warning"></i>कार्यालय
+                </h5>
+                <p class="text-light mb-0">
+                    ७, सावंत कॉलनी, सातारा,<br>महाराष्ट्र - ४१५००१
                 </p>
-            </div> -->
-            <!-- Contact Section -->
+            </div>
+
+            <!-- Registration Info Column -->
             <div class="col-lg-4 col-md-12">
-                <h2 class="mb-3">संपर्क</h2>
-                <p class="text-muted">
-                    ई-मेल: <a href="mailto:satarashikalgar@gmail.com"
-                        class="text-white text-decoration-none">satarashikalgar&#64;gmail.com</a>
+                <h5 class="text-white fw-bold mb-3 border-bottom pb-2 border-success-subtle">
+                    <i class="bi bi-file-earmark-text-fill me-2 text-warning"></i>नोंदणी माहिती
+                </h5>
+                <p class="small text-muted-custom mb-1">
+                    <strong class="text-light">संस्था नोंदणी क्र:</strong> महा/४६४५/सातारा/२२-३-१९९६
                 </p>
-                <p class="text-muted">
-                    फोन: <a href="tel:+919886174607" class="text-white text-decoration-none">९८८६१७४६०७</a>
+                <p class="small text-muted-custom mb-0">
+                    <strong class="text-light">सार्वजनिक विश्वस्त क्र:</strong> एफ ४६१६/सातारा/१८-५-१९९६
                 </p>
-                <p class="text-muted">कार्यालय: ७, सावंत कॉलनी, सातारा, महाराष्ट्र</p>
-                <p class="text-muted">संस्था नोंदणी क्रमांक - महा/४६४५/सातारा/२२-३-१९९६; सार्वजनिक विश्वस्त व्यवस्था
-                    नोंदणी क्रमांक - एफ ४६१६/सातारा/१८-५-१९९६</p>
             </div>
         </div>
-        <!-- <div class="text-center mt-3">
-            <p class="text-muted mb-0">&copy; 2025 Satara Jilha Muslim Shikalgar Sanghatana. All rights reserved.</p>
-        </div> -->
+
+        <hr class="border-success-subtle my-3">
+
+        <!-- Copyright Bottom Bar -->
+        <div class="row align-items-center">
+            <div class="col-12 text-center">
+                <p class="small text-muted-custom mb-0">
+                    &copy; 2026-27 सातारा जिल्हा मुस्लिम शिकलगार संघटना. सर्व हक्क सुरक्षित.
+                </p>
+            </div>
+        </div>
     </div>
 </footer>
 

@@ -7,22 +7,25 @@ import { Member } from '../interfaces/interfaces';
 import { HeaderComponent } from '../shared/header/header.component';
 import { SearchComponent } from '../search/search.component';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-memberslist',
   templateUrl: './memberslist.component.html',
-  imports: [HeaderComponent, SearchComponent, CommonModule,
-    FormsModule],
+  imports: [HeaderComponent, SearchComponent, CommonModule, FormsModule],
   styleUrls: ['./memberslist.component.css'],
   standalone: true
 })
 export class MemberslistComponent implements OnInit {
 
   router = inject(Router);
+  firebaseService = inject(FirebaseService);
+  authService = inject(AuthService);
+  location = inject(Location);
+
   members: Member[] = [];
   filteredMembers: Member[] = [];
-  firebaseService = inject(FirebaseService);
-  location = inject(Location);
 
   // Selected member ID state for expanded view
   selectedMemberId: string | null = null;
@@ -32,6 +35,9 @@ export class MemberslistComponent implements OnInit {
   // Active search query state
   searchQuery: string = '';
 
+  // Auth & Permissions State
+  loggedInPhone: string | null = null;
+
   // Set defaults: Load saved selection from localStorage or fall back to Satara & Nagthane
   mytaluka = localStorage.getItem("mytaluka") || "सातारा";
   myvillage = localStorage.getItem("myvillage") || "नागठाणे";
@@ -39,8 +45,14 @@ export class MemberslistComponent implements OnInit {
   talukas: taluka[] = talukas;
   villages: village[] = villages;
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    // Reset window scroll position to top
+    window.scrollTo(0, 0);
+
     this.updateVillagesForSelectedTaluka();
+
+    // Retrieve logged in phone for checking ownership permission
+    this.loggedInPhone = await firstValueFrom(this.authService.getLoggedInPhone());
 
     this.firebaseService.getMembers().subscribe(data => {
       this.members = data;
@@ -76,7 +88,6 @@ export class MemberslistComponent implements OnInit {
 
     this.updateVillagesForSelectedTaluka();
 
-    // Default to 'none' if current village is not in the newly selected taluka
     const villageExists = this.villagesByTaluka.some(v => v.name === this.myvillage);
     if (!villageExists) {
       this.myvillage = "none";
@@ -94,8 +105,7 @@ export class MemberslistComponent implements OnInit {
   }
 
   /**
-   * Single source of truth for filtering member records.
-   * Evaluates Taluka, Village, and Search Text simultaneously.
+   * Evaluates Taluka, Village, and Search Text (Name, Village, Designation, Phone) simultaneously.
    */
   applyCombinedFilters(): void {
     this.filteredMembers = this.members.filter((member) => {
@@ -105,14 +115,29 @@ export class MemberslistComponent implements OnInit {
       // 2. Check Village Filter
       const matchesVillage = this.myvillage === "none" || member.village === this.myvillage;
 
-      // 3. Check Search Query Filter
+      // 3. Check Search Query Filter (Name, Village, Designation, or Phone)
       const matchesSearch = !this.searchQuery ||
         member.fname?.toLowerCase().includes(this.searchQuery) ||
         member.lname?.toLowerCase().includes(this.searchQuery) ||
         member.village?.toLowerCase().includes(this.searchQuery) ||
-        member.designation?.toLowerCase().includes(this.searchQuery);
+        member.designation?.toLowerCase().includes(this.searchQuery) ||
+        member.phone?.includes(this.searchQuery);
 
       return matchesTaluka && matchesVillage && matchesSearch;
     });
+  }
+
+  /**
+   * Helper to determine if current user can edit this record
+   */
+  canEdit(member: Member): boolean {
+    return !!this.loggedInPhone && this.loggedInPhone === member.phone;
+  }
+
+  /**
+   * Navigates to MemberManager component passing the selected member to edit
+   */
+  editMember(member: Member): void {
+    this.router.navigate(['/membermanager'], { state: { memberToEdit: member } });
   }
 }
