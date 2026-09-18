@@ -1,39 +1,81 @@
-<div *ngIf="isRegistered" class="alert alert-info" role="alert"> You are already registered! </div>
-
-<div *ngIf="!isRegistered" class="container">
+<app-header></app-header>
+<div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <h2 class="text-center mt-2">Register</h2>
-            <form (ngSubmit)="requestVerification()">
-                <div class="mb-2">
-                    <label for="phoneNumber" class="form-label">Phone Number</label>
-                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
-                        placeholder="Enter your phone" required>
-                </div>
-                <div class="mb-1">
-                    <label for="fname" class="form-label">Member Details</label>
-                    <input type="text" name="fname" class="form-control" id="fname" placeholder="Enter your first name">
-                </div>
-                <div class="mb-2">
-                    <input type="text" name="mname" class="form-control" id="mname" placeholder="middle name">
-                </div>
-                <div class="mb-2">
-                    <input type="text" name="village" class="form-control" id="village"
-                        placeholder="Enter your village">
-                </div>
-                <div class="mb-3">
-                    <input type="text" name="taluka" class="form-control" id="taluka" placeholder="Enter your taluka">
-                </div>
-                <div id="recaptcha-container"></div>
-                <!-- <button type="submit mt-2" class="btn btn-primary">Request Verification Code</button><br> -->
-                <button *ngIf="verificationId == ''" class="btn btn-secondary mt-2 me-2" (click)="onBack()">मागे
-                    जा</button>
-                <!-- <button *ngIf="verificationId == ''" class="btn mt-2 me-2" (click)="onLogin()">Login</button> -->
-            </form>
+            <div class="card shadow-sm border-0">
 
-            <form *ngIf="verificationId" (ngSubmit)="verifyCode()">
-                <button type="submit" class="btn btn-success mt-2">Register</button>
-            </form>
+                <!-- Card Header with Centered Logo & Title -->
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <div class="d-flex flex-column align-items-center justify-content-center gap-2">
+                        <h4 class="mb-0 fw-bold">पहिलीच वेळ आहे? खाते तयार करा / नोंदणी करा</h4>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+
+                    <!-- Error Alert -->
+                    <div *ngIf="errorMessage" class="alert alert-danger py-2 mb-3">
+                        {{ errorMessage }}
+                    </div>
+
+                    <!-- Success Alert -->
+                    <div *ngIf="successMessage" class="alert alert-success py-2 mb-3">
+                        {{ successMessage }}
+                    </div>
+
+                    <form (ngSubmit)="onRegister()">
+                        <!-- Phone Number / User ID -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">मोबाईल नंबर (User ID)</label>
+                            <input type="tel" class="form-control form-control-lg" [(ngModel)]="registrationData.phone"
+                                name="phone" maxlength="10" required placeholder="९८८६१७४६०७">
+                            <small class="text-muted d-block mt-1">अगोदरच नाव नोंदवले असल्यास तोच मोबाईल नंबर
+                                टाका.</small>
+                        </div>
+
+                        <!-- New Password -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">नवीन पासवर्ड तयार करा</label>
+                            <input type="password" class="form-control form-control-lg"
+                                [(ngModel)]="registrationData.password" name="password" required placeholder="******">
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">पासवर्ड पुन्हा टाका (Confirm Password)</label>
+                            <input type="password" class="form-control form-control-lg"
+                                [(ngModel)]="registrationData.confirmPassword" name="confirmPassword" required
+                                placeholder="******">
+                        </div>
+
+                        <!-- Basic Profile Information for New Members -->
+                        <div class="border-top pt-3 mt-3">
+                            <p class="text-secondary small mb-2">नवीन सभासदांसाठी (नवी नोंदणी असल्यास):</p>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" [(ngModel)]="registrationData.fname"
+                                        name="fname" placeholder="पहिले नाव">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" [(ngModel)]="registrationData.lname"
+                                        name="lname" placeholder="आडनाव">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">
+                                {{ isLoading ? 'नोंदणी होत आहे...' : 'खाते तयार करा' }}
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" (click)="onBack()">
+                                लॉगिन कडे जा
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
         </div>
     </div>
 </div>

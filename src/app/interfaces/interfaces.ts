@@ -11,11 +11,11 @@ export function checkIfWeAreTesting(): string {
 
 export interface IMember {
     fname: string,
-    mname: string,
+    mname?: string,
     lname: string,
     village: string,
     taluka: string,
-    dist: string,
+    dist?: string,
     phone: string,
     designation?: string,
     createdBy?: string | undefined,
@@ -40,7 +40,6 @@ export interface IEvent {
     createdBy: string,
     createdOn: string,
 }
-
 
 export interface FamilyMember {
     relation?: 'आई' | 'वडील' | 'मुलगा' | 'मुलगी' | string;
@@ -75,20 +74,21 @@ export interface Member {
     id?: string;
     initial?: string;
     fname: string;
+    mname?: string;
     lname: string;
     address?: string;
     village: string;
     taluka: string;
-    district: string;
+    district?: string;
     phone: string;
     age?: number;
-    designation: string;
-    joinedOn: string;
+    designation?: string;
+    joinedOn?: string;
     alive?: boolean;
     active?: boolean;
     familyMembers?: FamilyMember[];
     donations?: Donation[];
     helpReceived?: HelpReceived[];
-    recommendationLetters?: RecommendationLetter[]; // Added
+    recommendationLetters?: RecommendationLetter[];
     timestamp?: Date;
 }

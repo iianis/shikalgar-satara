@@ -25,6 +25,8 @@ import { ZakatcalculatorComponent } from './zakatcalculator/zakatcalculator.comp
 import { KulakjaiComponent } from './kulakjai/kulakjai.component';
 import { MembermanagerComponent } from './membermanager/membermanager.component';
 import { ReportsComponent } from './reports/reports.component';
+import { RegisterComponent } from './register/register.component';
+import { adminGuard } from './admin.guard';
 
 const routes: Routes = [
   {
@@ -49,7 +51,7 @@ const routes: Routes = [
   },
   {
     path: 'register',
-    component: MembernewComponent
+    component: RegisterComponent //MemberNewComponent
   },
   {
     path: 'eventsdatacollector',
@@ -81,7 +83,7 @@ const routes: Routes = [
   },
   {
     path: 'membermanager',
-    component: MembermanagerComponent
+    component: MembermanagerComponent, canActivate: [adminGuard]
   },
   {
     path: '',

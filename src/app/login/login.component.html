@@ -1,28 +1,64 @@
-<div *ngIf="isLoggedIn" class="alert alert-info" role="alert"> You are already logged-in! </div>
-<app-logo></app-logo>
-<div *ngIf="!isLoggedIn" class="container mt-5">
-    <!-- src/app/phone-auth/phone-auth.component.html -->
-    <div class="container mt-6">
-        <h2 class="text-center mt-2">Login</h2>
-        <form (ngSubmit)="requestVerification()">
-            <div class="mb-3">
-                <label for="phoneNumber" class="form-label">Phone Number</label>
-                <input type="tel" class="form-control" id="phoneNumber" [(ngModel)]="loggedInUser.phoneNumber"
-                    name="phoneNumber" placeholder="Enter your phone" required>
-            </div>
-            <div id="recaptcha-container"></div>
-            <button type="submit" class="btn btn-primary">Request Verification Code</button><br>
-            <button class="btn btn-secondary mt-2 me-2" (click)="onBack()">मागे जा</button>
-            <button class="btn mt-2 me-2" (click)="onRegister()">Register</button>
-        </form>
+<app-header></app-header>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 position-relative overflow-hidden">
 
-        <form *ngIf=" verificationId" (ngSubmit)="verifyCode()">
-            <div class="mb-3">
-                <label for="verificationCode" class="form-label">Verification Code</label>
-                <input type="text" class="form-control" id="verificationCode"
-                    [(ngModel)]="loggedInUser.verificationCode" name="verificationCode" required>
+                <div class="card-header bg-primary text-white text-center py-3 position-relative z-1">
+                    <h4 class="mb-0 fw-bold">सभासद लॉगिन (Login)</h4>
+                </div>
+
+                <div class="card-body p-4 position-relative">
+
+                    <!-- Direct PNG Image Watermark -->
+                    <div
+                        class="position-absolute top-50 start-50 translate-middle pe-none z-0 opacity-25 w-100 text-center">
+                        <img src="/assets/images/logo.png" alt="Logo Watermark" class="img-fluid"
+                            style="max-width: 260px;">
+                    </div>
+
+                    <!-- Form Content Layered Above Watermark -->
+                    <div class="position-relative z-1">
+                        <div *ngIf="errorMessage" class="alert alert-danger py-2 mb-3">
+                            {{ errorMessage }}
+                        </div>
+
+                        <form (ngSubmit)="onLogin()">
+                            <div class="mb-3">
+                                <label for="phone" class="form-label fw-bold">मोबाईल नंबर (User ID)</label>
+                                <input type="tel" class="form-control form-control-lg" id="phone"
+                                    [(ngModel)]="credentials.phone" name="phone" maxlength="10" required
+                                    placeholder="उदा. ९८८६१७४६०७">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label fw-bold">पासवर्ड (Password)</label>
+                                <input type="password" class="form-control form-control-lg" id="password"
+                                    [(ngModel)]="credentials.password" name="password" required placeholder="******">
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">
+                                    {{ isLoading ? 'लॉगिन होत आहे...' : 'लॉगिन करा' }}
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" (click)="onBack()">
+                                    मागे जा
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- First-time / New User Registration Prompt -->
+                        <div class="mt-4 text-center border-top pt-3">
+                            <p class="mb-2 text-muted small">पहिलीच वेळ भेट दिली आहे किंवा पासवर्ड नाही?</p>
+                            <button type="button" class="btn btn-outline-success btn-sm w-100 fw-bold"
+                                (click)="onRegister()">
+                                नवीन नोंदणी / खाते तयार करा
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <button type="submit" class="btn btn-success">Verify Code</button>
-        </form>
+        </div>
     </div>
 </div>

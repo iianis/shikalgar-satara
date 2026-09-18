@@ -1,87 +1,76 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import firebase from 'firebase/compat/app';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { FirebaseService } from '../../app/services/firebase.service';
+import { AuthService } from '../../app/services/auth.service';
+import { HeaderComponent } from '../shared/header/header.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  standalone: false
+  imports: [HeaderComponent, CommonModule, FormsModule],
+  standalone: true
 })
 export class LoginComponent implements OnInit {
 
   router = inject(Router);
-  firebaseAuthentication = inject(AngularFireAuth);
-  firebaseService = inject(FirebaseService);
+  authService = inject(AuthService);
 
   isLoggedIn = false;
-  verificationId = "";
+  errorMessage = '';
+  isLoading = false;
 
-  loggedInUser = {
-    fname: "",
-    mname: "",
-    lname: "",
-    village: "",
-    taluka: "",
-    phoneNumber: "+919886174607",
-    verificationCode: "",
-    verificationId: ""
-  }
+  credentials = {
+    phone: '',
+    password: ''
+  };
 
   ngOnInit(): void {
-    // Initialization logic here
-    console.log('LoginComponent Initialized');
     const localUser = localStorage.getItem("loggedInUser");
     if (localUser) {
-      //user has logged-in
       this.isLoggedIn = true;
-      setTimeout(() => { this.router.navigateByUrl("home"); }, 2000);
+      setTimeout(() => { this.router.navigateByUrl("home"); }, 1500);
     }
   }
 
-  async requestVerification() {
-    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
-    try {
-      const result = await this.firebaseAuthentication.signInWithPhoneNumber(this.loggedInUser.phoneNumber, appVerifier);
-      this.verificationId = result.verificationId;
-      console.log('result.verificationId = ' + result.verificationId);
+  async onLogin() {
+    if (!this.credentials.phone || !this.credentials.password) {
+      this.errorMessage = 'कृपया मोबाईल नंबर आणि पासवर्ड प्रविष्ट करा.';
+      return;
     }
-    catch (error) {
-      console.error('Error during phone number sign-in:', error);
-    }
-  }
 
-  // Verify the code async
-  async verifyCode() {
-    const credential = firebase.auth.PhoneAuthProvider.credential(this.verificationId, this.loggedInUser.verificationCode);
-    const user = await this.firebaseService.loginUser(this.loggedInUser.phoneNumber, this.verificationId, this.loggedInUser.verificationCode).toPromise();
-    const localUser = await localStorage.getItem("loggedInUser");
-    try {
-      await this.firebaseAuthentication.signInWithCredential(credential);
-      console.log('Phone number verified and user signed in.');
-      if (localUser) {
-        //user has logged-in
-        const storedUser = JSON.parse(localUser);
-        let isUserExists: boolean = false;
-        isUserExists = storedUser.find((user: any) => user.phone == this.loggedInUser.phoneNumber);
-        if (!isUserExists) {
-          storedUser.push(this.loggedInUser);
-          localStorage.setItem("loggedInUser", JSON.stringify(storedUser));
+    const cleanPhone = this.credentials.phone.trim();
+    if (!/^[0-9]{10}$/.test(cleanPhone)) {
+      this.errorMessage = 'कृपया योग्य १० अंकी मोबाईल नंबर प्रविष्ट करा.';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.loginWithPhoneAndPassword(cleanPhone, this.credentials.password).subscribe({
+      next: (userCredential) => {
+        if (userCredential.user) {
+          localStorage.setItem("loggedInUser", JSON.stringify({
+            uid: userCredential.user.uid,
+            phone: cleanPhone
+          }));
+          this.router.navigateByUrl("home");
         }
+      },
+      error: (error) => {
+        console.error('Login error:', error);
+        this.errorMessage = 'लॉगिन अयशस्वी. मोबाईल नंबर किंवा पासवर्ड चुकला आहे.';
+        this.isLoading = false;
       }
-
-      this.router.navigateByUrl("home");
-    }
-    catch (error) {
-      console.error('Error during code verification:', error);
-    }
+    });
   }
 
   onRegister() {
     this.router.navigateByUrl('register');
   }
+
   onBack() {
     this.router.navigateByUrl('home');
   }

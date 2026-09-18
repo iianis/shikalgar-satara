@@ -1,43 +1,56 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#"></a>
-        <div>नोंदणी क्र - महा/४६४५/सातारा/२२-३-१९९६</div>
+        <!-- Registration Badge with Left Margin & Padding -->
+        <a class="navbar-brand text-wrap py-1 px-3 ms-2 ms-md-3 me-auto bg-white border rounded text-secondary shadow-sm"
+            style="font-size: 0.85rem;">
+            <span class="fw-bold text-dark">नोंदणी क्र:</span> महा/४६४५/सातारा/२२-३-१९९६
+        </a>
+
+        <!-- Mobile Toggler Button -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+
+        <!-- Navigation Menu Links -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-3">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="home"> मुख्यपृष्ठ</a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="login"> लॉगिन करा</a>
-                </li> -->
-                <li class="nav-item">
-                    <a class="nav-link" href="membermanager">सभासद नोंदणी</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="memberslist">सभासद यादी</a>
+                    <a class="nav-link active" href="home">मुख्यपृष्ठ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="education">शैक्षणिक माहिती</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="audits">मागील वर्षाचे ऑडिट</a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="announcement">सभा नोटीस</a>
-                </li> -->
-                <li class="nav-item">
                     <a class="nav-link" href="eventhighlight">एका सदस्याचे मनोगत</a>
                 </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="#" (click)="logout()">लॉगआउट</a>
-                </li> -->
+
+                <!-- Dynamic Auth Links When User Logs-Out-->
+                <li class="nav-item" *ngIf="!isLoggedIn">
+                    <a class="nav-link text-primary fw-bold" href="login">लॉगिन करा</a>
+                </li>
+                <li class="nav-item" *ngIf="!isLoggedIn">
+                    <a class="nav-link text-success fw-bold" href="register">खाते तयार करा</a>
+                </li>
+
+                <!-- Dynamic Auth Links When User Logs-In-->
+                <li class="nav-item" *ngIf="isLoggedIn">
+                    <a class="nav-link" href="memberslist">सभासद यादी</a>
+                </li>
+                <li class="nav-item" *ngIf="isLoggedIn">
+                    <a class="nav-link" href="audits">मागील वर्षाचे ऑडिट</a>
+                </li>
+                <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
+                    <a class="nav-link" href="membermanager">माझी प्रोफाइल / माहिती व्यवस्थापन</a>
+                </li>
+                <li class="nav-item" *ngIf="isLoggedIn">
+                    <a class="nav-link" href="announcement">सभा नोटीस</a>
+                </li>
+                <li class="nav-item" *ngIf="isLoggedIn">
+                    <a class="nav-link text-danger" href="#" (click)="logout()">लॉगआउट</a>
+                </li>
             </ul>
         </div>
-
     </div>
 </nav>
 <!-- <app-ads-popup></app-ads-popup> -->

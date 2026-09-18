@@ -1,87 +1,118 @@
-import { Location } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirebaseService } from '../../app/services/firebase.service';
 import { taluka, talukas, village, villages } from '../../data/areas';
+import { Member } from '../interfaces/interfaces';
+import { HeaderComponent } from '../shared/header/header.component';
+import { SearchComponent } from '../search/search.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-memberslist',
   templateUrl: './memberslist.component.html',
+  imports: [HeaderComponent, SearchComponent, CommonModule,
+    FormsModule],
   styleUrls: ['./memberslist.component.css'],
-  standalone: false
+  standalone: true
 })
 export class MemberslistComponent implements OnInit {
 
   router = inject(Router);
-  members: any[] = [];
-  filteredMembers: any[] = [];
+  members: Member[] = [];
+  filteredMembers: Member[] = [];
   firebaseService = inject(FirebaseService);
   location = inject(Location);
-  isloggedIn = this.firebaseService.getCurrentUser() ? true : false;
+
+  // Selected member ID state for expanded view
+  selectedMemberId: string | null = null;
+
+  villagesByTaluka: village[] = [];
+
+  // Active search query state
+  searchQuery: string = '';
+
+  // Set defaults: Load saved selection from localStorage or fall back to Satara & Nagthane
+  mytaluka = localStorage.getItem("mytaluka") || "सातारा";
+  myvillage = localStorage.getItem("myvillage") || "नागठाणे";
+
+  talukas: taluka[] = talukas;
+  villages: village[] = villages;
 
   ngOnInit(): void {
-    this.firebaseService.getMasterDataOrderByField("members", "timestamp").subscribe(data => {
-      //debugger;
-      this.members = this.filteredMembers = data;
+    this.updateVillagesForSelectedTaluka();
+
+    this.firebaseService.getMembers().subscribe(data => {
+      this.members = data;
+      this.applyCombinedFilters();
     });
+  }
+
+  toggleMemberDetails(memberId: string | undefined): void {
+    if (!memberId) return;
+    this.selectedMemberId = this.selectedMemberId === memberId ? null : memberId;
   }
 
   goBack(): void {
     this.location.back();
   }
-  goRegister(): void {
-    this.router.navigateByUrl('membermanager');
-  }
 
   onSearchChange(query: string) {
-    if (query) {
-      this.filteredMembers = this.members.filter((member) =>
-        member.fname.toLowerCase().includes(query.toLowerCase()) ||
-        member.mname?.toLowerCase().includes(query.toLowerCase()) ||
-        member.lname.toLowerCase().includes(query.toLowerCase()) ||
-        member.village.toLowerCase().includes(query.toLowerCase()) ||
-        member.designation.toLowerCase().includes(query.toLowerCase())
-      );
+    this.searchQuery = query ? query.toLowerCase().trim() : '';
+    this.applyCombinedFilters();
+  }
+
+  updateVillagesForSelectedTaluka(): void {
+    if (this.mytaluka && this.mytaluka !== "none") {
+      this.villagesByTaluka = this.villages.filter(v => v.taluka === this.mytaluka);
     } else {
-      this.filteredMembers = this.members;
+      this.villagesByTaluka = [];
     }
   }
 
-  villagesByTaluka: village[] = [];
-  mytaluka = "";
-  myvillage = "";
-  talukas: taluka[] = talukas;
-  villages: village[] = villages;
-  //membersByVillage = [];
-
   onTalukaChange(event: any) {
     this.mytaluka = event.target.value;
-    localStorage.setItem("mytaluka", event.target.value);
+    localStorage.setItem("mytaluka", this.mytaluka);
 
-    // Filter the villages array by the selected taluka
-    this.villagesByTaluka = this.villages.filter(village => village.taluka === this.mytaluka);
+    this.updateVillagesForSelectedTaluka();
 
-    this.myvillage = this.mytaluka; //most of the time taluka n village are same. satara - satara etc.
-    localStorage.setItem("myvillage", this.myvillage);
+    // Default to 'none' if current village is not in the newly selected taluka
+    const villageExists = this.villagesByTaluka.some(v => v.name === this.myvillage);
+    if (!villageExists) {
+      this.myvillage = "none";
+      localStorage.setItem("myvillage", "none");
+    }
 
-    this.resetMemberListFilterAsPerTalukaAndVillageSelection();
+    this.applyCombinedFilters();
   }
 
   onVillageChange(event: any) {
     this.myvillage = event.target.value;
-    localStorage.setItem("myvillage", event.target.value);
+    localStorage.setItem("myvillage", this.myvillage);
 
-    this.resetMemberListFilterAsPerTalukaAndVillageSelection();
+    this.applyCombinedFilters();
   }
 
-  resetMemberListFilterAsPerTalukaAndVillageSelection() {
+  /**
+   * Single source of truth for filtering member records.
+   * Evaluates Taluka, Village, and Search Text simultaneously.
+   */
+  applyCombinedFilters(): void {
+    this.filteredMembers = this.members.filter((member) => {
+      // 1. Check Taluka Filter
+      const matchesTaluka = this.mytaluka === "none" || member.taluka === this.mytaluka;
 
-    if (this.mytaluka === "none" && this.myvillage === "none") this.filteredMembers = this.members;
+      // 2. Check Village Filter
+      const matchesVillage = this.myvillage === "none" || member.village === this.myvillage;
 
-    if (this.mytaluka !== "none" && this.myvillage === "none")
-      this.filteredMembers = this.members.filter(member => (member.taluka === this.mytaluka));
+      // 3. Check Search Query Filter
+      const matchesSearch = !this.searchQuery ||
+        member.fname?.toLowerCase().includes(this.searchQuery) ||
+        member.lname?.toLowerCase().includes(this.searchQuery) ||
+        member.village?.toLowerCase().includes(this.searchQuery) ||
+        member.designation?.toLowerCase().includes(this.searchQuery);
 
-    if (this.mytaluka !== "none" && this.myvillage !== "none")
-      this.filteredMembers = this.members.filter(member => (member.taluka === this.mytaluka && member.village === this.myvillage));
+      return matchesTaluka && matchesVillage && matchesSearch;
+    });
   }
 }

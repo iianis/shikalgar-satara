@@ -5,6 +5,9 @@ import { taluka, talukas, village, villages } from '../../data/areas';
 import { FirebaseService } from '../services/firebase.service';
 import { Donation, FamilyMember, HelpReceived, Member, RecommendationLetter } from '../interfaces/interfaces';
 import { HeaderComponent } from '../shared/header/header.component';
+import { AuthService } from '../services/auth.service';
+import { firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-membermanager',
@@ -26,6 +29,11 @@ export class MembermanagerComponent implements OnInit {
   searchPhoneControl = new FormControl('', [Validators.required, Validators.pattern('^[0-9]{10}$')]);
   foundMembers: Member[] = [];
 
+  authService = inject(AuthService);
+  loggedInPhone: string | null = null;
+  isAdminUser = false;
+  canEditOtherSections = false;
+
   // Form Group
   memberForm!: FormGroup;
 
@@ -38,20 +46,63 @@ export class MembermanagerComponent implements OnInit {
   userVillageSelection = '';
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder, private router: Router
   ) { }
 
-  ngOnInit(): void {
-    // Form initialized when entering the form step
-  }
-  goBack(): void {
-    this.location.back();
+  async ngOnInit(): Promise<void> {
+    // 1. Get current logged-in phone number
+    this.loggedInPhone = await firstValueFrom(this.authService.getLoggedInPhone());
+
+    if (!this.loggedInPhone) {
+      // Redirect to login if unauthenticated
+      this.router.navigateByUrl('login');
+      return;
+    }
+
+    // 2. Check if current logged-in phone belongs to an Admin member
+    const matchingMemberSnapshot = await firstValueFrom(
+      this.firebaseService.getMemberByPhone(this.loggedInPhone)
+    );
+
+    if (matchingMemberSnapshot && matchingMemberSnapshot.length > 0) {
+      const currentMemberData = matchingMemberSnapshot[0];
+      this.isAdminUser = this.authService.isAdminDesignation(currentMemberData.designation);
+    }
   }
 
   selectMemberToEdit(member: Member): void {
+    // Authorization Check 1: Prevent editing someone else's profile unless Admin
+    const isOwnRecord = this.loggedInPhone === member.phone;
+
+    if (!isOwnRecord && !this.isAdminUser) {
+      alert('तुम्हाला फक्त स्वतःची माहिती अपडेट करण्याची परवानगी आहे.');
+      return;
+    }
+
+    // Authorization Check 2: Determine section privileges
+    // Admins can edit donations/help/recommendations; regular members cannot.
+    this.canEditOtherSections = this.isAdminUser;
+
     this.isEditMode = true;
     this.initForm(member);
+    this.applySectionPermissions();
     this.step = 'form';
+  }
+
+  applySectionPermissions(): void {
+    // Disable restricted sub-arrays if user is not an admin
+    if (!this.canEditOtherSections) {
+      this.donations.disable();
+      this.helpReceived.disable();
+      this.recommendationLetters.disable();
+    } else {
+      this.donations.enable();
+      this.helpReceived.enable();
+      this.recommendationLetters.enable();
+    }
+  }
+  goBack(): void {
+    this.location.back();
   }
 
   // Navigation & State flags

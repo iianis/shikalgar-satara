@@ -8,12 +8,9 @@ import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
-  declarations: [MemberslistComponent],
+  declarations: [],
   imports: [
-    CommonModule,
-    MemberslistRoutingModule,
-    SearchComponent,
-    FormsModule
+    MemberslistRoutingModule
   ]
 })
 export class MemberslistModule { }

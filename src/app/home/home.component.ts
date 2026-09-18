@@ -1,10 +1,11 @@
 import { Component, ElementRef, inject, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { FirebaseService } from '../../app/services/firebase.service';
+import { AuthService } from '../services/auth.service';
 //import { AdsPopupComponent } from '../advertisement/ads-popup/ads-popup.component';
 // Flash marque news
 //इयत्ता दहावीच्या परीक्षेत यशस्वी सर्व विद्यार्थी व पालकांना अनेक शुभेच्छा ।
-
+import { map, switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -18,13 +19,18 @@ export class HomeComponent implements OnInit {
   renderer = inject(Renderer2);
   router = inject(Router);
   firebaseService = inject(FirebaseService);
+  authService = inject(AuthService);
   appsettings: any = [];
   masterdata: any = [];
   charityCount = 72;
   isTesting: boolean = false;
+  isLoggedIn: boolean = false;
+
+  isAdmin = false;
 
   ngOnInit(): void {
     // Fetch by Document ID
+    this.isLoggedIn = !!localStorage.getItem("loggedInUser");
 
     localStorage.setItem("isTesting", String(this.isTesting));
 
@@ -43,6 +49,20 @@ export class HomeComponent implements OnInit {
       //debugger;
       this.masterdata = data;
     });
+
+    this.authService.getLoggedInPhone().pipe(
+      switchMap(phone => {
+        if (phone) {
+          this.isLoggedIn = true;
+          return this.firebaseService.getMemberByPhone(phone);
+        }
+        this.isLoggedIn = false;
+        return of(null);
+      })
+    ).subscribe(result => {
+      const member = Array.isArray(result) ? result[0] : result;
+      this.isAdmin = !!member && this.authService.isAdminDesignation(member.designation);
+    });
   }
 
   jumpTo(section: string): void {
@@ -55,9 +75,9 @@ export class HomeComponent implements OnInit {
   }
 
   async logout() {
-    console.log('Logout in progress..');
-    await localStorage.removeItem("loggedInUser");
-    setTimeout(() => { this.router.navigateByUrl("login"); }, 2000);
+    localStorage.removeItem("loggedInUser");
+    this.isLoggedIn = false;
+    this.router.navigateByUrl("login");
   }
 
   showList() {

@@ -387,239 +387,246 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 4: Donations -->
-                    <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden"
-                        formArrayName="donations">
-                        <h2 class="accordion-header d-flex align-items-center bg-light">
-                            <button class="accordion-button fw-semibold text-secondary flex-grow-1"
-                                [class.collapsed]="!isSectionOpen('donations')" type="button"
-                                (click)="toggleSection('donations')">
-                                <span class="me-2">💰 वर्गणी / देणगी</span>
-                                <span class="badge bg-primary ms-auto me-3">{{ donations.length }} नोंदी</span>
-                            </button>
-                        </h2>
-                        <div [class.show]="isSectionOpen('donations')" [class.collapsed]="!isSectionOpen('donations')"
-                            class="accordion-collapse collapse">
-                            <div class="accordion-body bg-white p-3">
-                                <div class="d-flex justify-content-end mb-3">
-                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                        (click)="addDonation()">
-                                        + देणगी नोंद
-                                    </button>
-                                </div>
-                                <div *ngFor="let donation of donations.controls; let i = index" [formGroupName]="i"
-                                    class="p-2 mb-2 bg-light rounded border">
-                                    <div *ngIf="!isEditingDonation(i)"
-                                        class="d-flex justify-content-between align-items-center px-2 py-1">
-                                        <div class="small">
-                                            <span class="badge bg-primary me-2">{{
-                                                donation.get('contributionType')?.value }}</span>
-                                            <strong class="text-success">₹{{ donation.get('amount')?.value || 0
-                                                }}</strong>
-                                            <span class="text-muted ms-2" *ngIf="donation.get('date')?.value">• {{
-                                                donation.get('date')?.value }}</span>
-                                        </div>
-                                        <div class="d-flex gap-2">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
-                                                (click)="toggleEditDonation(i)">✏️</button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
-                                                (click)="removeDonation(i)">🗑️</button>
-                                        </div>
+                    <ng-container *ngIf="canEditOtherSections">
+                        <!-- SECTION 4: Donations -->
+                        <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden"
+                            formArrayName="donations">
+                            <h2 class="accordion-header d-flex align-items-center bg-light">
+                                <button class="accordion-button fw-semibold text-secondary flex-grow-1"
+                                    [class.collapsed]="!isSectionOpen('donations')" type="button"
+                                    (click)="toggleSection('donations')">
+                                    <span class="me-2">💰 वर्गणी / देणगी</span>
+                                    <span class="badge bg-primary ms-auto me-3">{{ donations.length }} नोंदी</span>
+                                </button>
+                            </h2>
+                            <div [class.show]="isSectionOpen('donations')"
+                                [class.collapsed]="!isSectionOpen('donations')" class="accordion-collapse collapse">
+                                <div class="accordion-body bg-white p-3">
+                                    <div class="d-flex justify-content-end mb-3">
+                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                            (click)="addDonation()">
+                                            + देणगी नोंद
+                                        </button>
                                     </div>
-                                    <div *ngIf="isEditingDonation(i)" class="pt-2">
-                                        <div class="row g-2 align-items-center">
-                                            <div class="col-12 col-sm-4 col-md-2">
-                                                <input type="date" class="form-control form-control-sm"
-                                                    formControlName="date" />
+                                    <div *ngFor="let donation of donations.controls; let i = index" [formGroupName]="i"
+                                        class="p-2 mb-2 bg-light rounded border">
+                                        <div *ngIf="!isEditingDonation(i)"
+                                            class="d-flex justify-content-between align-items-center px-2 py-1">
+                                            <div class="small">
+                                                <span class="badge bg-primary me-2">{{
+                                                    donation.get('contributionType')?.value }}</span>
+                                                <strong class="text-success">₹{{ donation.get('amount')?.value || 0
+                                                    }}</strong>
+                                                <span class="text-muted ms-2" *ngIf="donation.get('date')?.value">• {{
+                                                    donation.get('date')?.value }}</span>
                                             </div>
-                                            <div class="col-12 col-sm-4 col-md-2">
-                                                <div class="input-group input-group-sm">
-                                                    <span class="input-group-text">₹</span>
-                                                    <input type="number" class="form-control" formControlName="amount"
-                                                        placeholder="रक्कम" />
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                                    (click)="toggleEditDonation(i)">✏️</button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
+                                                    (click)="removeDonation(i)">🗑️</button>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="isEditingDonation(i)" class="pt-2">
+                                            <div class="row g-2 align-items-center">
+                                                <div class="col-12 col-sm-4 col-md-2">
+                                                    <input type="date" class="form-control form-control-sm"
+                                                        formControlName="date" />
+                                                </div>
+                                                <div class="col-12 col-sm-4 col-md-2">
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text">₹</span>
+                                                        <input type="number" class="form-control"
+                                                            formControlName="amount" placeholder="रक्कम" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-sm-4 col-md-3">
+                                                    <select class="form-select form-select-sm"
+                                                        formControlName="contributionType">
+                                                        <option value="सभासद वर्गणी">सभासद वर्गणी</option>
+                                                        <option value="जकात">जकात</option>
+                                                        <option value="सदका">सदका</option>
+                                                        <option value="फित्रा">फित्रा</option>
+                                                        <option value="शिक्षण नीधी">शिक्षण नीधी</option>
+                                                        <option value="इतर">इतर</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12 col-sm-8 col-md-3">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        formControlName="description" placeholder="तपशील / विवरण" />
+                                                </div>
+                                                <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                                    <button *ngIf="newDonationIndexes.has(i)" type="button"
+                                                        class="btn btn-sm btn-outline-secondary"
+                                                        (click)="cancelNewDonation(i)">रद्द करा</button>
+                                                    <button type="button" class="btn btn-sm btn-success px-4"
+                                                        (click)="finishEditDonation(i)">पूर्ण झाले</button>
                                                 </div>
                                             </div>
-                                            <div class="col-12 col-sm-4 col-md-3">
-                                                <select class="form-select form-select-sm"
-                                                    formControlName="contributionType">
-                                                    <option value="सभासद वर्गणी">सभासद वर्गणी</option>
-                                                    <option value="जकात">जकात</option>
-                                                    <option value="सदका">सदका</option>
-                                                    <option value="फित्रा">फित्रा</option>
-                                                    <option value="शिक्षण नीधी">शिक्षण नीधी</option>
-                                                    <option value="इतर">इतर</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-12 col-sm-8 col-md-3">
-                                                <input type="text" class="form-control form-control-sm"
-                                                    formControlName="description" placeholder="तपशील / विवरण" />
-                                            </div>
-                                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
-                                                <button *ngIf="newDonationIndexes.has(i)" type="button"
-                                                    class="btn btn-sm btn-outline-secondary"
-                                                    (click)="cancelNewDonation(i)">रद्द करा</button>
-                                                <button type="button" class="btn btn-sm btn-success px-4"
-                                                    (click)="finishEditDonation(i)">पूर्ण झाले</button>
-                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div *ngIf="donations.length === 0" class="text-muted small text-center py-2">
-                                    देणगीची नोंद नाही
+                                    <div *ngIf="donations.length === 0" class="text-muted small text-center py-2">
+                                        देणगीची नोंद नाही
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- SECTION 5: Help Received -->
-                    <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden"
-                        formArrayName="helpReceived">
-                        <h2 class="accordion-header d-flex align-items-center bg-light">
-                            <button class="accordion-button fw-semibold text-secondary flex-grow-1"
-                                [class.collapsed]="!isSectionOpen('help')" type="button"
-                                (click)="toggleSection('help')">
-                                <span class="me-2">🤝 मिळालेली मदत</span>
-                                <span class="badge bg-info text-dark ms-auto me-3">{{ helpReceived.length }}
-                                    नोंदी</span>
-                            </button>
-                        </h2>
-                        <div [class.show]="isSectionOpen('help')" [class.collapsed]="!isSectionOpen('help')"
-                            class="accordion-collapse collapse">
-                            <div class="accordion-body bg-white p-3">
-                                <div class="d-flex justify-content-end mb-3">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="addHelp()">
-                                        + मदत नोंद
-                                    </button>
-                                </div>
-                                <div *ngFor="let help of helpReceived.controls; let i = index" [formGroupName]="i"
-                                    class="p-2 mb-2 bg-light rounded border">
-                                    <div *ngIf="!isEditingHelp(i)"
-                                        class="d-flex justify-content-between align-items-center px-2 py-1">
-                                        <div class="small">
-                                            <span class="badge bg-info text-dark me-2">{{ help.get('helpType')?.value
-                                                }}</span>
-                                            <strong class="text-primary">₹{{ help.get('amount')?.value || 0 }}</strong>
-                                            <span class="text-muted ms-2" *ngIf="help.get('date')?.value">• {{
-                                                help.get('date')?.value }}</span>
-                                        </div>
-                                        <div class="d-flex gap-2">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
-                                                (click)="toggleEditHelp(i)">✏️</button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
-                                                (click)="removeHelp(i)">🗑️</button>
-                                        </div>
+                        <!-- SECTION 5: Help Received -->
+                        <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden"
+                            formArrayName="helpReceived">
+                            <h2 class="accordion-header d-flex align-items-center bg-light">
+                                <button class="accordion-button fw-semibold text-secondary flex-grow-1"
+                                    [class.collapsed]="!isSectionOpen('help')" type="button"
+                                    (click)="toggleSection('help')">
+                                    <span class="me-2">🤝 मिळालेली मदत</span>
+                                    <span class="badge bg-info text-dark ms-auto me-3">{{ helpReceived.length }}
+                                        नोंदी</span>
+                                </button>
+                            </h2>
+                            <div [class.show]="isSectionOpen('help')" [class.collapsed]="!isSectionOpen('help')"
+                                class="accordion-collapse collapse">
+                                <div class="accordion-body bg-white p-3">
+                                    <div class="d-flex justify-content-end mb-3">
+                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                            (click)="addHelp()">
+                                            + मदत नोंद
+                                        </button>
                                     </div>
-                                    <div *ngIf="isEditingHelp(i)" class="pt-2">
-                                        <div class="row g-2 align-items-center">
-                                            <div class="col-12 col-sm-4 col-md-2">
-                                                <input type="date" class="form-control form-control-sm"
-                                                    formControlName="date" />
+                                    <div *ngFor="let help of helpReceived.controls; let i = index" [formGroupName]="i"
+                                        class="p-2 mb-2 bg-light rounded border">
+                                        <div *ngIf="!isEditingHelp(i)"
+                                            class="d-flex justify-content-between align-items-center px-2 py-1">
+                                            <div class="small">
+                                                <span class="badge bg-info text-dark me-2">{{
+                                                    help.get('helpType')?.value
+                                                    }}</span>
+                                                <strong class="text-primary">₹{{ help.get('amount')?.value || 0
+                                                    }}</strong>
+                                                <span class="text-muted ms-2" *ngIf="help.get('date')?.value">• {{
+                                                    help.get('date')?.value }}</span>
                                             </div>
-                                            <div class="col-12 col-sm-4 col-md-2">
-                                                <div class="input-group input-group-sm">
-                                                    <span class="input-group-text">₹</span>
-                                                    <input type="number" class="form-control" formControlName="amount"
-                                                        placeholder="रक्कम" />
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                                    (click)="toggleEditHelp(i)">✏️</button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
+                                                    (click)="removeHelp(i)">🗑️</button>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="isEditingHelp(i)" class="pt-2">
+                                            <div class="row g-2 align-items-center">
+                                                <div class="col-12 col-sm-4 col-md-2">
+                                                    <input type="date" class="form-control form-control-sm"
+                                                        formControlName="date" />
+                                                </div>
+                                                <div class="col-12 col-sm-4 col-md-2">
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text">₹</span>
+                                                        <input type="number" class="form-control"
+                                                            formControlName="amount" placeholder="रक्कम" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-sm-4 col-md-3">
+                                                    <select class="form-select form-select-sm"
+                                                        formControlName="helpType">
+                                                        <option value="वैद्यकीय मदत">वैद्यकीय मदत</option>
+                                                        <option value="शैक्षणिक मदत">शैक्षणिक मदत</option>
+                                                        <option value="आर्थिक मदत">आर्थिक मदत</option>
+                                                        <option value="इतर मदत">इतर मदत</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12 col-sm-8 col-md-3">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        formControlName="description" placeholder="तपशील / विवरण" />
+                                                </div>
+                                                <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                                    <button *ngIf="newHelpIndexes.has(i)" type="button"
+                                                        class="btn btn-sm btn-outline-secondary"
+                                                        (click)="cancelNewHelp(i)">रद्द करा</button>
+                                                    <button type="button" class="btn btn-sm btn-success px-4"
+                                                        (click)="finishEditHelp(i)">पूर्ण झाले</button>
                                                 </div>
                                             </div>
-                                            <div class="col-12 col-sm-4 col-md-3">
-                                                <select class="form-select form-select-sm" formControlName="helpType">
-                                                    <option value="वैद्यकीय मदत">वैद्यकीय मदत</option>
-                                                    <option value="शैक्षणिक मदत">शैक्षणिक मदत</option>
-                                                    <option value="आर्थिक मदत">आर्थिक मदत</option>
-                                                    <option value="इतर मदत">इतर मदत</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-12 col-sm-8 col-md-3">
-                                                <input type="text" class="form-control form-control-sm"
-                                                    formControlName="description" placeholder="तपशील / विवरण" />
-                                            </div>
-                                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
-                                                <button *ngIf="newHelpIndexes.has(i)" type="button"
-                                                    class="btn btn-sm btn-outline-secondary"
-                                                    (click)="cancelNewHelp(i)">रद्द करा</button>
-                                                <button type="button" class="btn btn-sm btn-success px-4"
-                                                    (click)="finishEditHelp(i)">पूर्ण झाले</button>
-                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div *ngIf="helpReceived.length === 0" class="text-muted small text-center py-2">
-                                    मदतीची नोंद नाही
+                                    <div *ngIf="helpReceived.length === 0" class="text-muted small text-center py-2">
+                                        मदतीची नोंद नाही
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- SECTION 6: Recommendation Letters -->
-                    <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden"
-                        formArrayName="recommendationLetters">
-                        <h2 class="accordion-header d-flex align-items-center bg-light">
-                            <button class="accordion-button fw-semibold text-secondary flex-grow-1"
-                                [class.collapsed]="!isSectionOpen('recommendations')" type="button"
-                                (click)="toggleSection('recommendations')">
-                                <span class="me-2">📄 शिफारस पत्र</span>
-                                <span class="badge bg-secondary ms-auto me-3">{{ recommendationLetters.length }}
-                                    नोंदी</span>
-                            </button>
-                        </h2>
-                        <div [class.show]="isSectionOpen('recommendations')"
-                            [class.collapsed]="!isSectionOpen('recommendations')" class="accordion-collapse collapse">
-                            <div class="accordion-body bg-white p-3">
-                                <div class="d-flex justify-content-end mb-3">
-                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                        (click)="addRecommendation()">
-                                        + शिफारस पत्र नोंद
-                                    </button>
-                                </div>
-                                <div *ngFor="let rec of recommendationLetters.controls; let i = index"
-                                    [formGroupName]="i" class="p-2 mb-2 bg-light rounded border">
-                                    <div *ngIf="!isEditingRecommendation(i)"
-                                        class="d-flex justify-content-between align-items-center px-2 py-1">
-                                        <div class="small">
-                                            <strong class="text-dark">{{ rec.get('name')?.value || 'नाव दिलेले नाही'
-                                                }}</strong>
-                                            <span class="text-muted ms-2" *ngIf="rec.get('date')?.value">• {{
-                                                rec.get('date')?.value }}</span>
+                        <!-- SECTION 6: Recommendation Letters -->
+                        <div class="accordion-item border-light-subtle mb-3 rounded overflow-hidden"
+                            formArrayName="recommendationLetters">
+                            <h2 class="accordion-header d-flex align-items-center bg-light">
+                                <button class="accordion-button fw-semibold text-secondary flex-grow-1"
+                                    [class.collapsed]="!isSectionOpen('recommendations')" type="button"
+                                    (click)="toggleSection('recommendations')">
+                                    <span class="me-2">📄 शिफारस पत्र</span>
+                                    <span class="badge bg-secondary ms-auto me-3">{{ recommendationLetters.length }}
+                                        नोंदी</span>
+                                </button>
+                            </h2>
+                            <div [class.show]="isSectionOpen('recommendations')"
+                                [class.collapsed]="!isSectionOpen('recommendations')"
+                                class="accordion-collapse collapse">
+                                <div class="accordion-body bg-white p-3">
+                                    <div class="d-flex justify-content-end mb-3">
+                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                            (click)="addRecommendation()">
+                                            + शिफारस पत्र नोंद
+                                        </button>
+                                    </div>
+                                    <div *ngFor="let rec of recommendationLetters.controls; let i = index"
+                                        [formGroupName]="i" class="p-2 mb-2 bg-light rounded border">
+                                        <div *ngIf="!isEditingRecommendation(i)"
+                                            class="d-flex justify-content-between align-items-center px-2 py-1">
+                                            <div class="small">
+                                                <strong class="text-dark">{{ rec.get('name')?.value || 'नाव दिलेले नाही'
+                                                    }}</strong>
+                                                <span class="text-muted ms-2" *ngIf="rec.get('date')?.value">• {{
+                                                    rec.get('date')?.value }}</span>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                                    (click)="toggleEditRecommendation(i)">✏️</button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
+                                                    (click)="removeRecommendation(i)">🗑️</button>
+                                            </div>
                                         </div>
-                                        <div class="d-flex gap-2">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
-                                                (click)="toggleEditRecommendation(i)">✏️</button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
-                                                (click)="removeRecommendation(i)">🗑️</button>
+                                        <div *ngIf="isEditingRecommendation(i)" class="pt-2">
+                                            <div class="row g-2 align-items-center">
+                                                <div class="col-12 col-sm-4 col-md-3">
+                                                    <input type="date" class="form-control form-control-sm"
+                                                        formControlName="date" />
+                                                </div>
+                                                <div class="col-12 col-sm-8 col-md-4">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        formControlName="name" placeholder="नाव *" />
+                                                </div>
+                                                <div class="col-12 col-sm-12 col-md-5">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        formControlName="description" placeholder="तपशील" />
+                                                </div>
+                                                <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                                                    <button *ngIf="newRecommendationIndexes.has(i)" type="button"
+                                                        class="btn btn-sm btn-outline-secondary"
+                                                        (click)="cancelNewRecommendation(i)">रद्द करा</button>
+                                                    <button type="button" class="btn btn-sm btn-success px-4"
+                                                        (click)="finishEditRecommendation(i)">पूर्ण झाले</button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div *ngIf="isEditingRecommendation(i)" class="pt-2">
-                                        <div class="row g-2 align-items-center">
-                                            <div class="col-12 col-sm-4 col-md-3">
-                                                <input type="date" class="form-control form-control-sm"
-                                                    formControlName="date" />
-                                            </div>
-                                            <div class="col-12 col-sm-8 col-md-4">
-                                                <input type="text" class="form-control form-control-sm"
-                                                    formControlName="name" placeholder="नाव *" />
-                                            </div>
-                                            <div class="col-12 col-sm-12 col-md-5">
-                                                <input type="text" class="form-control form-control-sm"
-                                                    formControlName="description" placeholder="तपशील" />
-                                            </div>
-                                            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
-                                                <button *ngIf="newRecommendationIndexes.has(i)" type="button"
-                                                    class="btn btn-sm btn-outline-secondary"
-                                                    (click)="cancelNewRecommendation(i)">रद्द करा</button>
-                                                <button type="button" class="btn btn-sm btn-success px-4"
-                                                    (click)="finishEditRecommendation(i)">पूर्ण झाले</button>
-                                            </div>
-                                        </div>
+                                    <div *ngIf="recommendationLetters.length === 0"
+                                        class="text-muted small text-center py-2">
+                                        शिफारस पत्राची नोंद नाही
                                     </div>
-                                </div>
-                                <div *ngIf="recommendationLetters.length === 0"
-                                    class="text-muted small text-center py-2">
-                                    शिफारस पत्राची नोंद नाही
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </ng-container>
 
                 </div>
 
