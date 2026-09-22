@@ -27,18 +27,19 @@ export class MemberslistComponent implements OnInit {
   members: Member[] = [];
   filteredMembers: Member[] = [];
 
-  // Selected member ID state for expanded view
   selectedMemberId: string | null = null;
-
   villagesByTaluka: village[] = [];
 
-  // Active search query state
+  // Active search query term
   searchQuery: string = '';
 
-  // Auth & Permissions State
+  // Lazy loading & UI state controls
+  isDataLoaded: boolean = false;
+  isSearching: boolean = false;
+  hasSearched: boolean = false;
+
   loggedInPhone: string | null = null;
 
-  // Set defaults: Load saved selection from localStorage or fall back to Satara & Nagthane
   mytaluka = localStorage.getItem("mytaluka") || "सातारा";
   myvillage = localStorage.getItem("myvillage") || "नागठाणे";
 
@@ -46,18 +47,9 @@ export class MemberslistComponent implements OnInit {
   villages: village[] = villages;
 
   async ngOnInit(): Promise<void> {
-    // Reset window scroll position to top
     window.scrollTo(0, 0);
-
     this.updateVillagesForSelectedTaluka();
-
-    // Retrieve logged in phone for checking ownership permission
     this.loggedInPhone = await firstValueFrom(this.authService.getLoggedInPhone());
-
-    this.firebaseService.getMembers().subscribe(data => {
-      this.members = data;
-      this.applyCombinedFilters();
-    });
   }
 
   toggleMemberDetails(memberId: string | undefined): void {
@@ -69,8 +61,42 @@ export class MemberslistComponent implements OnInit {
     this.location.back();
   }
 
-  onSearchChange(query: string) {
+  /**
+   * Updates search term state on typing (Does NOT trigger search automatically)
+   */
+  onSearchInput(query: string): void {
     this.searchQuery = query ? query.toLowerCase().trim() : '';
+  }
+
+  /**
+   * Triggers search if Enter key is pressed inside search input
+   */
+  onSearchKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      this.executeSearch();
+    }
+  }
+
+  /**
+   * Main search trigger (Called on Enter keypress or Search Button click)
+   */
+  async executeSearch(): Promise<void> {
+    this.hasSearched = true;
+
+    // Load records from Firestore on first search invocation
+    if (!this.isDataLoaded) {
+      this.isSearching = true;
+      try {
+        const data = await firstValueFrom(this.firebaseService.getMembers());
+        this.members = data || [];
+        this.isDataLoaded = true;
+      } catch (err) {
+        console.error('Error fetching members:', err);
+      } finally {
+        this.isSearching = false;
+      }
+    }
+
     this.applyCombinedFilters();
   }
 
@@ -82,10 +108,9 @@ export class MemberslistComponent implements OnInit {
     }
   }
 
-  onTalukaChange(event: any) {
+  onTalukaChange(event: any): void {
     this.mytaluka = event.target.value;
     localStorage.setItem("mytaluka", this.mytaluka);
-
     this.updateVillagesForSelectedTaluka();
 
     const villageExists = this.villagesByTaluka.some(v => v.name === this.myvillage);
@@ -94,20 +119,26 @@ export class MemberslistComponent implements OnInit {
       localStorage.setItem("myvillage", "none");
     }
 
-    this.applyCombinedFilters();
+    if (this.hasSearched) {
+      this.applyCombinedFilters();
+    }
   }
 
-  onVillageChange(event: any) {
+  onVillageChange(event: any): void {
     this.myvillage = event.target.value;
     localStorage.setItem("myvillage", this.myvillage);
 
-    this.applyCombinedFilters();
+    if (this.hasSearched) {
+      this.applyCombinedFilters();
+    }
   }
 
   /**
-   * Evaluates Taluka, Village, and Search Text (Name, Village, Designation, Phone) simultaneously.
+   * General Filter: Matches Taluka, Village, and Generalized Search (fname or phone)
    */
   applyCombinedFilters(): void {
+    const query = this.searchQuery;
+
     this.filteredMembers = this.members.filter((member) => {
       // 1. Check Taluka Filter
       const matchesTaluka = this.mytaluka === "none" || member.taluka === this.mytaluka;
@@ -115,28 +146,20 @@ export class MemberslistComponent implements OnInit {
       // 2. Check Village Filter
       const matchesVillage = this.myvillage === "none" || member.village === this.myvillage;
 
-      // 3. Check Search Query Filter (Name, Village, Designation, or Phone)
-      const matchesSearch = !this.searchQuery ||
-        member.fname?.toLowerCase().includes(this.searchQuery) ||
-        member.lname?.toLowerCase().includes(this.searchQuery) ||
-        member.village?.toLowerCase().includes(this.searchQuery) ||
-        member.designation?.toLowerCase().includes(this.searchQuery) ||
-        member.phone?.includes(this.searchQuery);
+      // 3. Generalized Search: Matches First Name or Phone Number
+      const matchesSearch = !query ||
+        member.fname?.toLowerCase().includes(query) ||
+        member.lname?.toLowerCase().includes(query) ||
+        member.phone?.includes(query);
 
       return matchesTaluka && matchesVillage && matchesSearch;
     });
   }
 
-  /**
-   * Helper to determine if current user can edit this record
-   */
   canEdit(member: Member): boolean {
     return !!this.loggedInPhone && this.loggedInPhone === member.phone;
   }
 
-  /**
-   * Navigates to MemberManager component passing the selected member to edit
-   */
   editMember(member: Member): void {
     this.router.navigate(['/membermanager'], { state: { memberToEdit: member } });
   }

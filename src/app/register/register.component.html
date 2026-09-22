@@ -4,12 +4,28 @@
         <div class="col-12 col-md-8 col-lg-7">
             <div class="card shadow-sm border-0">
 
-                <!-- Card Header with Centered Title -->
                 <div class="card-header bg-primary text-white text-center py-3">
-                    <h5 class="mb-0 fw-bold">पहिलीच वेळ आहे / पासवर्ड माहित नाही? अशा वेळेस नोंदणी करा</h5>
+                    <h5 class="mb-0 fw-bold">
+                        {{ isResetModeFromLogin ? 'पासवर्ड बदला (Password Reset)' : 'सभासद नोंदणी / पासवर्ड अपडेट' }}
+                    </h5>
                 </div>
 
                 <div class="card-body p-3 p-md-4">
+
+                    <!-- Admin Navigation Tabs (Only visible for Admin) -->
+                    <div *ngIf="isAdmin && !isResetModeFromLogin" class="nav nav-pills nav-fill mb-3">
+                        <button class="nav-link" [class.active]="activeAdminTab === 'register'"
+                            (click)="activeAdminTab = 'register'">
+                            📝 नोंदणी / पासवर्ड बदल
+                        </button>
+                        <button class="nav-link position-relative" [class.active]="activeAdminTab === 'resetRequests'"
+                            (click)="activeAdminTab = 'resetRequests'">
+                            🔔 पासवर्ड रिसेट विनंत्या
+                            <span *ngIf="pendingResetRequests.length > 0" class="badge bg-danger ms-1">
+                                {{ pendingResetRequests.length }}
+                            </span>
+                        </button>
+                    </div>
 
                     <!-- Error Alert -->
                     <div *ngIf="errorMessage" class="alert alert-danger py-2 mb-3">
@@ -21,165 +37,272 @@
                         {{ successMessage }}
                     </div>
 
-                    <form (ngSubmit)="onRegister()">
-                        <!-- Account Credentials Section -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">मोबाईल नंबर <span
-                                    class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text">+91</span>
-                                <input type="tel" class="form-control" [(ngModel)]="registrationData.phone" name="phone"
-                                    maxlength="10" required placeholder="१० अंकी नंबर">
-                            </div>
-                            <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                                अगोदरच नाव नोंदवले असल्यास तोच मोबाईल नंबर टाका.
-                            </small>
+                    <!-- TAB 1: PENDING RESET REQUESTS VIEW (ADMIN) -->
+                    <div *ngIf="isAdmin && activeAdminTab === 'resetRequests'">
+                        <h6 class="fw-bold mb-3 text-dark">लंबित पासवर्ड रिसेट विनंत्या (Pending Reset Requests):</h6>
+
+                        <div *ngIf="isLoadingRequests" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="small text-muted mt-2">माहिती लोड होत आहे...</p>
                         </div>
 
-                        <div class="row g-2 mb-3">
-                            <!-- Password -->
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-bold small">नवीन पासवर्ड <span
-                                        class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input [type]="showPassword ? 'text' : 'password'" class="form-control"
-                                        [(ngModel)]="registrationData.password" name="password" required
-                                        placeholder="******">
-                                    <button class="btn btn-outline-secondary" type="button"
-                                        (click)="togglePasswordVisibility()">
-                                        {{ showPassword ? 'Hide' : 'Show' }}
-                                    </button>
-                                </div>
-                            </div>
+                        <div *ngIf="!isLoadingRequests && pendingResetRequests.length === 0"
+                            class="alert alert-secondary text-center py-3">
+                            सध्या कोणतीही प्रलंबित पासवर्ड रिसेट विनंती नाही.
+                        </div>
 
-                            <!-- Confirm Password -->
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-bold small">नवीन पासवर्डची खात्री करा<span
-                                        class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control"
-                                        [(ngModel)]="registrationData.confirmPassword" name="confirmPassword" required
-                                        placeholder="******">
-                                    <button class="btn btn-outline-secondary" type="button"
-                                        (click)="toggleConfirmPasswordVisibility()">
-                                        {{ showConfirmPassword ? 'Hide' : 'Show' }}
-                                    </button>
+                        <div *ngIf="!isLoadingRequests && pendingResetRequests.length > 0" class="list-group mb-3">
+                            <div *ngFor="let req of pendingResetRequests"
+                                class="list-group-item p-3 shadow-sm mb-2 border rounded">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold mb-1 text-primary">
+                                            {{ req.initial }} {{ req.fname }} {{ req.lname }}
+                                        </h6>
+                                        <p class="mb-1 small text-dark">
+                                            📞 <strong>मोबाईल:</strong> {{ req.phone }}<br>
+                                            🏡 <strong>गाव:</strong> {{ req.village }} ({{ req.taluka }})<br>
+                                            🎖️ <strong>पद:</strong> {{ req.designation }}
+                                        </p>
+                                        <span *ngIf="req.passwordResetApproved" class="badge bg-success">
+                                            ✅ मंजूर केले आहे (Approved)
+                                        </span>
+                                        <span *ngIf="!req.passwordResetApproved" class="badge bg-warning text-dark">
+                                            ⏳ मंजुरी प्रलंबित (Pending Approval)
+                                        </span>
+                                    </div>
+                                    <div class="d-flex flex-column gap-1">
+                                        <button *ngIf="!req.passwordResetApproved"
+                                            class="btn btn-sm btn-success fw-semibold"
+                                            (click)="approveReset(req.phone)">
+                                            मंजूर करा
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary fw-semibold"
+                                            (click)="selectPhoneForReset(req.phone)">
+                                            पासवर्ड बदला
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" (click)="rejectReset(req.phone)">
+                                            रद्द करा
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Toggle Switch for Personal Information -->
-                        <div class="border-top pt-3 mt-3">
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="profileToggle"
+                    <!-- TAB 2: FORM REGISTRATION / RESET VIEW -->
+                    <div *ngIf="!isAdmin || activeAdminTab === 'register'">
+
+                        <!-- Admin Mode Toggle Switch -->
+                        <div *ngIf="isAdmin && !isResetModeFromLogin"
+                            class="bg-light border rounded p-2 mb-3 d-flex align-items-center justify-content-between">
+                            <span class="fw-bold small text-dark">प्रकार निवडा:</span>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" id="adminModeToggle"
                                     [(ngModel)]="showProfileFields" name="showProfileFields">
-                                <label class="form-check-label fw-bold small text-primary ms-1" for="profileToggle">
-                                    👤 वैयक्तिक माहिती भरा (पर्यायी) - फक्त नवीन सभासदां साठी.
+                                <label class="form-check-label fw-bold small text-primary ms-1" for="adminModeToggle">
+                                    {{ showProfileFields ? 'नवीन नोंदणी मोड (New Registration)' : 'पासवर्ड रिसेट मोड
+                                    (Password Reset)' }}
                                 </label>
                             </div>
+                        </div>
 
-                            <!-- Conditional Profile Information Fields -->
-                            <div *ngIf="showProfileFields" class="row g-3 border rounded p-2 bg-light">
-                                <!-- Initial -->
-                                <div class="col-6 col-sm-4 col-md-3">
-                                    <label class="form-label small text-muted">आदरार्थी <span
+                        <!-- Existing User Warning Alert -->
+                        <div *ngIf="foundMemberByPhone" class="alert alert-warning border-warning py-3 mb-3 shadow-sm">
+                            <div class="d-flex align-items-start">
+                                <span class="me-2 fs-4">⚠️</span>
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-dark">सभासद नोंदणी आढळली आहे!</h6>
+                                    <p class="mb-1 text-dark">
+                                        <strong>नाव:</strong> {{ foundMemberByPhone.initial }} {{
+                                        foundMemberByPhone.fname }} {{ foundMemberByPhone.lname }} |
+                                        <strong>गाव:</strong> {{ foundMemberByPhone.village }} ({{
+                                        foundMemberByPhone.taluka }})
+                                    </p>
+                                    <span class="fw-semibold text-danger d-block mt-1">
+                                        आपण या खात्याची माहिती/पासवर्ड अपडेट करू इच्छिता का?
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Admin Warning: Matching Name & Village Found -->
+                        <div *ngIf="foundMemberByNameAndVillage"
+                            class="alert alert-info border-info py-3 mb-3 shadow-sm">
+                            <div class="d-flex align-items-start">
+                                <span class="me-2 fs-4">ℹ️</span>
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-dark">वरील नाव आणि गाव असणारा सभासद अस्तित्वात
+                                        आहे:</h6>
+                                    <p class="mb-1 text-dark">
+                                        नाव: <strong>{{ foundMemberByNameAndVillage.fname }} {{
+                                            foundMemberByNameAndVillage.lname }}</strong> |
+                                        मोबाईल: <strong>{{ foundMemberByNameAndVillage.phone }}</strong>
+                                    </p>
+                                    <small class="text-muted">आपण तरीही नवीन नोंदणी करू इच्छिता?</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form (ngSubmit)="onRegister()">
+                            <!-- Account Credentials -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">मोबाईल नंबर <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">+91</span>
+                                    <input type="tel" class="form-control" [(ngModel)]="registrationData.phone"
+                                        (ngModelChange)="onPhoneChange()" name="phone" maxlength="10" required
+                                        [readonly]="isPhoneReadOnly" [class.bg-light]="isPhoneReadOnly"
+                                        placeholder="10 अंकी फोन नंबर">
+                                </div>
+                                <small *ngIf="isPhoneReadOnly" class="text-secondary d-block mt-1 fw-semibold"
+                                    style="font-size: 0.75rem;">
+                                    🔒 सुरक्षिततेसाठी मोबाईल नंबर बदलता येणार नाही.
+                                </small>
+                            </div>
+
+                            <div class="row g-2 mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-bold small">नवीन पासवर्ड <span
                                             class="text-danger">*</span></label>
-                                    <select class="form-select form-select-sm" [(ngModel)]="registrationData.initial"
-                                        name="initial" [required]="showProfileFields">
-                                        <option value="ज.">जनाब</option>
-                                        <option value="मो.">मोहतरमा</option>
-                                    </select>
+                                    <div class="input-group">
+                                        <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                                            [(ngModel)]="registrationData.password" name="password" required
+                                            placeholder="******">
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            (click)="showPassword = !showPassword">
+                                            {{ showPassword ? 'Hide' : 'Show' }}
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <!-- First Name -->
-                                <div class="col-12 col-sm-8 col-md-5">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label fw-bold small">नवीन पासवर्डची खात्री करा <span
+                                            class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control"
+                                            [(ngModel)]="registrationData.confirmPassword" name="confirmPassword"
+                                            required placeholder="******">
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            (click)="showConfirmPassword = !showConfirmPassword">
+                                            {{ showConfirmPassword ? 'Hide' : 'Show' }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Toggle Profile Information Section (For Standard Non-Reset Mode) -->
+                            <div *ngIf="!isResetModeFromLogin && !isAdmin" class="border-top pt-3 mt-3">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="profileToggle"
+                                        [(ngModel)]="showProfileFields" name="showProfileFields">
+                                    <label class="form-check-label fw-bold small text-primary ms-1" for="profileToggle">
+                                        👤 वैयक्तिक माहिती भरा (नवीन सभासदांसाठी)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Profile Fields View -->
+                            <div *ngIf="showProfileFields && !isResetModeFromLogin"
+                                class="row g-3 border rounded p-2 bg-light mb-3">
+                                <div class="col-12 col-sm-6 col-md-4">
                                     <label class="form-label small text-muted">नाव <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control form-control-sm"
-                                        [(ngModel)]="registrationData.fname" name="fname" [required]="showProfileFields"
-                                        placeholder="सभासद आणि वडीलांचे नाव">
+                                        [(ngModel)]="registrationData.fname" (ngModelChange)="onNameOrVillageChange()"
+                                        name="fname" [required]="showProfileFields" placeholder="नाव">
                                 </div>
 
-                                <!-- Last Name -->
                                 <div class="col-12 col-sm-6 col-md-4">
                                     <label class="form-label small text-muted">आडनाव <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control form-control-sm"
-                                        [(ngModel)]="registrationData.lname" name="lname" [required]="showProfileFields"
-                                        placeholder="आडनाव">
+                                        [(ngModel)]="registrationData.lname" (ngModelChange)="onNameOrVillageChange()"
+                                        name="lname" [required]="showProfileFields" placeholder="आडनाव">
                                 </div>
 
                                 <!-- Age -->
-                                <div class="col-6 col-sm-6 col-md-4">
-                                    <label class="form-label small text-muted">वय <span
-                                            class="text-danger">*</span></label>
-                                    <input type="number" class="form-control form-control-sm"
-                                        [(ngModel)]="registrationData.age" name="age" min="1" max="99"
-                                        [required]="showProfileFields" placeholder="१ ते ९९">
-                                </div>
-
-                                <!-- Designation (Disabled) -->
-                                <div class="col-6 col-sm-6 col-md-4">
-                                    <label class="form-label small text-muted">पद <span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-sm bg-light"
-                                        [(ngModel)]="registrationData.designation" name="designation" disabled>
-                                </div>
-
-                                <!-- District -->
                                 <div class="col-12 col-sm-6 col-md-4">
-                                    <label class="form-label small text-muted">जिल्हा <span
+                                    <label class="form-label small text-muted">वय<span
                                             class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-sm"
-                                        [(ngModel)]="registrationData.district" name="district"
-                                        [required]="showProfileFields" placeholder="जिल्हा">
+                                    <input type="number" class="form-control form-control-sm" min="1" max="120"
+                                        [(ngModel)]="registrationData.age" name="age" [required]="showProfileFields"
+                                        placeholder="उदा. २५">
                                 </div>
 
-                                <!-- Taluka -->
+                                <!-- Education -->
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">शिक्षण</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        [(ngModel)]="registrationData.education" name="education"
+                                        placeholder="उदा. बी.कॉम / १२ वी">
+                                </div>
+
+                                <!-- Occupation -->
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">व्यवसाय</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        [(ngModel)]="registrationData.occupation" name="occupation"
+                                        placeholder="उदा. शेती / व्यवसाय">
+                                </div>
+
+                                <!-- Designation -->
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">पद</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        [(ngModel)]="registrationData.designation" name="designation"
+                                        placeholder="उदा. सभासद" disabled>
+                                </div>
+
+                                <!-- Joined On Date -->
+                                <div class="col-12 col-sm-6 col-md-4">
+                                    <label class="form-label small text-muted">सभासद नोंदणी</label>
+                                    <input type="date" class="form-control form-control-sm"
+                                        [(ngModel)]="registrationData.joinedOn" name="joinedOn">
+                                </div>
+                                <div class="col-12 col-md-8">
+                                    <label class="form-label small text-muted">गल्ली / रस्ता / घर क्र.</label>
+                                    <input type="text" class="form-control" formControlName="address"
+                                        placeholder="घर क्रमांक - बिल्डींगचे नाव - रस्ता इ." />
+                                </div>
+                                <!-- Taluka Dropdown -->
                                 <div class="col-12 col-sm-6 col-md-4">
                                     <label class="form-label small text-muted">तालुका <span
                                             class="text-danger">*</span></label>
                                     <select class="form-select form-select-sm" [(ngModel)]="registrationData.taluka"
-                                        (ngModelChange)="onTalukaChange($event)" name="taluka"
+                                        (ngModelChange)="filterVillages($event)" name="taluka"
                                         [required]="showProfileFields">
-                                        <option value="">तालुका निवडा</option>
                                         <option *ngFor="let t of talukaList" [value]="t.name">{{ t.name }}</option>
                                     </select>
                                 </div>
 
-                                <!-- Village -->
+                                <!-- Village Dropdown -->
                                 <div class="col-12 col-sm-6 col-md-4">
                                     <label class="form-label small text-muted">गावाचे नाव <span
                                             class="text-danger">*</span></label>
                                     <select class="form-select form-select-sm" [(ngModel)]="registrationData.village"
-                                        name="village" [required]="showProfileFields">
+                                        (ngModelChange)="onNameOrVillageChange()" name="village"
+                                        [required]="showProfileFields">
                                         <option value="">गावं निवडा</option>
                                         <option *ngFor="let v of filteredVillages" [value]="v.name">{{ v.name }}
                                         </option>
                                     </select>
                                 </div>
 
-                                <!-- Address (Optional) -->
-                                <div class="col-12 col-sm-6 col-md-4">
-                                    <label class="form-label small text-muted">गल्ली / रस्ता / घर क्र.</label>
-                                    <input type="text" class="form-control form-control-sm"
-                                        [(ngModel)]="registrationData.address" name="address"
-                                        placeholder="घर क्र. - रस्ता इ.">
-                                </div>
                             </div>
-                        </div>
 
-                        <!-- Action Buttons -->
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary fw-semibold" [disabled]="isLoading">
-                                {{ isLoading ? 'प्रक्रिया होत आहे...' : (showProfileFields ? 'सभासद माहिती नोंद करा'
-                                : 'पासवर्डची नोंद करा') }}
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary" (click)="onBack()">
-                                लॉगिन कडे जा
-                            </button>
-                        </div>
-                    </form>
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary fw-semibold" [disabled]="isLoading">
+                                    {{ isLoading ? 'प्रक्रिया होत आहे...' : (showProfileFields ? 'सभासद माहिती नोंद करा'
+                                    : 'पासवर्ड अपडेट करा') }}
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" (click)="onBack()">
+                                    लॉगिन कडे जा
+                                </button>
+                            </div>
+                        </form>
+                    </div>
 
                 </div>
             </div>

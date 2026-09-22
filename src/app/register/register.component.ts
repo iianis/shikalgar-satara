@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FirebaseService } from '../../app/services/firebase.service';
 import { AuthService } from '../../app/services/auth.service';
 import { firstValueFrom } from 'rxjs';
@@ -18,6 +18,7 @@ import { taluka, talukas, village, villages } from '../../data/areas';
 export class RegisterComponent implements OnInit {
 
   router = inject(Router);
+  route = inject(ActivatedRoute);
   firebaseService = inject(FirebaseService);
   authService = inject(AuthService);
 
@@ -25,16 +26,29 @@ export class RegisterComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
 
-  // Mode Toggle & Password Visibility
-  showProfileFields = false; // Default: false (Password Change Screen)
+  // Auth & Mode Controls
+  isLoggedIn = false;
+  isAdmin = false;
+  isPhoneReadOnly = false;
+  isResetModeFromLogin = false;
+  foundMemberByPhone: any = null;
+  foundMemberByNameAndVillage: any = null;
+
+  // Pending Reset Requests State (Admin View)
+  pendingResetRequests: any[] = [];
+  isLoadingRequests = false;
+  activeAdminTab: 'register' | 'resetRequests' = 'register';
+
+  // Toggle for Profile Fields / Reset View
+  showProfileFields = false;
   showPassword = false;
   showConfirmPassword = false;
 
-  // Master Lists
   talukaList: taluka[] = talukas;
   allVillages: village[] = villages;
   filteredVillages: village[] = [];
 
+  // Expanded registration model to capture required personal attributes
   registrationData = {
     phone: '',
     password: '',
@@ -42,7 +56,10 @@ export class RegisterComponent implements OnInit {
     initial: 'ज.',
     fname: '',
     lname: 'शिकलगार',
-    age: 21,
+    age: 25,
+    joinedOn: new Date().toISOString().substring(0, 10), // Default to today YYYY-MM-DD
+    education: '',
+    occupation: '',
     designation: 'सभासद',
     address: '',
     district: 'सातारा',
@@ -50,22 +67,137 @@ export class RegisterComponent implements OnInit {
     village: 'नागठाणे'
   };
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.filterVillages(this.registrationData.taluka);
+
+    // Read Query Parameters
+    this.route.queryParams.subscribe(async params => {
+      const mode = params['mode'];
+      const phone = params['phone'];
+
+      if (mode === 'reset' && phone) {
+        // Validate that this phone number is ACTUALLY approved for reset
+        const status = await this.firebaseService.checkResetStatus(phone);
+        if (!status.approved) {
+          this.errorMessage = 'आपली पासवर्ड रिसेट विनंती अजून मंजूर झालेली नाही किंवा अमान्य आहे.';
+          setTimeout(() => this.router.navigateByUrl('login'), 3000);
+          return;
+        }
+
+        this.registrationData.phone = phone;
+        this.isResetModeFromLogin = true;
+        this.showProfileFields = false; // Directly show password view
+        this.isPhoneReadOnly = true;    // Phone remains strictly read-only
+        await this.checkExistingMemberByPhone(phone);
+      } else {
+        await this.evaluateUserPermissions();
+      }
+    });
   }
 
-  togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
+  async evaluateUserPermissions(): Promise<void> {
+    const authUser = await firstValueFrom(this.firebaseService.getCurrentUser());
+    if (authUser) {
+      this.isLoggedIn = true;
+      const cleanPhone = await firstValueFrom(this.authService.getLoggedInPhone());
+
+      if (cleanPhone) {
+        const members = await firstValueFrom(this.firebaseService.getMemberByPhone(cleanPhone));
+        const loggedInMember = members && members.length > 0 ? members[0] : null;
+
+        if (loggedInMember && this.authService.isAdminDesignation(loggedInMember.designation)) {
+          this.isAdmin = true;
+          this.isPhoneReadOnly = false; // Admin can change phone to manage others
+          await this.loadPendingResetRequests(); // Fetch pending requests for Admin
+        } else {
+          this.isAdmin = false;
+          this.isPhoneReadOnly = true;  // Standard user phone locked
+          this.registrationData.phone = cleanPhone;
+        }
+      }
+    } else {
+      this.isLoggedIn = false;
+      this.isAdmin = false;
+      this.isPhoneReadOnly = false;
+    }
   }
 
-  toggleConfirmPasswordVisibility(): void {
-    this.showConfirmPassword = !this.showConfirmPassword;
+  // Load all pending reset requests for Admin Panel
+  async loadPendingResetRequests(): Promise<void> {
+    this.isLoadingRequests = true;
+    try {
+      this.pendingResetRequests = await firstValueFrom(
+        this.firebaseService.getPendingResetRequests()
+      );
+    } catch (err) {
+      console.error('Error loading pending reset requests:', err);
+    } finally {
+      this.isLoadingRequests = false;
+    }
   }
 
-  onTalukaChange(selectedTaluka: string): void {
-    this.filterVillages(selectedTaluka);
-    if (!this.filteredVillages.some(v => v.name === this.registrationData.village)) {
-      this.registrationData.village = '';
+  // Admin approves reset request
+  async approveReset(phone: string): Promise<void> {
+    try {
+      await this.firebaseService.approvePasswordReset(phone);
+      this.successMessage = `मोबाईल ${phone} साठी पासवर्ड रिसेट विनंती मंजूर करण्यात आली आहे.`;
+      await this.loadPendingResetRequests();
+    } catch (err) {
+      console.error('Approval Error:', err);
+      this.errorMessage = 'विनंती मंजूर करताना त्रुटी आली.';
+    }
+  }
+
+  // Admin rejects / clears reset request
+  async rejectReset(phone: string): Promise<void> {
+    try {
+      await this.firebaseService.clearResetFlags(phone);
+      this.successMessage = `मोबाईल ${phone} साठी पासवर्ड रिसेट विनंती रद्द करण्यात आली आहे.`;
+      await this.loadPendingResetRequests();
+    } catch (err) {
+      console.error('Rejection Error:', err);
+      this.errorMessage = 'विनंती रद्द करताना त्रुटी आली.';
+    }
+  }
+
+  // Fast-fill phone number into form from request list
+  selectPhoneForReset(phone: string): void {
+    this.registrationData.phone = phone;
+    this.activeAdminTab = 'register';
+    this.showProfileFields = false;
+    this.onPhoneChange();
+  }
+
+  async onPhoneChange(): Promise<void> {
+    const cleanPhone = this.registrationData.phone.trim();
+    if (cleanPhone.length === 10) {
+      await this.checkExistingMemberByPhone(cleanPhone);
+    } else {
+      this.foundMemberByPhone = null;
+    }
+  }
+
+  async onNameOrVillageChange(): Promise<void> {
+    if (this.showProfileFields && this.registrationData.fname && this.registrationData.village) {
+      this.foundMemberByNameAndVillage = await this.firebaseService.findMemberByNameAndVillage(
+        this.registrationData.fname.trim(),
+        this.registrationData.lname.trim(),
+        this.registrationData.village
+      );
+    } else {
+      this.foundMemberByNameAndVillage = null;
+    }
+  }
+
+  async checkExistingMemberByPhone(phone: string): Promise<void> {
+    try {
+      const existingMembers = await firstValueFrom(
+        this.firebaseService.getMemberByPhone(phone)
+      );
+      this.foundMemberByPhone = (existingMembers && existingMembers.length > 0) ? existingMembers[0] : null;
+    } catch (err) {
+      console.error('Error fetching member:', err);
+      this.foundMemberByPhone = null;
     }
   }
 
@@ -75,12 +207,12 @@ export class RegisterComponent implements OnInit {
     } else {
       this.filteredVillages = [...this.allVillages];
     }
+    this.onNameOrVillageChange();
   }
 
-  async onRegister() {
+  async onRegister(): Promise<void> {
     const cleanPhone = this.registrationData.phone.trim();
 
-    // 1. Core Password & Phone Validations (Always Executed)
     if (!/^[0-9]{10}$/.test(cleanPhone)) {
       this.errorMessage = 'कृपया योग्य १० अंकी मोबाईल नंबर प्रविष्ट करा.';
       return;
@@ -96,79 +228,54 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    // 2. Personal Information Validations (Executed ONLY if toggle is active)
-    if (this.showProfileFields) {
-      if (!this.registrationData.fname.trim()) {
-        this.errorMessage = 'कृपया नाव प्रविष्ट करा.';
-        return;
-      }
-
-      if (!this.registrationData.lname.trim()) {
-        this.errorMessage = 'कृपया आडनाव प्रविष्ट करा.';
-        return;
-      }
-
-      if (!this.registrationData.age || this.registrationData.age < 1 || this.registrationData.age > 99) {
-        this.errorMessage = 'कृपया योग्य वय (१ ते ९९) नमूद करा.';
-        return;
-      }
-
-      if (!this.registrationData.taluka || !this.registrationData.village) {
-        this.errorMessage = 'कृपया तालुका आणि गाव निवडा.';
-        return;
-      }
-    }
-
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
 
     try {
-      // 3. Check if member record exists in Firestore
-      const existingMembers = await firstValueFrom(
-        this.firebaseService.getMemberByPhone(cleanPhone)
-      );
-
-      // 4. Register or Update credentials in Firebase Authentication
+      // 1. Update Authentication Credentials
       await firstValueFrom(
         this.authService.registerWithPhoneAndPassword(cleanPhone, this.registrationData.password)
       );
 
-      // 5. Add new member profile to Firestore ONLY if member does not exist AND personal info toggle is enabled
-      if (this.showProfileFields && (!existingMembers || existingMembers.length === 0)) {
+      // 2. Add New Member Profile including all detailed personal fields
+      if (this.showProfileFields && !this.foundMemberByPhone) {
         await this.firebaseService.addMember({
           initial: this.registrationData.initial,
           fname: this.registrationData.fname,
           lname: this.registrationData.lname,
           phone: cleanPhone,
           age: Number(this.registrationData.age),
+          joinedOn: this.registrationData.joinedOn,
+          education: this.registrationData.education,
+          occupation: this.registrationData.occupation,
           designation: this.registrationData.designation,
           address: this.registrationData.address,
           district: this.registrationData.district,
           taluka: this.registrationData.taluka,
           village: this.registrationData.village,
-          joinedOn: new Date().toISOString().substring(0, 10),
           active: true,
-          alive: true
+          alive: true,
+          passwordResetRequested: false,
+          passwordResetApproved: false
         });
       }
 
-      this.successMessage = 'नोंदणी / पासवर्ड अपडेट यशस्वी झाली! आता लॉगिन करा.';
+      // 3. Clear reset flags upon successful update
+      await this.firebaseService.clearResetFlags(cleanPhone);
+
+      this.successMessage = 'नोंदणी / पासवर्ड अपडेट यशस्वी झाला! आता लॉगिन करा.';
       setTimeout(() => this.router.navigateByUrl('login'), 2000);
 
     } catch (error: any) {
       console.error('Registration Error:', error);
-      if (error.code === 'auth/email-already-in-use') {
-        this.errorMessage = 'या मोबाईल नंबरवर आधीच खाते नोंदणीकृत आहे. कृपया लॉगिन करा.';
-      } else {
-        this.errorMessage = 'नोंदणी करताना त्रुटी आली. पुन्हा प्रयत्न करा.';
-      }
+      this.errorMessage = 'त्रुटी आली. कृपया नोंदणी माहिती तपासा आणि पुन्हा प्रयत्न करा.';
     } finally {
       this.isLoading = false;
     }
   }
 
-  onBack() {
+  onBack(): void {
     this.router.navigateByUrl('login');
   }
 }

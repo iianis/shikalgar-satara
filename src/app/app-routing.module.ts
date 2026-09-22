@@ -83,7 +83,7 @@ const routes: Routes = [
   },
   {
     path: 'membermanager',
-    component: MembermanagerComponent, canActivate: [adminGuard]
+    component: MembermanagerComponent
   },
   {
     path: '',

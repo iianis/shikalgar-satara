@@ -1,6 +1,18 @@
 <app-header></app-header>
 <div class="container my-4">
 
+    <!-- Global Error Banner -->
+    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
+        <button type="button" class="btn-close" (click)="errorMessage = null" aria-label="Close"></button>
+    </div>
+
+    <!-- Global Success Banner -->
+    <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage }}
+        <button type="button" class="btn-close" (click)="successMessage = null" aria-label="Close"></button>
+    </div>
+
     <!-- STEP 1: Search -->
     <div *ngIf="step === 'search'" class="row justify-content-center">
         <div class="col-12 col-md-6">
@@ -111,20 +123,25 @@
                     '{{ searchQueryControl.value }}' या माहिती संदर्भात कोणतीही नोंद आढळली नाही.
                 </p>
 
-                <p class="text-muted small mb-1" style="font-size: 0.8rem;">
+                <p class="text-muted small mb-1">
                     आपण पुन्हा शोधण्याचा प्रयत्न करा.
                 </p>
+
                 <p class="text-dark mb-2">
-                    'शोधताना मोबाईल नंबर, किंवा नाव, किंवा वडीलांचे नांव याचा वापर करावा. अचुक व्यकरणाने शोध सोपा होईल.
+                    शोधताना मोबाईल नंबर, नाव, किंवा वडिलांचे नाव वापरावे. अचूक व्याकरणाने शोध सोपा होईल.
                 </p>
-                <p class="text-muted small mb-4" style="font-size: 0.8rem;">
+
+                <p class="text-muted small mb-4">
                     अन्यथा नवीन सभासद नोंदणी करू शकता.
                 </p>
 
                 <div class="d-flex gap-2 justify-content-center">
-                    <button class="btn btn-outline-secondary" (click)="resetSearch()">रद्द करा</button>
-                    <button class="btn btn-primary fw-semibold" (click)="startNewMemberCreation()">+ नवीन सभासद
-                        नोंद</button>
+                    <button type="button" class="btn btn-outline-secondary" (click)="resetSearch()">
+                        पुन्हा शोधा
+                    </button>
+                    <button type="button" class="btn btn-primary fw-semibold" (click)="startNewMemberCreation()">
+                        + नवीन सभासद नोंद
+                    </button>
                 </div>
             </div>
         </div>
@@ -143,14 +160,16 @@
         <div class="card-body p-3 p-md-4">
             <form [formGroup]="memberForm" (ngSubmit)="onSubmit()">
 
-                <!-- Quick Section Controls -->
-                <div class="d-flex justify-content-end gap-2 mb-3">
-                    <button type="button" class="btn btn-xs btn-outline-secondary" (click)="expandAllSections()">
-                        सर्व परिच्छेद उघडा (Expand All)
-                    </button>
-                    <button type="button" class="btn btn-xs btn-outline-secondary" (click)="collapseAllSections()">
-                        सर्व परिच्छेद बंद करा (Collapse All)
-                    </button>
+                <!-- Quick Section Control Switch -->
+                <div class="d-flex justify-content-end align-items-center mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="expandAllSwitch"
+                            [checked]="areAllExpanded" (change)="toggleAllSections($event)">
+                        <label class="form-check-label small text-muted" for="expandAllSwitch">
+                            {{ areAllExpanded ? 'सर्व परिच्छेद बंद करा (Collapse All)' : 'सर्व परिच्छेद उघडा (Expand
+                            All)' }}
+                        </label>
+                    </div>
                 </div>
 
                 <div class="accordion" id="memberFormAccordion">
@@ -218,7 +237,17 @@
                                                 ९९ पेक्षा कमी (१ ते ९९) असणे आवश्यक आहे.</small>
                                         </div>
                                     </div>
+                                    <div class="col-12 col-sm-6 col-md-4">
+                                        <label class="form-label small text-muted">शिक्षण</label>
+                                        <input type="text" class="form-control" formControlName="education"
+                                            placeholder="शिक्षण नमूद करा (उदा. BSc)" />
+                                    </div>
 
+                                    <div class="col-12 col-sm-6 col-md-4">
+                                        <label class="form-label small text-muted">व्यवसाय</label>
+                                        <input type="text" class="form-control" formControlName="occupation"
+                                            placeholder="व्यवसाय / काम नमूद करा" />
+                                    </div>
                                     <div class="col-12 col-sm-6 col-md-4">
                                         <label class="form-label small text-muted">पद <span
                                                 class="text-danger">*</span></label>
@@ -405,7 +434,7 @@
                         <div [class.show]="isSectionOpen('donations')" [class.collapsed]="!isSectionOpen('donations')"
                             class="accordion-collapse collapse">
                             <div class="accordion-body bg-white p-3">
-                                <div class="d-flex justify-content-end mb-3" *ngIf="!isReadOnly">
+                                <div class="d-flex justify-content-end mb-3" *ngIf="isAdminUser && !isReadOnly">
                                     <button type="button" class="btn btn-sm btn-outline-primary"
                                         (click)="addDonation()">
                                         + देणगी नोंद
@@ -423,7 +452,7 @@
                                             <span class="text-muted ms-2" *ngIf="donation.get('date')?.value">• {{
                                                 donation.get('date')?.value }}</span>
                                         </div>
-                                        <div class="d-flex gap-2" *ngIf="!isReadOnly">
+                                        <div class="d-flex gap-2" *ngIf="isAdminUser && !isReadOnly">
                                             <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
                                                 (click)="toggleEditDonation(i)">✏️</button>
                                             <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
@@ -491,7 +520,7 @@
                         <div [class.show]="isSectionOpen('help')" [class.collapsed]="!isSectionOpen('help')"
                             class="accordion-collapse collapse">
                             <div class="accordion-body bg-white p-3">
-                                <div class="d-flex justify-content-end mb-3" *ngIf="!isReadOnly">
+                                <div class="d-flex justify-content-end mb-3" *ngIf="isAdminUser && !isReadOnly">
                                     <button type="button" class="btn btn-sm btn-outline-primary" (click)="addHelp()">
                                         + मदत नोंद
                                     </button>
@@ -507,7 +536,7 @@
                                             <span class="text-muted ms-2" *ngIf="help.get('date')?.value">• {{
                                                 help.get('date')?.value }}</span>
                                         </div>
-                                        <div class="d-flex gap-2" *ngIf="!isReadOnly">
+                                        <div class="d-flex gap-2" *ngIf="isAdminUser && !isReadOnly">
                                             <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
                                                 (click)="toggleEditHelp(i)">✏️</button>
                                             <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
@@ -572,7 +601,7 @@
                         <div [class.show]="isSectionOpen('recommendations')"
                             [class.collapsed]="!isSectionOpen('recommendations')" class="accordion-collapse collapse">
                             <div class="accordion-body bg-white p-3">
-                                <div class="d-flex justify-content-end mb-3" *ngIf="!isReadOnly">
+                                <div class="d-flex justify-content-end mb-3" *ngIf="isAdminUser && !isReadOnly">
                                     <button type="button" class="btn btn-sm btn-outline-primary"
                                         (click)="addRecommendation()">
                                         + शिफारस पत्र नोंद
@@ -588,7 +617,7 @@
                                             <span class="text-muted ms-2" *ngIf="rec.get('date')?.value">• {{
                                                 rec.get('date')?.value }}</span>
                                         </div>
-                                        <div class="d-flex gap-2" *ngIf="!isReadOnly">
+                                        <div class="d-flex gap-2" *ngIf="isAdminUser && !isReadOnly">
                                             <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
                                                 (click)="toggleEditRecommendation(i)">✏️</button>
                                             <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"

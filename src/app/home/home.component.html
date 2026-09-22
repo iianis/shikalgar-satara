@@ -1,20 +1,51 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm">
-    <div class="container-fluid">
-        <!-- Registration Badge with Left Margin & Padding -->
-        <a class="navbar-brand text-wrap py-1 px-3 ms-2 ms-md-3 me-auto bg-white border rounded text-secondary shadow-sm"
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm px-2 px-md-3">
+    <div class="container-fluid p-0">
+        <!-- Top Row Header for Mobile (Brand Badge + Logged-in Badge + Toggler) -->
+        <div class="d-flex align-items-center justify-content-between w-100 d-lg-none mb-1">
+            <!-- Mobile Brand & Logged-In Badge -->
+            <a class="navbar-brand text-truncate py-1 px-2 me-2 bg-white border rounded text-secondary shadow-sm d-inline-flex align-items-center mb-0"
+                style="font-size: 0.78rem; max-width: calc(100% - 55px);">
+                <span class="fw-bold text-dark me-1">नोंदणी:</span>
+                <span class="text-truncate me-1">महा/४६४५/सातारा...</span>
+
+                <!-- Logged In Indicator Badge on Mobile -->
+                <span *ngIf="isLoggedIn" class="badge bg-success rounded-pill px-2 py-1 text-white ms-1"
+                    title="लॉगिन आहे">
+                    सभासद: {{loggedInFirstName}}
+                </span>
+            </a>
+
+            <!-- Mobile Toggler Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+
+        <!-- Desktop Brand & Logged-In Badge (Hidden on Mobile) -->
+        <a class="navbar-brand py-1 px-3 me-auto bg-white border rounded text-secondary shadow-sm d-none d-lg-inline-flex align-items-center"
             style="font-size: 0.85rem;">
-            <span class="fw-bold text-dark">नोंदणी क्र:</span> महा/४६४५/सातारा/२२-३-१९९६
+            <span class="fw-bold text-dark me-1 text-nowrap">नोंदणी क्र:</span>
+            <span class="text-nowrap">महा/४६४५/सातारा/२२-३-१९९६</span>
+
+            <!-- Logged In Indicator Badge on Desktop -->
+            <span *ngIf="isLoggedIn" class="badge bg-success rounded-pill px-2 py-1 text-white ms-2 text-nowrap"
+                title="लॉगिन आहे">
+                सभासद: {{loggedInFirstName}}
+            </span>
         </a>
 
-        <!-- Mobile Toggler Button -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <!-- Desktop Toggler Button placeholder for breakpoint edge-cases -->
+        <button class="navbar-toggler d-none" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- Navigation Menu Links -->
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-3 fw-semibold">
+        <!-- Navigation Menu Links (Expands full-width on mobile below top bar) -->
+        <div class="collapse navbar-collapse w-100" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-0 ms-lg-3 fw-semibold pt-2 pt-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" href="home">मुख्यपृष्ठ</a>
                 </li>
@@ -41,11 +72,14 @@
                     <a class="nav-link" href="audits">मागील वर्षाचे ऑडिट</a>
                 </li>
                 <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
-                    <a class="nav-link" href="membermanager">माझी प्रोफाइल / माहिती व्यवस्थापन</a>
+                    <a class="nav-link" href="membermanager">माहिती व्यवस्थापन</a>
                 </li>
-                <li class="nav-item" *ngIf="isLoggedIn">
+                <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
+                    <a class="nav-link" href="register">सभासद नोंदणी</a>
+                </li>
+                <!-- <li class="nav-item" *ngIf="isLoggedIn">
                     <a class="nav-link" href="announcement">सभा नोटीस</a>
-                </li>
+                </li> -->
                 <li class="nav-item" *ngIf="isLoggedIn">
                     <a class="nav-link text-danger" href="#" (click)="logout()">लॉगआउट</a>
                 </li>

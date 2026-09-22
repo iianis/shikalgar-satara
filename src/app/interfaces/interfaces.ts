@@ -17,11 +17,18 @@ export interface IMember {
     taluka: string,
     dist?: string,
     phone: string,
+    age?: number,
+    education?: string;
+    occupation?: string;
     designation?: string,
     createdBy?: string | undefined,
     timestamp?: Timestamp | null,
     verificationCode?: string | undefined,
     verificationId?: string | undefined
+    // Password Reset Approval Workflow Flags
+    passwordResetRequested?: boolean;
+    passwordResetApproved?: boolean;
+    resetRequestedAt?: string;
 }
 
 export interface IUser {
@@ -82,6 +89,8 @@ export interface Member {
     district?: string;
     phone: string;
     age?: number;
+    education?: string;
+    occupation?: string;
     designation?: string;
     joinedOn?: string;
     alive?: boolean;

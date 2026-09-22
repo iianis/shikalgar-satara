@@ -5,7 +5,9 @@
             <div class="card shadow-sm border-0 position-relative overflow-hidden">
 
                 <div class="card-header bg-primary text-white text-center py-3 position-relative z-1">
-                    <h4 class="mb-0 fw-bold">सभासद पडताळणी</h4>
+                    <h4 class="mb-0 fw-bold">
+                        {{ showResetSection ? 'पासवर्ड रिसेट' : 'सभासद पडताळणी' }}
+                    </h4>
                 </div>
 
                 <div class="card-body p-4 position-relative">
@@ -19,54 +21,123 @@
 
                     <!-- Form Content Layered Above Watermark -->
                     <div class="position-relative z-1">
-                        <div *ngIf="errorMessage" class="alert alert-danger py-2 mb-3">
-                            {{ errorMessage }}
-                        </div>
 
-                        <form (ngSubmit)="onLogin()">
-                            <div class="mb-3">
-                                <label for="phone" class="form-label fw-bold">
-                                    मोबाईल नंबर <span class="text-danger">*</span>
-                                </label>
-                                <input type="tel" class="form-control form-control-lg" id="phone"
-                                    [(ngModel)]="credentials.phone" name="phone" maxlength="10" required
-                                    placeholder="उदा. ९८८६१७४६०७">
+                        <!-- ================= 1. LOGIN VIEW ================= -->
+                        <div *ngIf="!showResetSection">
+                            <!-- Main Error Message -->
+                            <div *ngIf="errorMessage" class="alert alert-danger py-2 mb-3">
+                                {{ errorMessage }}
                             </div>
 
+                            <!-- Main Login Form -->
+                            <form (ngSubmit)="onLogin()">
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label fw-bold">
+                                        मोबाईल नंबर <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="tel" class="form-control form-control-lg" id="phone"
+                                        [(ngModel)]="credentials.phone" name="phone" maxlength="10" required
+                                        placeholder="उदा. ९८८६१७४६०७">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="password" class="form-label fw-bold">
+                                        पासवर्ड (Password) <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="input-group">
+                                        <input [type]="showPassword ? 'text' : 'password'"
+                                            class="form-control form-control-lg" id="password"
+                                            [(ngModel)]="credentials.password" name="password" required
+                                            placeholder="******">
+                                        <button class="btn btn-outline-secondary" type="button"
+                                            (click)="togglePasswordVisibility()">
+                                            {{ showPassword ? 'Hide' : 'Show' }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">
+                                        {{ isLoading ? 'लॉगिन होत आहे...' : 'लॉगिन करा' }}
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" (click)="onBack()">
+                                        मागे जा
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Forgot Password Trigger Link -->
+                            <div class="mt-4 border-top pt-3 text-center">
+                                <button type="button"
+                                    class="btn btn-link text-decoration-none p-0 fw-semibold text-danger"
+                                    (click)="showResetSection = true">
+                                    🔑 पासवर्ड विसरलात? (Forgot Password?)
+                                </button>
+                            </div>
+
+                            <!-- First-time / New User Registration Prompt -->
+                            <div class="mt-3 text-center">
+                                <p class="mb-2 text-muted small">पहिल्याच वेळी भेट दिली आहे?</p>
+                                <button type="button" class="btn btn-outline-success btn-sm w-100 fw-bold"
+                                    (click)="onRegister()">
+                                    नवीन सभासद नोंदणी करा
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ================= 2. FORGOT PASSWORD VIEW ================= -->
+                        <div *ngIf="showResetSection">
+                            <h6 class="fw-bold mb-2 text-dark">पासवर्ड रिसेट विनंती</h6>
+                            <p class="small text-muted mb-3">
+                                आपला नोंदणीकृत मोबाईल नंबर टाका आणि रिसेट विनंती पाठवा.
+                            </p>
+
+                            <!-- Feedback Alerts -->
+                            <div *ngIf="resetMessage" class="alert alert-info py-2 small mb-3">
+                                {{ resetMessage }}
+                            </div>
+                            <div *ngIf="resetError" class="alert alert-danger py-2 small mb-3">
+                                {{ resetError }}
+                            </div>
+
+                            <!-- Phone Number Input with Auto-Check Trigger -->
                             <div class="mb-3">
-                                <label for="password" class="form-label fw-bold">
-                                    पासवर्ड (Password) <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <input [type]="showPassword ? 'text' : 'password'"
-                                        class="form-control form-control-lg" id="password"
-                                        [(ngModel)]="credentials.password" name="password" required
-                                        placeholder="******">
-                                    <button class="btn btn-outline-secondary" type="button"
-                                        (click)="togglePasswordVisibility()">
-                                        {{ showPassword ? 'Hide' : 'Show' }}
+                                <label class="form-label fw-bold small">मोबाईल नंबर <span
+                                        class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" [(ngModel)]="resetPhone"
+                                    (ngModelChange)="onPhoneInputChange()" maxlength="10"
+                                    placeholder="१० अंकी मोबाईल नंबर">
+                            </div>
+
+                            <!-- Actions Based on Status -->
+                            <div class="d-grid gap-2 mb-3">
+                                <!-- Show "Send Request" button if valid number, NOT approved, AND no request is pending -->
+                                <button
+                                    *ngIf="resetPhone.trim().length === 10 && !isApprovedForReset && !resetMessage.includes('प्रलंबित')"
+                                    type="button" class="btn btn-warning fw-bold" [disabled]="isLoading"
+                                    (click)="onRequestReset()">
+                                    {{ isLoading ? 'तपासत आहे...' : 'विनंती पाठवा' }}
+                                </button>
+
+                                <!-- Show "Reset Password" Action button if Admin has Approved -->
+                                <div *ngIf="isApprovedForReset" class="p-3 bg-success text-white rounded text-center">
+                                    <small class="d-block mb-2 fw-semibold">आपली विनंती मंजूर झाली आहे!</small>
+                                    <button type="button" class="btn btn-light btn-sm fw-bold text-success w-100"
+                                        (click)="navigateToResetPage()">
+                                        👉 पासवर्ड बदलण्यासाठी येथे क्लिक करा
                                     </button>
                                 </div>
                             </div>
 
-                            <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">
-                                    {{ isLoading ? 'लॉगिन होत आहे...' : 'लॉगिन करा' }}
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary" (click)="onBack()">
-                                    मागे जा
+                            <!-- Back to Login Button -->
+                            <div class="border-top pt-3 text-center">
+                                <button type="button" class="btn btn-outline-secondary w-100"
+                                    (click)="toggleResetView(false)">
+                                    ⬅️ मागे जा (लॉगिन करा)
                                 </button>
                             </div>
-                        </form>
-
-                        <!-- First-time / New User Registration Prompt -->
-                        <div class="mt-4 text-center border-top pt-3">
-                            <p class="mb-2 text-muted small">पहिल्याच वेळी भेट दिली आहे किंवा पासवर्ड माहित नाही?</p>
-                            <button type="button" class="btn btn-outline-success btn-sm w-100 fw-bold"
-                                (click)="onRegister()">
-                                नवीन नोंदणी / पासवर्ड बदला
-                            </button>
                         </div>
+
                     </div>
 
                 </div>

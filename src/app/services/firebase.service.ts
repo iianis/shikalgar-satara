@@ -262,4 +262,109 @@ export class FirebaseService {
       });
     });
   }
+
+  /**
+   * Submits a password reset request for a given phone number
+   */
+  async requestPasswordReset(phone: string): Promise<{ success: boolean; message: string }> {
+    const snapshot = await firstValueFrom(
+      this.firestore.collection('members', ref => ref.where('phone', '==', phone)).get()
+    );
+
+    if (snapshot.empty) {
+      return { success: false, message: 'हा मोबाईल नंबर सिस्टीममध्ये नोंदणीकृत नाही.' };
+    }
+
+    const docId = snapshot.docs[0].id;
+    await this.firestore.collection('members').doc(docId).update({
+      passwordResetRequested: true,
+      passwordResetApproved: false,
+      resetRequestedAt: new Date().toISOString()
+    });
+
+    return { success: true, message: 'पासवर्ड रिसेट विनंती पाठवली आहे. ॲडमिन मंजुरीनंतर आपण पासवर्ड बदलू शकाल.' };
+  }
+
+  /**
+   * Checks reset request status for a phone number on the Login page
+   */
+  async checkResetStatus(phone: string): Promise<{ requested: boolean; approved: boolean }> {
+    const snapshot = await firstValueFrom(
+      this.firestore.collection('members', ref => ref.where('phone', '==', phone)).get()
+    );
+
+    if (snapshot.empty) {
+      return { requested: false, approved: false };
+    }
+
+    const data = snapshot.docs[0].data() as IMember;
+    return {
+      requested: !!data.passwordResetRequested,
+      approved: !!data.passwordResetApproved
+    };
+  }
+
+  /**
+   * Admin: Get all members who requested password reset
+   */
+  getPendingResetRequests(): Observable<IMember[]> {
+    return this.firestore.collection<IMember>('members', ref =>
+      ref.where('passwordResetRequested', '==', true)
+    ).valueChanges({ idField: 'id' });
+  }
+
+  /**
+   * Admin: Approve password reset request
+   */
+  async approvePasswordReset(phone: string): Promise<void> {
+    const snapshot = await firstValueFrom(
+      this.firestore.collection('members', ref =>
+        ref.where('phone', '==', phone.trim())
+      ).get()
+    );
+
+    if (snapshot.empty) {
+      throw new Error(`सभासद नोंदणी आढळली नाही: ${phone}`);
+    }
+
+    // Retrieve the actual Firestore auto-generated document ID
+    const docId = snapshot.docs[0].id;
+
+    // Perform update on the actual document reference
+    await this.firestore.collection('members').doc(docId).update({
+      passwordResetApproved: true
+    });
+  }
+
+  /**
+   * Clears flags after password reset completion
+   */
+  async clearResetFlags(phone: string): Promise<void> {
+    const snapshot = await firstValueFrom(
+      this.firestore.collection('members', ref => ref.where('phone', '==', phone)).get()
+    );
+
+    if (!snapshot.empty) {
+      const docId = snapshot.docs[0].id;
+      await this.firestore.collection('members').doc(docId).update({
+        passwordResetRequested: false,
+        passwordResetApproved: false
+      });
+    }
+  }
+
+  /**
+   * Admin Warning Helper: Search existing member by Name and Village
+   */
+  async findMemberByNameAndVillage(fname: string, lname: string, villageName: string): Promise<IMember | null> {
+    const snapshot = await firstValueFrom(
+      this.firestore.collection<IMember>('members', ref =>
+        ref.where('fname', '==', fname)
+          .where('lname', '==', lname)
+          .where('village', '==', villageName)
+      ).get()
+    );
+
+    return snapshot.empty ? null : (snapshot.docs[0].data() as IMember);
+  }
 }

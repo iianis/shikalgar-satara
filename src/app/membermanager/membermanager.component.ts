@@ -42,12 +42,15 @@ export class MembermanagerComponent implements OnInit {
   allVillages: village[] = villages;
   filteredVillages: village[] = [];
 
-  userTalukaSelection = '';
-  userVillageSelection = '';
+  userTalukaSelection = localStorage.getItem("mytaluka") || "सातारा";
+  userVillageSelection = localStorage.getItem("myvillage") || "नागठाणे";
   step: 'search' | 'results' | 'not-found' | 'form' = 'search';
   isEditMode = false;
   isReadOnly = false;
-  //loggedInPhone = '';   // Adjust based on your logged-in user state
+
+  // Inline Feedback Banners
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
 
   // Section visibility flags
   showPersonalSection = true;
@@ -55,10 +58,16 @@ export class MembermanagerComponent implements OnInit {
   showRecommendationsSection = true;
   showHelpReceivedSection = true;
 
+  clearMessages(): void {
+    this.errorMessage = null;
+    this.successMessage = null;
+  }
+
   /**
    * Opens member details in Read-Only Mode (All sections visible, inputs disabled)
    */
   viewMemberDetails(member: Member): void {
+    this.clearMessages();
     this.isReadOnly = true;
     this.isEditMode = true;
 
@@ -76,7 +85,6 @@ export class MembermanagerComponent implements OnInit {
    * Applies section visibility & edit permissions
    */
   applySectionPermissions(): void {
-    // If in Read-Only view mode, show all sections regardless of user role
     if (this.isReadOnly) {
       this.showPersonalSection = true;
       this.showDonationsSection = true;
@@ -85,7 +93,6 @@ export class MembermanagerComponent implements OnInit {
       return;
     }
 
-    // Edit Mode Permissions
     const isOwnRecord = this.loggedInPhone === this.memberForm.get('phone')?.value;
     this.showPersonalSection = true; // Always visible
     this.showDonationsSection = this.isAdminUser || isOwnRecord;
@@ -97,10 +104,11 @@ export class MembermanagerComponent implements OnInit {
    * Opens member details in Edit Mode
    */
   selectMemberToEdit(member: any): void {
+    this.clearMessages();
     const isOwnRecord = this.loggedInPhone === member.phone;
 
     if (!isOwnRecord && !this.isAdminUser) {
-      alert('तुम्हाला फक्त स्वतःची माहिती अपडेट करण्याची परवानगी आहे.');
+      this.errorMessage = 'तुम्हाला फक्त स्वतःची माहिती अपडेट करण्याची परवानगी आहे.';
       return;
     }
 
@@ -108,7 +116,11 @@ export class MembermanagerComponent implements OnInit {
     this.isEditMode = true;
 
     this.initForm(member);
-    this.memberForm.enable(); // Re-enables form controls
+    this.memberForm.enable();
+
+    // Keep designation control disabled in edit mode
+    this.memberForm.get('designation')?.disable();
+
     this.applySectionPermissions();
     this.step = 'form';
   }
@@ -118,16 +130,13 @@ export class MembermanagerComponent implements OnInit {
   ) { }
 
   async ngOnInit(): Promise<void> {
-    // 1. Get current logged-in phone number
     this.loggedInPhone = await firstValueFrom(this.authService.getLoggedInPhone());
 
     if (!this.loggedInPhone) {
-      // Redirect to login if unauthenticated
       this.router.navigateByUrl('login');
       return;
     }
 
-    // 2. Check if current logged-in phone belongs to an Admin member
     const matchingMemberSnapshot = await firstValueFrom(
       this.firebaseService.getMemberByPhone(this.loggedInPhone)
     );
@@ -137,7 +146,6 @@ export class MembermanagerComponent implements OnInit {
       this.isAdminUser = this.authService.isAdminDesignation(currentMemberData.designation);
     }
 
-    // 3. Check router state for member passed from MemberslistComponent
     const stateMember = history.state?.memberToEdit as Member | undefined;
     if (stateMember) {
       this.selectMemberToEdit(stateMember);
@@ -145,37 +153,31 @@ export class MembermanagerComponent implements OnInit {
   }
 
   goBack(): void {
+    this.clearMessages();
     this.location.back();
   }
 
   goBackFromForm(): void {
-    // 1. Came from MemberslistComponent (or external route via state)
-    // Or if we came straight into form mode without searching first
+    this.clearMessages();
     if (history.state?.memberToEdit || (this.foundMembers.length === 0 && this.step === 'form')) {
       this.location.back();
       return;
     }
 
-    // 2. Came from search results within MembermanagerComponent
     if (this.foundMembers.length > 0) {
       this.step = 'results';
       return;
     }
 
-    // 3. Fallback to initial search view
     this.resetSearch();
   }
 
   isLoading = false;
-
-  // Dedicated property to hold the active document ID when editing
   editingMemberId: string | null = null;
 
   initForm(member?: Member): void {
-
     this.activeSection = 'personal';
 
-    // Retain edit mode if explicit editing ID exists or passed member has an ID
     if (member?.id) {
       this.editingMemberId = member.id;
       this.isEditMode = true;
@@ -198,7 +200,8 @@ export class MembermanagerComponent implements OnInit {
       district: [member?.district || 'सातारा', Validators.required],
       taluka: [initialTaluka, Validators.required],
       village: [initialVillage, Validators.required],
-      phone: [member?.phone || '', [Validators.required, Validators.pattern('^[0-9]{10}$')]], age: [
+      phone: [member?.phone || '', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      age: [
         member?.age ?? 21,
         [
           Validators.required,
@@ -207,6 +210,8 @@ export class MembermanagerComponent implements OnInit {
           Validators.max(99)
         ]
       ],
+      education: [member?.education || ''],
+      occupation: [member?.occupation || ''],
       designation: [{ value: member?.designation || 'सभासद', disabled: true }, Validators.required],
       joinedOn: [defaultJoinedOn, Validators.required],
       alive: [defaultAlive],
@@ -234,6 +239,7 @@ export class MembermanagerComponent implements OnInit {
     this.memberForm.get('taluka')?.valueChanges.subscribe((selectedTaluka: string) => {
       this.filterVillages(selectedTaluka);
       const currentVillage = this.memberForm.get('village')?.value;
+      localStorage.setItem("mytaluka", selectedTaluka);
       if (!this.filteredVillages.some(v => v.name === currentVillage)) {
         this.memberForm.get('village')?.setValue('');
       }
@@ -241,20 +247,20 @@ export class MembermanagerComponent implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
+    this.clearMessages();
+
     if (this.memberForm.invalid) {
       this.memberForm.markAllAsTouched();
+      this.errorMessage = 'कृपया सर्व आवश्यक माहिती योग्य प्रकारे भरा.';
       return;
     }
 
-    // Extract raw form values
     const { id: formId, ...memberData } = this.memberForm.getRawValue();
     this.isLoading = true;
 
     try {
-      // Rely explicitly on editingMemberId when editing, falling back to form control id
       const currentMemberId = this.isEditMode ? (this.editingMemberId || formId) : null;
 
-      // Check duplicate phone excluding current member ID if updating
       const isDuplicate = await this.firebaseService.checkDuplicatePhone(
         memberData.phone,
         currentMemberId
@@ -262,20 +268,30 @@ export class MembermanagerComponent implements OnInit {
 
       if (isDuplicate) {
         this.isLoading = false;
-        alert(`त्रुटी: '${memberData.phone}' हा मोबाईल नंबर दुसऱ्या सभासदासाठी आधीच नोंदणीकृत आहे!`);
+        this.errorMessage = `त्रुटी: '${memberData.phone}' हा मोबाईल नंबर दुसऱ्या सभासदासाठी आधीच नोंदणीकृत आहे!`;
         return;
       }
 
       if (this.isEditMode && currentMemberId) {
-        // Perform Update (excluding the 'id' field from document payload)
         await this.firebaseService.updateMember(currentMemberId, memberData);
+        this.successMessage = 'सभासद माहिती यशस्वीरित्या अद्ययावत केली!';
       } else {
-        // Perform Insert
         await this.firebaseService.addMember(memberData);
+        this.successMessage = 'नवीन सभासद यशस्वीरित्या जतन केला!';
       }
 
       this.isLoading = false;
-      // Replace this.resetSearch() inside onSubmit() with:
+
+      this.isEditMode = false;
+      this.isReadOnly = false;
+      this.editingMemberId = null;
+      this.memberForm.enable();
+
+      this.memberForm.get('designation')?.setValue('सभासद');
+      this.memberForm.get('designation')?.disable();
+
+      this.initForm();
+
       if (this.foundMembers.length > 0) {
         this.step = 'results';
       } else {
@@ -284,7 +300,7 @@ export class MembermanagerComponent implements OnInit {
     } catch (error) {
       this.isLoading = false;
       console.error('Error saving/updating member:', error);
-      alert('माहिती जतन करताना त्रुटी आली.');
+      this.errorMessage = 'माहिती जतन करताना त्रुटी आली.';
     }
   }
 
@@ -296,17 +312,13 @@ export class MembermanagerComponent implements OnInit {
     }
   }
 
-  // FormArray Getters
   get familyMembers(): FormArray { return this.memberForm.get('familyMembers') as FormArray; }
   get donations(): FormArray { return this.memberForm.get('donations') as FormArray; }
   get helpReceived(): FormArray { return this.memberForm.get('helpReceived') as FormArray; }
-  get ageControl() {
-    return this.memberForm.get('age');
-  }
+  get ageControl() { return this.memberForm.get('age'); }
 
-  // Dynamic Array Creators
   createFamilyGroup(data?: FamilyMember): FormGroup {
-    return this.fb.group({
+    const group = this.fb.group({
       relation: [data?.relation || ''],
       name: [data?.name || '', Validators.required],
       education: [data?.education || ''],
@@ -314,6 +326,18 @@ export class MembermanagerComponent implements OnInit {
       gender: [data?.gender || ''],
       occupation: [data?.occupation || '']
     });
+
+    group.get('relation')?.valueChanges.subscribe((selectedRelation: string | null) => {
+      if (!selectedRelation) return;
+
+      if (['मुलगी', 'पत्नी', 'आई'].includes(selectedRelation)) {
+        group.get('gender')?.setValue('स्त्री');
+      } else if (['मुलगा', 'वडील', 'पति'].includes(selectedRelation)) {
+        group.get('gender')?.setValue('पुरुष');
+      }
+    });
+
+    return group;
   }
 
   createDonationGroup(data?: Donation): FormGroup {
@@ -334,11 +358,10 @@ export class MembermanagerComponent implements OnInit {
     });
   }
 
-  // Update Search Control to accept either 10 digits OR text (fname)
   searchQueryControl = new FormControl('', [Validators.required, Validators.minLength(2)]);
 
-  // --- Search Logic ---
   searchMember(): void {
+    this.clearMessages();
     if (this.searchQueryControl.invalid) {
       this.searchQueryControl.markAsTouched();
       return;
@@ -347,7 +370,6 @@ export class MembermanagerComponent implements OnInit {
     const query = this.searchQueryControl.value!.trim();
     this.isLoading = true;
 
-    // Check if query is 10-digit phone or partial text pattern
     const isPhone = /^[0-9]{10}$/.test(query);
     const search$ = isPhone
       ? this.firebaseService.getMemberByPhone(query)
@@ -367,32 +389,45 @@ export class MembermanagerComponent implements OnInit {
       error: (err) => {
         this.isLoading = false;
         console.error('Error fetching members:', err);
+        this.errorMessage = 'सभासद शोधताना त्रुटी आली.';
       }
     });
   }
 
   startNewMemberCreation(): void {
-    const query = this.searchQueryControl.value || '';
+    this.clearMessages();
+    const query = (this.searchQueryControl.value || '').trim();
     const isPhone = /^[0-9]{10}$/.test(query);
 
-    // Auto-fill phone if input was numeric, otherwise auto-fill fname
-    this.initForm({
+    const initialData: Partial<Member> = {
       phone: isPhone ? query : '',
       fname: !isPhone ? query : ''
-    } as Member);
+    };
+
+    this.prepareNewMember(initialData);
+    this.step = 'form';
+  }
+
+  prepareNewMember(initialData: Partial<Member> = {}): void {
+    this.editingMemberId = null;
+    this.isEditMode = false;
+    this.isReadOnly = false;
+
+    this.initForm(initialData as Member);
+
+    this.memberForm.enable();
+
+    this.memberForm.get('designation')?.setValue('सभासद');
+    this.memberForm.get('designation')?.disable();
 
     this.step = 'form';
   }
 
-  // Track open edit rows by FormArray index
   editingFamilyIndexes: Set<number> = new Set<number>();
   editingDonationIndexes: Set<number> = new Set<number>();
   editingHelpIndexes: Set<number> = new Set<number>();
 
-  // Helper methods to check edit state (New items default to open edit mode)
-  isEditingFamily(index: number): boolean {
-    return this.editingFamilyIndexes.has(index);
-  }
+  isEditingFamily(index: number): boolean { return this.editingFamilyIndexes.has(index); }
   toggleEditFamily(index: number): void {
     if (this.editingFamilyIndexes.has(index)) {
       this.editingFamilyIndexes.delete(index);
@@ -401,9 +436,7 @@ export class MembermanagerComponent implements OnInit {
     }
   }
 
-  isEditingDonation(index: number): boolean {
-    return this.editingDonationIndexes.has(index);
-  }
+  isEditingDonation(index: number): boolean { return this.editingDonationIndexes.has(index); }
   toggleEditDonation(index: number): void {
     if (this.editingDonationIndexes.has(index)) {
       this.editingDonationIndexes.delete(index);
@@ -412,9 +445,7 @@ export class MembermanagerComponent implements OnInit {
     }
   }
 
-  isEditingHelp(index: number): boolean {
-    return this.editingHelpIndexes.has(index);
-  }
+  isEditingHelp(index: number): boolean { return this.editingHelpIndexes.has(index); }
   toggleEditHelp(index: number): void {
     if (this.editingHelpIndexes.has(index)) {
       this.editingHelpIndexes.delete(index);
@@ -438,25 +469,23 @@ export class MembermanagerComponent implements OnInit {
     this.editingHelpIndexes.delete(i);
   }
 
-  // Track newly created unsaved rows
   newFamilyIndexes: Set<number> = new Set<number>();
   newDonationIndexes: Set<number> = new Set<number>();
   newHelpIndexes: Set<number> = new Set<number>();
 
-  // --- FAMILY MEMBERS ---
   addFamilyMember(): void {
     this.familyMembers.insert(0, this.createFamilyGroup());
     this.shiftIndexesOnInsert(this.editingFamilyIndexes);
     this.shiftIndexesOnInsert(this.newFamilyIndexes);
 
     this.editingFamilyIndexes.add(0);
-    this.newFamilyIndexes.add(0); // Mark index 0 as new
+    this.newFamilyIndexes.add(0);
   }
 
   finishEditFamily(index: number): void {
     this.editingFamilyIndexes.delete(index);
     this.newFamilyIndexes.delete(index);
-    this.memberForm.markAsDirty(); // Explicitly set form as dirty
+    this.memberForm.markAsDirty();
     this.memberForm.updateValueAndValidity();
   }
   cancelNewFamilyMember(index: number): void {
@@ -465,7 +494,6 @@ export class MembermanagerComponent implements OnInit {
     this.newFamilyIndexes.delete(index);
   }
 
-  // --- DONATIONS ---
   addDonation(): void {
     this.donations.insert(0, this.createDonationGroup());
     this.shiftIndexesOnInsert(this.editingDonationIndexes);
@@ -488,7 +516,6 @@ export class MembermanagerComponent implements OnInit {
     this.newDonationIndexes.delete(index);
   }
 
-  // --- HELP RECEIVED ---
   addHelp(): void {
     this.helpReceived.insert(0, this.createHelpGroup());
     this.shiftIndexesOnInsert(this.editingHelpIndexes);
@@ -511,17 +538,14 @@ export class MembermanagerComponent implements OnInit {
     this.newHelpIndexes.delete(index);
   }
 
-  // Helper method to shift indices when prepending item at index 0
   private shiftIndexesOnInsert(indexSet: Set<number>): void {
     const updated = Array.from(indexSet).map(idx => idx + 1);
     indexSet.clear();
     updated.forEach(idx => indexSet.add(idx));
   }
 
-  // 3. Add getter
   get recommendationLetters(): FormArray { return this.memberForm.get('recommendationLetters') as FormArray; }
 
-  // 4. Add Group Creator
   createRecommendationGroup(data?: RecommendationLetter): FormGroup {
     return this.fb.group({
       date: [data?.date || new Date().toISOString().substring(0, 10)],
@@ -530,14 +554,10 @@ export class MembermanagerComponent implements OnInit {
     });
   }
 
-  // 5. Add Index Tracking Sets
   editingRecommendationIndexes: Set<number> = new Set<number>();
   newRecommendationIndexes: Set<number> = new Set<number>();
 
-  // 6. Add Helper Methods & Handlers
-  isEditingRecommendation(index: number): boolean {
-    return this.editingRecommendationIndexes.has(index);
-  }
+  isEditingRecommendation(index: number): boolean { return this.editingRecommendationIndexes.has(index); }
 
   toggleEditRecommendation(index: number): void {
     if (this.editingRecommendationIndexes.has(index)) {
@@ -575,7 +595,7 @@ export class MembermanagerComponent implements OnInit {
   }
 
   resetSearch(): void {
-    // Clear router state reference if it exists
+    this.clearMessages();
     if (history.state?.memberToEdit) {
       history.state.memberToEdit = null;
     }
@@ -611,5 +631,25 @@ export class MembermanagerComponent implements OnInit {
 
   isSectionOpen(sectionKey: string): boolean {
     return this.activeSection === sectionKey || this.activeSection === 'all';
+  }
+
+  // Add helper getter or boolean property
+  get isAdminOrReadOnly(): boolean {
+    return this.isAdminUser || this.isReadOnly;
+  }
+  areAllExpanded: boolean = false;
+
+  /**
+   * Toggles expand/collapse state for all accordion sections
+   */
+  toggleAllSections(event: Event): void {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    this.areAllExpanded = isChecked;
+
+    if (isChecked) {
+      this.expandAllSections();
+    } else {
+      this.collapseAllSections();
+    }
   }
 }

@@ -2,159 +2,201 @@
 
 <div class="container my-3 my-md-4">
     <div class="row align-items-center g-2">
-        <!-- Back Button Column -->
         <div class="col-auto">
             <button class="btn btn-primary d-inline-flex align-items-center gap-1 shadow-sm" (click)="goBack()">
                 <i class="bi bi-arrow-left"></i>
                 <span>मागे जा</span>
             </button>
         </div>
-
-        <!-- Section Title Column -->
         <div class="col">
             <h1 class="h3 h2-md display-6-lg fw-bold mb-0 text-truncate">
-                सभासद यादी
+                सभासद शोध / यादी
             </h1>
         </div>
     </div>
 </div>
 
-<app-search placeholder="नाव किंवा 10 अंकी मोबाईल नंबर.." (searchChange)="onSearchChange($event)"></app-search>
+<!-- Search Input Component with Enter Key Trigger -->
+<div class="container mb-3" (keydown)="onSearchKeydown($event)">
+    <app-search placeholder="नाव किंवा १० अंकी मोबाईल नंबर.." (searchChange)="onSearchInput($event)">
+    </app-search>
+</div>
+
 <div class="container">
-    <div class="row mb-3">
-        <div class="col-md-1">
-            <label for="taluka" class="form-label">तालुका</label>
-        </div>
-        <div class="col-md-2">
-            <select class="form-control" id="taluka" [(ngModel)]="mytaluka" (change)="onTalukaChange($event)"
-                style="appearance:auto;">
+    <div class="row mb-3 align-items-end g-2">
+        <div class="col-md-4 col-12">
+            <label for="taluka" class="form-label fw-bold small">तालुका</label>
+            <select class="form-select" id="taluka" [(ngModel)]="mytaluka" (change)="onTalukaChange($event)">
                 <option value="none">सर्व तालुके</option>
                 <option *ngFor="let taluka of talukas" [value]="taluka.name">{{ taluka.name }}</option>
             </select>
         </div>
-    </div>
 
-    <div class="row mb-3">
-        <div class="col-md-1">
-            <label for="village" class="form-label">गावं</label>
-        </div>
-        <div class="col-md-2">
-            <select class="form-control" id="village" [(ngModel)]="myvillage" (change)="onVillageChange($event)"
-                style="appearance:auto;">
+        <div class="col-md-4 col-12">
+            <label for="village" class="form-label fw-bold small">गावं</label>
+            <select class="form-select" id="village" [(ngModel)]="myvillage" (change)="onVillageChange($event)">
                 <option value="none">सर्व गावे</option>
                 <option *ngFor="let village of villagesByTaluka" [value]="village.name">{{ village.name }}</option>
             </select>
         </div>
+
+        <!-- Search Button Trigger -->
+        <div class="col-md-4 col-12">
+            <button class="btn btn-primary w-100 fw-semibold shadow-sm" (click)="executeSearch()"
+                [disabled]="isSearching">
+                <span *ngIf="!isSearching">🔍 शोध घ्या</span>
+                <span *ngIf="isSearching" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                <span *ngIf="isSearching">शोधत आहे...</span>
+            </button>
+        </div>
     </div>
 </div>
 
+<!-- Container Views for Different States -->
 <div class="container mt-3">
-    <div *ngFor="let member of filteredMembers" class="card mt-2 shadow-sm" [ngClass]="{
-             'border-danger bg-danger-subtle': member.alive === false,
-             'border-secondary bg-light opacity-75 member-inactive': member.active === false && member.alive !== false
-         }">
 
-        <!-- Card Header with Dynamic Status Badges -->
-        <div class="card-header fs-5 d-flex justify-content-between align-items-center"
-            (click)="toggleMemberDetails(member.id)" style="cursor: pointer;">
-            <div class="d-flex align-items-center gap-2">
-                <span [ngClass]="{ 'text-danger': member.alive === false, 'text-muted': member.active === false }">
-                    <strong>{{ member.initial }} {{ member.fname }} {{ member.lname }}</strong>
-                </span>
+    <!-- STATE 1: Initial Prompt -->
+    <div *ngIf="!hasSearched" class="text-center py-5 border rounded bg-light my-3 shadow-sm">
+        <div class="fs-1 text-muted mb-2">🔍</div>
+        <h5 class="fw-bold text-secondary">सभासद शोधण्यासाठी माहिती द्या</h5>
+        <p class="text-muted small mb-0">
+            नाव किंवा मोबाईल नंबर टाका आणि <strong>Enter</strong> दाबा किंवा <strong>'शोध घ्या'</strong> बटणावर क्लिक
+            करा.
+        </p>
+    </div>
 
-                <!-- Status Badges -->
-                <span *ngIf="member.alive === false" class="badge bg-danger">स्वर्गीय</span>
-                <span *ngIf="member.active === false && member.alive !== false"
-                    class="badge bg-secondary">निष्क्रिय</span>
-            </div>
+    <!-- STATE 2: Loading Spinner -->
+    <div *ngIf="isSearching" class="text-center py-5 my-3">
+        <div class="spinner-border text-primary mb-2" role="status"></div>
+        <p class="text-muted small">माहिती शोधत आहे, कृपया वाट पाहा...</p>
+    </div>
 
-            <button class="btn btn-sm"
-                [ngClass]="selectedMemberId === member.id ? 'btn-secondary' : 'btn-outline-primary'">
-                {{ selectedMemberId === member.id ? 'माहिती लपवा' : 'अधिक माहिती' }}
-            </button>
+    <!-- STATE 3: No Records Found -->
+    <div *ngIf="hasSearched && !isSearching && filteredMembers.length === 0"
+        class="alert alert-warning text-center py-4 my-3 shadow-sm">
+        <h6 class="fw-bold mb-1">कोणतीही नोंद आढळली नाही!</h6>
+        <p class="mb-0 small">कृपया नाव किंवा मोबाईल नंबर तपासून पुन्हा प्रयत्न करा.</p>
+    </div>
+
+    <!-- STATE 4: Search Results -->
+    <div *ngIf="hasSearched && !isSearching && filteredMembers.length > 0">
+        <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+            <span class="small text-muted fw-bold">
+                एकूण नोंद: {{ filteredMembers.length }}
+            </span>
         </div>
 
-        <!-- Initial Summary Row -->
-        <div class="card-body py-2">
-            <div>
-                <span><strong></strong> {{ member.designation || 'सभासद' }}</span>
+        <div *ngFor="let member of filteredMembers" class="card mt-2 shadow-sm" [ngClass]="{
+                 'border-danger bg-danger-subtle': member.alive === false,
+                 'border-secondary bg-light opacity-75 member-inactive': member.active === false && member.alive !== false
+             }">
+
+            <!-- Card Header -->
+            <div class="card-header fs-5 d-flex justify-content-between align-items-center"
+                (click)="toggleMemberDetails(member.id)" style="cursor: pointer;">
+                <div class="d-flex align-items-center gap-2">
+                    <span [ngClass]="{ 'text-danger': member.alive === false, 'text-muted': member.active === false }">
+                        <strong>{{ member.initial }} {{ member.fname }} {{ member.lname }}</strong>
+                    </span>
+
+                    <span *ngIf="member.alive === false" class="badge bg-danger">स्वर्गीय</span>
+                    <span *ngIf="member.active === false && member.alive !== false"
+                        class="badge bg-secondary">निष्क्रिय</span>
+                </div>
+
+                <button class="btn btn-sm"
+                    [ngClass]="selectedMemberId === member.id ? 'btn-secondary' : 'btn-outline-primary'">
+                    {{ selectedMemberId === member.id ? 'माहिती लपवा' : 'अधिक माहिती' }}
+                </button>
             </div>
-        </div>
 
-        <!-- Extended Information Section -->
-        <div *ngIf="selectedMemberId === member.id" class="card-footer bg-white border-top">
-
-            <!-- Personal Details List -->
-            <div class="row mb-3">
-                <div class="col-12">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item px-0 py-1">
-                            <strong>पत्ता:</strong> {{ member.address || 'नोंद नाही' }}
-                        </li>
-                        <!-- Combined Village and Taluka Details -->
-                        <li class="list-group-item px-0 py-1">
-                            <strong>गांव:</strong> {{ member.village || 'नोंद नाही' }}, <strong>तालुका:</strong> {{
-                            member.taluka || 'नोंद नाही' }}
-                        </li>
-
-                        <!-- Single Line for Age & Phone -->
-                        <li class="list-group-item px-0 py-1">
-                            <div class="d-flex justify-content-between">
-                                <span><strong>वय:</strong> {{ member.age || 'नोंद नाही' }}</span>
-                                <span><strong>फोन:</strong> {{ member.phone || 'उपलब्ध नाही' }}</span>
-                            </div>
-                        </li>
-
-                        <!-- Member Status Badges & Right-Aligned Edit Button -->
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="badge me-1"
-                                    [ngClass]="member.alive !== false ? 'bg-success' : 'bg-danger'">
-                                    {{ member.alive !== false ? 'हयात' : 'स्वर्गीय' }}
-                                </span>
-                                <span class="badge"
-                                    [ngClass]="member.active !== false ? 'bg-info text-dark' : 'bg-secondary'">
-                                    {{ member.active !== false ? 'सक्रिय' : 'निष्क्रिय' }}
-                                </span>
-                            </div>
-
-                            <!-- Edit Button aligned to the right of the badges -->
-                            <button *ngIf="canEdit(member)" type="button"
-                                class="btn btn-sm btn-warning text-dark fw-bold shadow-sm" (click)="editMember(member)">
-                                ✏️ माझी माहिती अपडेट करा
-                            </button>
-                        </li>
-                    </ul>
+            <!-- Initial Summary Row -->
+            <div class="card-body py-2">
+                <div>
+                    <span><strong>{{ member.designation || 'सभासद' }}</strong></span>
                 </div>
             </div>
 
-            <!-- Family Members Section -->
-            <div class="mb-2" *ngIf="member.familyMembers && member.familyMembers.length > 0">
-                <h6 class="fw-bold text-primary mb-2">कुटुंबियांची माहिती:</h6>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm mt-1 mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>नाते</th>
-                                <th>नाव</th>
-                                <th>वय</th>
-                                <th>शिक्षण</th>
-                                <th>व्यवसाय</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let fm of member.familyMembers">
-                                <td><span class="badge bg-secondary">{{ fm.relation }}</span></td>
-                                <td>{{ fm.name }}</td>
-                                <td>{{ fm.age || '-' }}</td>
-                                <td>{{ fm.education || '-' }}</td>
-                                <td>{{ fm.occupation || '-' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <!-- Extended Information Section -->
+            <div *ngIf="selectedMemberId === member.id" class="card-footer bg-white border-top">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item px-0 py-1">
+                                <strong>पत्ता:</strong> {{ member.address || 'नोंद नाही' }}
+                            </li>
+                            <li class="list-group-item px-0 py-1">
+                                <strong>गांव:</strong> {{ member.village || 'नोंद नाही' }},
+                                <strong>तालुका:</strong> {{ member.taluka || 'नोंद नाही' }}
+                            </li>
+                            <li class="list-group-item px-0 py-1">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                    <span *ngIf="member.education">
+                                        <strong>शिक्षण:</strong> {{ member.education }}
+                                    </span>
+                                    <span *ngIf="member.occupation">
+                                        <strong>व्यवसाय:</strong> {{ member.occupation }}
+                                    </span>
+                                    <span>
+                                        <strong>वय:</strong> {{ member.age ? member.age + ' वर्षे' : 'नोंद नाही' }}
+                                    </span>
+                                    <span>
+                                        <strong>फोन:</strong> {{ member.phone || 'उपलब्ध नाही' }}
+                                    </span>
+                                </div>
+                            </li>
 
+                            <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <!-- Rendered ONLY when member.alive is false -->
+                                    <span *ngIf="member.alive === false" class="badge bg-danger me-1">
+                                        स्वर्गीय
+                                    </span>
+                                    <span class="badge"
+                                        [ngClass]="member.active !== false ? 'bg-info text-dark' : 'bg-secondary'">
+                                        {{ member.active !== false ? 'सक्रिय' : 'निष्क्रिय' }}
+                                    </span>
+                                </div>
+
+                                <button *ngIf="canEdit(member)" type="button"
+                                    class="btn btn-sm btn-warning text-dark fw-bold shadow-sm"
+                                    (click)="editMember(member)">
+                                    ✏️ माहिती अपडेट करा
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Family Members Section -->
+                <div class="mb-2" *ngIf="member.familyMembers && member.familyMembers.length > 0">
+                    <h6 class="fw-bold text-primary mb-2">कुटुंबियांची माहिती:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm mt-1 mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>नाते</th>
+                                    <th>नाव</th>
+                                    <th>वय</th>
+                                    <th>शिक्षण</th>
+                                    <th>व्यवसाय</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let fm of member.familyMembers">
+                                    <td><span class="badge bg-secondary">{{ fm.relation }}</span></td>
+                                    <td>{{ fm.name }}</td>
+                                    <td>{{ fm.age || '-' }}</td>
+                                    <td>{{ fm.education || '-' }}</td>
+                                    <td>{{ fm.occupation || '-' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
+
 </div>
