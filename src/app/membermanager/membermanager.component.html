@@ -15,32 +15,54 @@
 
     <!-- STEP 1: Search -->
     <div *ngIf="step === 'search'" class="row justify-content-center">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-8 col-lg-6">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold">सभासद शोधा</h5>
+                    <h5 class="mb-0 fw-bold">सभासद शोध</h5>
                     <button class="btn btn-sm btn-light" (click)="goBack()">मागे जा</button>
                 </div>
-                <div class="card-body p-4">
-                    <div class="mb-3">
-                        <div class="input-group">
-                            <input type="text" class="form-control" [formControl]="searchQueryControl"
-                                [class.is-invalid]="searchQueryControl.touched && searchQueryControl.invalid"
-                                placeholder="नाव किंवा 10 अंकी मोबाईल नंबर" (keyup.enter)="searchMember()" />
+                <div class="card-body p-3 p-md-4">
+
+                    <!-- Combined Search Control -->
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">नाव किंवा मोबाईल नंबर</label>
+                            <input type="text" class="form-control" [(ngModel)]="searchTerm"
+                                placeholder="सभासदाचे नांव किंवा 10 अंकी मोबाईल नंबर.."
+                                (keyup.enter)="searchMember()" />
                         </div>
 
-                        <div class="text-muted small mt-1" style="font-size: 0.6rem;">
-                            💡 टीप: मोबाईल नंबर किंवा <strong>सभासदाचे / वडीलांचे नाव</strong>
-                            वापरून शोधू शकता.
+                        <!-- Taluka Select -->
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label small fw-bold">तालुका</label>
+                            <select class="form-select" [(ngModel)]="selectedTaluka" (change)="onTalukaChange($event)">
+                                <option value="none">सर्व तालुके</option>
+                                <option *ngFor="let t of talukaList" [value]="t.name">{{ t.name }}</option>
+                            </select>
                         </div>
-                        <div *ngIf="searchQueryControl.touched && searchQueryControl.invalid"
-                            class="text-danger small mt-1">
-                            कृपया अचुक माहिती टाका - मोबाईल नंबर किंवा नाव.
+
+                        <!-- Village Select -->
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label small fw-bold">गावं</label>
+                            <select class="form-select" [(ngModel)]="selectedVillage"
+                                (change)="onVillageChange($event)">
+                                <option value="none">सर्व गावे</option>
+                                <option *ngFor="let v of filteredSearchVillages" [value]="v.name">{{ v.name }}</option>
+                            </select>
                         </div>
                     </div>
-                    <button class="btn btn-primary w-100 fw-semibold" (click)="searchMember()" [disabled]="isLoading">
-                        {{ isLoading ? 'शोधत आहे...' : 'शोधा' }}
+
+                    <div class="text-muted small mt-3 mb-3">
+                        💡 टीप: नाव, मोबाईल नंबर, तालुका अथवा गाव निवडून शोध घेता येईल.
+                    </div>
+
+                    <button class="btn btn-primary w-100 fw-semibold shadow-sm" (click)="searchMember()"
+                        [disabled]="isLoading">
+                        <span *ngIf="!isLoading">🔍 शोध घ्या</span>
+                        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                        <span *ngIf="isLoading">शोधत आहे...</span>
                     </button>
+
                 </div>
             </div>
         </div>
@@ -51,7 +73,7 @@
         <div class="col-12 col-lg-10">
             <div class="card shadow-sm border-0 mb-3">
                 <div class="card-header bg-success text-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold">सभासद यादी</h5>
+                    <h5 class="mb-0 fw-bold">सभासद यादी (एकूण: {{ foundMembers.length }})</h5>
                     <button class="btn btn-sm btn-light" (click)="resetSearch()">नवीन शोध</button>
                 </div>
                 <div class="card-body p-2 p-md-3">
@@ -92,14 +114,11 @@
 
                             <!-- Action Buttons Container -->
                             <div class="d-flex align-items-center gap-2 flex-shrink-0">
-                                <!-- Readonly View Button -->
                                 <button type="button"
                                     class="btn btn-sm btn-outline-info text-dark fw-medium shadow-sm px-3"
                                     (click)="viewMemberDetails(member)" title="माहिती पहा">
                                     👁️ पहा
                                 </button>
-
-                                <!-- Edit Button -->
                                 <button type="button" class="btn btn-sm btn-outline-primary fw-medium shadow-sm px-3"
                                     (click)="selectMemberToEdit(member)" title="संपादित करा">
                                     ✏️ संपादित करा
@@ -120,22 +139,14 @@
                 <h5 class="text-warning fw-bold mb-3">सभासद सापडला नाही</h5>
 
                 <p class="text-dark mb-2">
-                    '{{ searchQueryControl.value }}' या माहिती संदर्भात कोणतीही नोंद आढळली नाही.
+                    दिलेल्या शोध निकषांनुसार कोणतीही नोंद आढळली नाही.
                 </p>
 
                 <p class="text-muted small mb-1">
-                    आपण पुन्हा शोधण्याचा प्रयत्न करा.
+                    आपण पुन्हा शोधण्याचा प्रयत्न करा किंवा नवीन सभासद नोंदणी करा.
                 </p>
 
-                <p class="text-dark mb-2">
-                    शोधताना मोबाईल नंबर, नाव, किंवा वडिलांचे नाव वापरावे. अचूक व्याकरणाने शोध सोपा होईल.
-                </p>
-
-                <p class="text-muted small mb-4">
-                    अन्यथा नवीन सभासद नोंदणी करू शकता.
-                </p>
-
-                <div class="d-flex gap-2 justify-content-center">
+                <div class="d-flex gap-2 justify-content-center mt-3">
                     <button type="button" class="btn btn-outline-secondary" (click)="resetSearch()">
                         पुन्हा शोधा
                     </button>
@@ -150,8 +161,8 @@
     <!-- STEP 4: Member Form (Create / Edit / Readonly View) -->
     <div *ngIf="step === 'form'" class="card shadow-sm border-0">
         <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
-            <h4 class="mb-0 fw-bold">
-                {{ isReadOnly ? 'सभासद माहिती (केवळ पाहण्यासाठी)' : (isEditMode ? 'सभासद माहिती अद्ययावत करा' : 'नवीन
+            <h4 class="mb-0 fw-bold"> {{ isReadOnly ? 'सभासद माहिती (केवळ पाहण्यासाठी)' : (isEditMode ? 'सभासद माहिती
+                अद्ययावत करा' : 'नवीन
                 सभासद नोंदणी') }}
             </h4>
             <button class="btn btn-sm btn-light" (click)="goBackFromForm()">मागे जा</button>

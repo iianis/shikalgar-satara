@@ -1,19 +1,21 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
+import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+
 import { taluka, talukas, village, villages } from '../../data/areas';
 import { FirebaseService } from '../services/firebase.service';
-import { Donation, FamilyMember, HelpReceived, Member, RecommendationLetter } from '../interfaces/interfaces';
-import { HeaderComponent } from '../shared/header/header.component';
 import { AuthService } from '../services/auth.service';
-import { firstValueFrom } from 'rxjs';
-import { Router } from '@angular/router';
+import { HeaderComponent } from '../shared/header/header.component';
+import { Donation, FamilyMember, HelpReceived, Member, RecommendationLetter } from '../interfaces/interfaces';
 
 @Component({
   selector: 'app-membermanager',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     HeaderComponent
   ],
@@ -22,113 +24,69 @@ import { Router } from '@angular/router';
 })
 export class MembermanagerComponent implements OnInit {
 
-  firebaseService = inject(FirebaseService);
+  // Dependency Injections
+  private firebaseService = inject(FirebaseService);
+  private authService = inject(AuthService);
   private location = inject(Location);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
 
-  // Search Control & Found Members
-  searchPhoneControl = new FormControl('', [Validators.required, Validators.pattern('^[0-9]{10}$')]);
-  foundMembers: Member[] = [];
-
-  authService = inject(AuthService);
+  // Application & Auth State
   loggedInPhone: string | null = null;
   isAdminUser = false;
   canEditOtherSections = false;
+  isLoading = false;
+
+  // Navigation / View State
+  step: 'search' | 'results' | 'not-found' | 'form' = 'search';
+  isEditMode = false;
+  isReadOnly = false;
+  editingMemberId: string | null = null;
+
+  // Master Data & Search State
+  allMembers: Member[] = [];
+  foundMembers: Member[] = [];
+  isDataLoaded = false;
+  hasSearched = false;
+  searchTerm: string = '';
+
+  // Dropdown Lists & Filters
+  talukaList: taluka[] = talukas;
+  allVillages: village[] = villages;
+  filteredSearchVillages: village[] = [];
+  filteredVillages: village[] = [];
+  selectedTaluka: string = localStorage.getItem("mytaluka") || "none";
+  selectedVillage: string = localStorage.getItem("myvillage") || "none";
 
   // Form Group
   memberForm!: FormGroup;
 
-  // Master Lists
-  talukaList: taluka[] = talukas;
-  allVillages: village[] = villages;
-  filteredVillages: village[] = [];
-
-  userTalukaSelection = localStorage.getItem("mytaluka") || "सातारा";
-  userVillageSelection = localStorage.getItem("myvillage") || "नागठाणे";
-  step: 'search' | 'results' | 'not-found' | 'form' = 'search';
-  isEditMode = false;
-  isReadOnly = false;
-
-  // Inline Feedback Banners
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
-
-  // Section visibility flags
+  // Accordion & Section Controls
+  activeSection: string | null = 'personal';
+  areAllExpanded = false;
   showPersonalSection = true;
   showDonationsSection = true;
   showRecommendationsSection = true;
   showHelpReceivedSection = true;
 
-  clearMessages(): void {
-    this.errorMessage = null;
-    this.successMessage = null;
-  }
+  // Inline Feedback Messages
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
 
-  /**
-   * Opens member details in Read-Only Mode (All sections visible, inputs disabled)
-   */
-  viewMemberDetails(member: Member): void {
-    this.clearMessages();
-    this.isReadOnly = true;
-    this.isEditMode = true;
+  // Form Sub-item Editing Indexes
+  editingFamilyIndexes = new Set<number>();
+  editingDonationIndexes = new Set<number>();
+  editingHelpIndexes = new Set<number>();
+  editingRecommendationIndexes = new Set<number>();
 
-    // Enable visibility for all sections during view mode
-    this.canEditOtherSections = true;
+  newFamilyIndexes = new Set<number>();
+  newDonationIndexes = new Set<number>();
+  newHelpIndexes = new Set<number>();
+  newRecommendationIndexes = new Set<number>();
 
-    this.initForm(member);
-    this.memberForm.disable(); // Fully disables all form fields/controls
-
-    this.applySectionPermissions(); // Ensures all section flags remain true
-    this.step = 'form';
-  }
-
-  /**
-   * Applies section visibility & edit permissions
-   */
-  applySectionPermissions(): void {
-    if (this.isReadOnly) {
-      this.showPersonalSection = true;
-      this.showDonationsSection = true;
-      this.showRecommendationsSection = true;
-      this.showHelpReceivedSection = true;
-      return;
-    }
-
-    const isOwnRecord = this.loggedInPhone === this.memberForm.get('phone')?.value;
-    this.showPersonalSection = true; // Always visible
-    this.showDonationsSection = this.isAdminUser || isOwnRecord;
-    this.showRecommendationsSection = this.isAdminUser || isOwnRecord;
-    this.showHelpReceivedSection = this.isAdminUser || isOwnRecord;
-  }
-
-  /**
-   * Opens member details in Edit Mode
-   */
-  selectMemberToEdit(member: any): void {
-    this.clearMessages();
-    const isOwnRecord = this.loggedInPhone === member.phone;
-
-    if (!isOwnRecord && !this.isAdminUser) {
-      this.errorMessage = 'तुम्हाला फक्त स्वतःची माहिती अपडेट करण्याची परवानगी आहे.';
-      return;
-    }
-
-    this.isReadOnly = false;
-    this.isEditMode = true;
-
-    this.initForm(member);
-    this.memberForm.enable();
-
-    // Keep designation control disabled in edit mode
-    this.memberForm.get('designation')?.disable();
-
-    this.applySectionPermissions();
-    this.step = 'form';
-  }
-
-  constructor(
-    private fb: FormBuilder, private router: Router
-  ) { }
-
+  // -------------------------------------------------------------------
+  // LIFECYCLE HOOKS
+  // -------------------------------------------------------------------
   async ngOnInit(): Promise<void> {
     this.loggedInPhone = await firstValueFrom(this.authService.getLoggedInPhone());
 
@@ -146,10 +104,20 @@ export class MembermanagerComponent implements OnInit {
       this.isAdminUser = this.authService.isAdminDesignation(currentMemberData.designation);
     }
 
+    this.updateSearchVillages();
+
     const stateMember = history.state?.memberToEdit as Member | undefined;
     if (stateMember) {
       this.selectMemberToEdit(stateMember);
     }
+  }
+
+  // -------------------------------------------------------------------
+  // NAVIGATION & MESSAGES
+  // -------------------------------------------------------------------
+  clearMessages(): void {
+    this.errorMessage = null;
+    this.successMessage = null;
   }
 
   goBack(): void {
@@ -172,11 +140,14 @@ export class MembermanagerComponent implements OnInit {
     this.resetSearch();
   }
 
-  isLoading = false;
-  editingMemberId: string | null = null;
-
+  // -------------------------------------------------------------------
+  // FORM INITIALIZATION & SETUP
+  // -------------------------------------------------------------------
   initForm(member?: Member): void {
     this.activeSection = 'personal';
+
+    const initialTaluka = member?.taluka || (this.selectedTaluka !== 'none' ? this.selectedTaluka : '');
+    const initialVillage = member?.village || (this.selectedVillage !== 'none' ? this.selectedVillage : '');
 
     if (member?.id) {
       this.editingMemberId = member.id;
@@ -184,9 +155,6 @@ export class MembermanagerComponent implements OnInit {
     } else if (!this.editingMemberId) {
       this.isEditMode = false;
     }
-
-    const initialTaluka = member?.taluka || this.userTalukaSelection;
-    const initialVillage = member?.village || this.userVillageSelection;
 
     const defaultJoinedOn = member?.joinedOn || new Date().toISOString().substring(0, 10);
     const defaultAlive = (member?.alive ?? '') === '' ? true : Boolean(member?.alive);
@@ -203,12 +171,7 @@ export class MembermanagerComponent implements OnInit {
       phone: [member?.phone || '', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       age: [
         member?.age ?? 21,
-        [
-          Validators.required,
-          Validators.pattern('^[0-9]+$'),
-          Validators.min(1),
-          Validators.max(99)
-        ]
+        [Validators.required, Validators.pattern('^[0-9]+$'), Validators.min(1), Validators.max(99)]
       ],
       education: [member?.education || ''],
       occupation: [member?.occupation || ''],
@@ -239,13 +202,81 @@ export class MembermanagerComponent implements OnInit {
     this.memberForm.get('taluka')?.valueChanges.subscribe((selectedTaluka: string) => {
       this.filterVillages(selectedTaluka);
       const currentVillage = this.memberForm.get('village')?.value;
-      localStorage.setItem("mytaluka", selectedTaluka);
       if (!this.filteredVillages.some(v => v.name === currentVillage)) {
         this.memberForm.get('village')?.setValue('');
       }
     });
   }
 
+  // -------------------------------------------------------------------
+  // MEMBER VIEW & EDIT MODES
+  // -------------------------------------------------------------------
+  viewMemberDetails(member: Member): void {
+    this.clearMessages();
+    this.isReadOnly = true;
+    this.isEditMode = true;
+    this.canEditOtherSections = true;
+
+    this.initForm(member);
+    this.memberForm.disable();
+
+    this.applySectionPermissions();
+    this.step = 'form';
+  }
+
+  selectMemberToEdit(member: Member): void {
+    this.clearMessages();
+    const isOwnRecord = this.loggedInPhone === member.phone;
+
+    if (!isOwnRecord && !this.isAdminUser) {
+      this.errorMessage = 'तुम्हाला फक्त स्वतःची माहिती अपडेट करण्याची परवानगी आहे.';
+      return;
+    }
+
+    this.isReadOnly = false;
+    this.isEditMode = true;
+
+    this.initForm(member);
+    this.memberForm.enable();
+    this.memberForm.get('designation')?.disable();
+
+    this.applySectionPermissions();
+    this.step = 'form';
+  }
+
+  prepareNewMember(initialData: Partial<Member> = {}): void {
+    this.editingMemberId = null;
+    this.isEditMode = false;
+    this.isReadOnly = false;
+
+    this.initForm(initialData as Member);
+
+    this.memberForm.enable();
+    this.memberForm.get('designation')?.setValue('सभासद');
+    this.memberForm.get('designation')?.disable();
+
+    this.step = 'form';
+  }
+
+  applySectionPermissions(): void {
+    if (this.isReadOnly) {
+      this.showPersonalSection = true;
+      this.showDonationsSection = true;
+      this.showRecommendationsSection = true;
+      this.showHelpReceivedSection = true;
+      return;
+    }
+
+    const isOwnRecord = this.loggedInPhone === this.memberForm.get('phone')?.value;
+    this.showPersonalSection = true;
+    this.showDonationsSection = this.isAdminUser || isOwnRecord;
+    this.showRecommendationsSection = this.isAdminUser || isOwnRecord;
+    this.showHelpReceivedSection = this.isAdminUser || isOwnRecord;
+  }
+
+  // -------------------------------------------------------------------
+  // FORM SUBMISSION & PERSISTENCE
+  // -------------------------------------------------------------------
   async onSubmit(): Promise<void> {
     this.clearMessages();
 
@@ -281,7 +312,6 @@ export class MembermanagerComponent implements OnInit {
       }
 
       this.isLoading = false;
-
       this.isEditMode = false;
       this.isReadOnly = false;
       this.editingMemberId = null;
@@ -304,6 +334,117 @@ export class MembermanagerComponent implements OnInit {
     }
   }
 
+  // -------------------------------------------------------------------
+  // SEARCH & FILTERING
+  // -------------------------------------------------------------------
+  async searchMember(): Promise<void> {
+    this.clearMessages();
+    this.hasSearched = true;
+
+    if (!this.isDataLoaded) {
+      this.isLoading = true;
+      try {
+        const data = await firstValueFrom(this.firebaseService.getMembers());
+        this.allMembers = (data || []) as Member[];
+        this.isDataLoaded = true;
+      } catch (err) {
+        console.error('Error fetching members:', err);
+        this.errorMessage = 'सभासद माहिती लोड करताना त्रुटी आली.';
+        this.isLoading = false;
+        return;
+      } finally {
+        this.isLoading = false;
+      }
+    }
+
+    this.applySearchFilters();
+  }
+
+  applySearchFilters(): void {
+    const query = this.searchTerm.trim().toLowerCase();
+
+    this.foundMembers = this.allMembers.filter(m => {
+      const matchesSearch = !query ||
+        m.fname?.toLowerCase().includes(query) ||
+        m.phone?.includes(query);
+
+      const matchesTaluka = this.selectedTaluka === 'none' || m.taluka === this.selectedTaluka;
+      const matchesVillage = this.selectedVillage === 'none' || m.village === this.selectedVillage;
+
+      return matchesSearch && matchesTaluka && matchesVillage;
+    });
+
+    this.step = this.foundMembers.length > 0 ? 'results' : 'not-found';
+  }
+
+  startNewMemberCreation(): void {
+    this.clearMessages();
+    const query = this.searchTerm.trim();
+    const isPhone = /^[0-9]+$/.test(query);
+
+    const initialData: Partial<Member> = {
+      fname: isPhone ? '' : query,
+      phone: isPhone ? query : '',
+      taluka: this.selectedTaluka !== 'none' ? this.selectedTaluka : '',
+      village: this.selectedVillage !== 'none' ? this.selectedVillage : ''
+    };
+
+    this.prepareNewMember(initialData);
+    this.step = 'form';
+  }
+
+  resetSearch(): void {
+    this.clearMessages();
+    if (history.state?.memberToEdit) {
+      history.state.memberToEdit = null;
+    }
+
+    this.isEditMode = false;
+    this.editingMemberId = null;
+    this.clearSubArrayIndexes();
+
+    this.searchTerm = '';
+    this.foundMembers = [];
+    this.hasSearched = false;
+
+    this.selectedTaluka = localStorage.getItem("mytaluka") || "none";
+    this.selectedVillage = localStorage.getItem("myvillage") || "none";
+    this.updateSearchVillages();
+
+    this.step = 'search';
+  }
+
+  onTalukaChange(event: Event): void {
+    localStorage.setItem('mytaluka', this.selectedTaluka);
+    this.updateSearchVillages();
+
+    const villageExists = this.filteredSearchVillages.some(v => v.name === this.selectedVillage);
+    if (!villageExists) {
+      this.selectedVillage = 'none';
+      localStorage.setItem('myvillage', 'none');
+    }
+
+    if (this.hasSearched) {
+      this.applySearchFilters();
+    }
+  }
+
+  onVillageChange(event: Event): void {
+    localStorage.setItem('myvillage', this.selectedVillage);
+
+    if (this.hasSearched) {
+      this.applySearchFilters();
+    }
+  }
+
+  updateSearchVillages(): void {
+    if (this.selectedTaluka && this.selectedTaluka !== 'none') {
+      this.filteredSearchVillages = this.allVillages.filter(v => v.taluka === this.selectedTaluka);
+    } else {
+      this.filteredSearchVillages = [];
+    }
+  }
+
   filterVillages(talukaName: string): void {
     if (talukaName) {
       this.filteredVillages = this.allVillages.filter(v => v.taluka === talukaName);
@@ -312,9 +453,13 @@ export class MembermanagerComponent implements OnInit {
     }
   }
 
+  // -------------------------------------------------------------------
+  // FORM GETTERS & CREATORS FOR SUB-GROUPS
+  // -------------------------------------------------------------------
   get familyMembers(): FormArray { return this.memberForm.get('familyMembers') as FormArray; }
   get donations(): FormArray { return this.memberForm.get('donations') as FormArray; }
   get helpReceived(): FormArray { return this.memberForm.get('helpReceived') as FormArray; }
+  get recommendationLetters(): FormArray { return this.memberForm.get('recommendationLetters') as FormArray; }
   get ageControl() { return this.memberForm.get('age'); }
 
   createFamilyGroup(data?: FamilyMember): FormGroup {
@@ -358,126 +503,27 @@ export class MembermanagerComponent implements OnInit {
     });
   }
 
-  searchQueryControl = new FormControl('', [Validators.required, Validators.minLength(2)]);
-
-  searchMember(): void {
-    this.clearMessages();
-    if (this.searchQueryControl.invalid) {
-      this.searchQueryControl.markAsTouched();
-      return;
-    }
-
-    const query = this.searchQueryControl.value!.trim();
-    this.isLoading = true;
-
-    const isPhone = /^[0-9]{10}$/.test(query);
-    const search$ = isPhone
-      ? this.firebaseService.getMemberByPhone(query)
-      : this.firebaseService.getMembersByFnamePattern(query);
-
-    search$.subscribe({
-      next: (members) => {
-        this.isLoading = false;
-        if (members && members.length > 0) {
-          this.foundMembers = members as Member[];
-          this.step = 'results';
-        } else {
-          this.foundMembers = [];
-          this.step = 'not-found';
-        }
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error('Error fetching members:', err);
-        this.errorMessage = 'सभासद शोधताना त्रुटी आली.';
-      }
+  createRecommendationGroup(data?: RecommendationLetter): FormGroup {
+    return this.fb.group({
+      date: [data?.date || new Date().toISOString().substring(0, 10)],
+      name: [data?.name || '', Validators.required],
+      description: [data?.description || '']
     });
   }
 
-  startNewMemberCreation(): void {
-    this.clearMessages();
-    const query = (this.searchQueryControl.value || '').trim();
-    const isPhone = /^[0-9]{10}$/.test(query);
-
-    const initialData: Partial<Member> = {
-      phone: isPhone ? query : '',
-      fname: !isPhone ? query : ''
-    };
-
-    this.prepareNewMember(initialData);
-    this.step = 'form';
-  }
-
-  prepareNewMember(initialData: Partial<Member> = {}): void {
-    this.editingMemberId = null;
-    this.isEditMode = false;
-    this.isReadOnly = false;
-
-    this.initForm(initialData as Member);
-
-    this.memberForm.enable();
-
-    this.memberForm.get('designation')?.setValue('सभासद');
-    this.memberForm.get('designation')?.disable();
-
-    this.step = 'form';
-  }
-
-  editingFamilyIndexes: Set<number> = new Set<number>();
-  editingDonationIndexes: Set<number> = new Set<number>();
-  editingHelpIndexes: Set<number> = new Set<number>();
-
+  // -------------------------------------------------------------------
+  // SUB-ARRAY MANAGEMENT: FAMILY MEMBERS
+  // -------------------------------------------------------------------
   isEditingFamily(index: number): boolean { return this.editingFamilyIndexes.has(index); }
+
   toggleEditFamily(index: number): void {
-    if (this.editingFamilyIndexes.has(index)) {
-      this.editingFamilyIndexes.delete(index);
-    } else {
-      this.editingFamilyIndexes.add(index);
-    }
+    this.toggleIndex(this.editingFamilyIndexes, index);
   }
-
-  isEditingDonation(index: number): boolean { return this.editingDonationIndexes.has(index); }
-  toggleEditDonation(index: number): void {
-    if (this.editingDonationIndexes.has(index)) {
-      this.editingDonationIndexes.delete(index);
-    } else {
-      this.editingDonationIndexes.add(index);
-    }
-  }
-
-  isEditingHelp(index: number): boolean { return this.editingHelpIndexes.has(index); }
-  toggleEditHelp(index: number): void {
-    if (this.editingHelpIndexes.has(index)) {
-      this.editingHelpIndexes.delete(index);
-    } else {
-      this.editingHelpIndexes.add(index);
-    }
-  }
-
-  removeFamilyMember(i: number): void {
-    this.familyMembers.removeAt(i);
-    this.editingFamilyIndexes.delete(i);
-  }
-
-  removeDonation(i: number): void {
-    this.donations.removeAt(i);
-    this.editingDonationIndexes.delete(i);
-  }
-
-  removeHelp(i: number): void {
-    this.helpReceived.removeAt(i);
-    this.editingHelpIndexes.delete(i);
-  }
-
-  newFamilyIndexes: Set<number> = new Set<number>();
-  newDonationIndexes: Set<number> = new Set<number>();
-  newHelpIndexes: Set<number> = new Set<number>();
 
   addFamilyMember(): void {
     this.familyMembers.insert(0, this.createFamilyGroup());
     this.shiftIndexesOnInsert(this.editingFamilyIndexes);
     this.shiftIndexesOnInsert(this.newFamilyIndexes);
-
     this.editingFamilyIndexes.add(0);
     this.newFamilyIndexes.add(0);
   }
@@ -488,17 +534,31 @@ export class MembermanagerComponent implements OnInit {
     this.memberForm.markAsDirty();
     this.memberForm.updateValueAndValidity();
   }
+
   cancelNewFamilyMember(index: number): void {
     this.familyMembers.removeAt(index);
     this.editingFamilyIndexes.delete(index);
     this.newFamilyIndexes.delete(index);
   }
 
+  removeFamilyMember(i: number): void {
+    this.familyMembers.removeAt(i);
+    this.editingFamilyIndexes.delete(i);
+  }
+
+  // -------------------------------------------------------------------
+  // SUB-ARRAY MANAGEMENT: DONATIONS
+  // -------------------------------------------------------------------
+  isEditingDonation(index: number): boolean { return this.editingDonationIndexes.has(index); }
+
+  toggleEditDonation(index: number): void {
+    this.toggleIndex(this.editingDonationIndexes, index);
+  }
+
   addDonation(): void {
     this.donations.insert(0, this.createDonationGroup());
     this.shiftIndexesOnInsert(this.editingDonationIndexes);
     this.shiftIndexesOnInsert(this.newDonationIndexes);
-
     this.editingDonationIndexes.add(0);
     this.newDonationIndexes.add(0);
   }
@@ -516,11 +576,24 @@ export class MembermanagerComponent implements OnInit {
     this.newDonationIndexes.delete(index);
   }
 
+  removeDonation(i: number): void {
+    this.donations.removeAt(i);
+    this.editingDonationIndexes.delete(i);
+  }
+
+  // -------------------------------------------------------------------
+  // SUB-ARRAY MANAGEMENT: HELP RECEIVED
+  // -------------------------------------------------------------------
+  isEditingHelp(index: number): boolean { return this.editingHelpIndexes.has(index); }
+
+  toggleEditHelp(index: number): void {
+    this.toggleIndex(this.editingHelpIndexes, index);
+  }
+
   addHelp(): void {
     this.helpReceived.insert(0, this.createHelpGroup());
     this.shiftIndexesOnInsert(this.editingHelpIndexes);
     this.shiftIndexesOnInsert(this.newHelpIndexes);
-
     this.editingHelpIndexes.add(0);
     this.newHelpIndexes.add(0);
   }
@@ -538,45 +611,24 @@ export class MembermanagerComponent implements OnInit {
     this.newHelpIndexes.delete(index);
   }
 
-  private shiftIndexesOnInsert(indexSet: Set<number>): void {
-    const updated = Array.from(indexSet).map(idx => idx + 1);
-    indexSet.clear();
-    updated.forEach(idx => indexSet.add(idx));
+  removeHelp(i: number): void {
+    this.helpReceived.removeAt(i);
+    this.editingHelpIndexes.delete(i);
   }
 
-  get recommendationLetters(): FormArray { return this.memberForm.get('recommendationLetters') as FormArray; }
-
-  createRecommendationGroup(data?: RecommendationLetter): FormGroup {
-    return this.fb.group({
-      date: [data?.date || new Date().toISOString().substring(0, 10)],
-      name: [data?.name || '', Validators.required],
-      description: [data?.description || '']
-    });
-  }
-
-  editingRecommendationIndexes: Set<number> = new Set<number>();
-  newRecommendationIndexes: Set<number> = new Set<number>();
-
+  // -------------------------------------------------------------------
+  // SUB-ARRAY MANAGEMENT: RECOMMENDATIONS
+  // -------------------------------------------------------------------
   isEditingRecommendation(index: number): boolean { return this.editingRecommendationIndexes.has(index); }
 
   toggleEditRecommendation(index: number): void {
-    if (this.editingRecommendationIndexes.has(index)) {
-      this.editingRecommendationIndexes.delete(index);
-    } else {
-      this.editingRecommendationIndexes.add(index);
-    }
-  }
-
-  removeRecommendation(i: number): void {
-    this.recommendationLetters.removeAt(i);
-    this.editingRecommendationIndexes.delete(i);
+    this.toggleIndex(this.editingRecommendationIndexes, index);
   }
 
   addRecommendation(): void {
     this.recommendationLetters.insert(0, this.createRecommendationGroup());
     this.shiftIndexesOnInsert(this.editingRecommendationIndexes);
     this.shiftIndexesOnInsert(this.newRecommendationIndexes);
-
     this.editingRecommendationIndexes.add(0);
     this.newRecommendationIndexes.add(0);
   }
@@ -594,14 +646,27 @@ export class MembermanagerComponent implements OnInit {
     this.newRecommendationIndexes.delete(index);
   }
 
-  resetSearch(): void {
-    this.clearMessages();
-    if (history.state?.memberToEdit) {
-      history.state.memberToEdit = null;
-    }
+  removeRecommendation(i: number): void {
+    this.recommendationLetters.removeAt(i);
+    this.editingRecommendationIndexes.delete(i);
+  }
 
-    this.isEditMode = false;
-    this.editingMemberId = null;
+  // Helper methods for sub-array index management
+  private toggleIndex(set: Set<number>, index: number): void {
+    if (set.has(index)) {
+      set.delete(index);
+    } else {
+      set.add(index);
+    }
+  }
+
+  private shiftIndexesOnInsert(indexSet: Set<number>): void {
+    const updated = Array.from(indexSet).map(idx => idx + 1);
+    indexSet.clear();
+    updated.forEach(idx => indexSet.add(idx));
+  }
+
+  private clearSubArrayIndexes(): void {
     this.editingFamilyIndexes.clear();
     this.editingDonationIndexes.clear();
     this.editingHelpIndexes.clear();
@@ -610,13 +675,11 @@ export class MembermanagerComponent implements OnInit {
     this.newDonationIndexes.clear();
     this.newHelpIndexes.clear();
     this.newRecommendationIndexes.clear();
-    this.searchQueryControl.reset();
-    this.foundMembers = [];
-    this.step = 'search';
   }
 
-  activeSection: string | null = 'personal';
-
+  // -------------------------------------------------------------------
+  // ACCORDION / SECTION TOGGLES
+  // -------------------------------------------------------------------
   toggleSection(sectionKey: string): void {
     this.activeSection = this.activeSection === sectionKey ? null : sectionKey;
   }
@@ -633,15 +696,6 @@ export class MembermanagerComponent implements OnInit {
     return this.activeSection === sectionKey || this.activeSection === 'all';
   }
 
-  // Add helper getter or boolean property
-  get isAdminOrReadOnly(): boolean {
-    return this.isAdminUser || this.isReadOnly;
-  }
-  areAllExpanded: boolean = false;
-
-  /**
-   * Toggles expand/collapse state for all accordion sections
-   */
   toggleAllSections(event: Event): void {
     const isChecked = (event.target as HTMLInputElement).checked;
     this.areAllExpanded = isChecked;
@@ -651,5 +705,9 @@ export class MembermanagerComponent implements OnInit {
     } else {
       this.collapseAllSections();
     }
+  }
+
+  get isAdminOrReadOnly(): boolean {
+    return this.isAdminUser || this.isReadOnly;
   }
 }
