@@ -131,12 +131,14 @@ export class ReportsComponent implements OnInit {
   }
 
   /**
-   * Formats a timestamp into a short date string.
-   * @param timestamp Firestore Timestamp or JS Date object/string
+   * Formats a timestamp into a short date/time string.
+   * @param timestamp Firestore Timestamp, JS Date object, or date string
    * @param includeTime If true, includes time (e.g. 'DD/MM/YY, HH:MM AM/PM'). Defaults to true.
    */
   formatDate(timestamp: any, includeTime: boolean = true): string {
     if (!timestamp) return 'N/A';
+
+    // Handle Firestore Timestamp vs native JS Date/String
     const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
     if (isNaN(date.getTime())) return 'N/A';
 

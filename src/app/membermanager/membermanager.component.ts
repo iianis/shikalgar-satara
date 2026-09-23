@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, take } from 'rxjs';
 
 import { taluka, talukas, village, villages } from '../../data/areas';
 import { FirebaseService } from '../services/firebase.service';
@@ -33,6 +33,7 @@ export class MembermanagerComponent implements OnInit {
 
   // Application & Auth State
   loggedInPhone: string | null = null;
+  loggedInUserFName: string | null = null;
   isAdminUser = false;
   canEditOtherSections = false;
   isLoading = false;
@@ -72,6 +73,7 @@ export class MembermanagerComponent implements OnInit {
   // Inline Feedback Messages
   errorMessage: string | null = null;
   successMessage: string | null = null;
+  private successTimeout: any = null;
 
   // Form Sub-item Editing Indexes
   editingFamilyIndexes = new Set<number>();
@@ -102,6 +104,7 @@ export class MembermanagerComponent implements OnInit {
     if (matchingMemberSnapshot && matchingMemberSnapshot.length > 0) {
       const currentMemberData = matchingMemberSnapshot[0];
       this.isAdminUser = this.authService.isAdminDesignation(currentMemberData.designation);
+      this.loggedInUserFName = currentMemberData.fname || null;
     }
 
     this.updateSearchVillages();
@@ -110,6 +113,13 @@ export class MembermanagerComponent implements OnInit {
     if (stateMember) {
       this.selectMemberToEdit(stateMember);
     }
+
+    this.authService.getLoggedInPhone().pipe(take(1)).subscribe(phone => {
+      if (phone && !sessionStorage.getItem('personal_info_logged')) {
+        this.firebaseService.logPersonalAccess(phone);
+        sessionStorage.setItem('personal_info_logged', 'true');
+      }
+    });
   }
 
   // -------------------------------------------------------------------
@@ -117,6 +127,22 @@ export class MembermanagerComponent implements OnInit {
   // -------------------------------------------------------------------
   clearMessages(): void {
     this.errorMessage = null;
+    this.clearSuccessMessage();
+  }
+
+  setSuccessMessage(msg: string, durationMs: number = 4000): void {
+    this.clearSuccessMessage();
+    this.successMessage = msg;
+    this.successTimeout = setTimeout(() => {
+      this.successMessage = null;
+    }, durationMs);
+  }
+
+  clearSuccessMessage(): void {
+    if (this.successTimeout) {
+      clearTimeout(this.successTimeout);
+      this.successTimeout = null;
+    }
     this.successMessage = null;
   }
 
@@ -278,7 +304,7 @@ export class MembermanagerComponent implements OnInit {
   // FORM SUBMISSION & PERSISTENCE
   // -------------------------------------------------------------------
   async onSubmit(): Promise<void> {
-    this.clearMessages();
+    this.errorMessage = null;
 
     if (this.memberForm.invalid) {
       this.memberForm.markAllAsTouched();
@@ -288,6 +314,13 @@ export class MembermanagerComponent implements OnInit {
 
     const { id: formId, ...memberData } = this.memberForm.getRawValue();
     this.isLoading = true;
+
+    // Attach modification metadata
+    const modifierIdentifier = this.loggedInUserFName || this.loggedInPhone;
+    if (modifierIdentifier) {
+      memberData.modifiedBy = modifierIdentifier;
+      memberData.modifiedAt = new Date();
+    }
 
     try {
       const currentMemberId = this.isEditMode ? (this.editingMemberId || formId) : null;
@@ -305,10 +338,10 @@ export class MembermanagerComponent implements OnInit {
 
       if (this.isEditMode && currentMemberId) {
         await this.firebaseService.updateMember(currentMemberId, memberData);
-        this.successMessage = 'सभासद माहिती यशस्वीरित्या अद्ययावत केली!';
+        this.setSuccessMessage('सभासद माहिती यशस्वीरित्या अद्ययावत केली!');
       } else {
         await this.firebaseService.addMember(memberData);
-        this.successMessage = 'नवीन सभासद यशस्वीरित्या जतन केला!';
+        this.setSuccessMessage('नवीन सभासद यशस्वीरित्या जतन केला!');
       }
 
       this.isLoading = false;
@@ -325,7 +358,7 @@ export class MembermanagerComponent implements OnInit {
       if (this.foundMembers.length > 0) {
         this.step = 'results';
       } else {
-        this.resetSearch();
+        this.resetSearch(false);
       }
     } catch (error) {
       this.isLoading = false;
@@ -393,8 +426,11 @@ export class MembermanagerComponent implements OnInit {
     this.step = 'form';
   }
 
-  resetSearch(): void {
-    this.clearMessages();
+  resetSearch(clearAlerts: boolean = true): void {
+    if (clearAlerts) {
+      this.clearMessages();
+    }
+
     if (history.state?.memberToEdit) {
       history.state.memberToEdit = null;
     }

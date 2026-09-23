@@ -260,11 +260,32 @@
 
         <hr class="border-success-subtle my-3">
 
-        <!-- Copyright Bottom Bar -->
-        <div class="row align-items-center">
-            <div class="col-12 text-center">
+        <!-- Metrics & Copyright Bottom Bar -->
+        <div class="row align-items-center gy-2">
+            <!-- Website Visitors, Members & Personal Info Views Counter -->
+            <div class="col-md-7 text-center text-md-start">
+                <div class="d-inline-flex flex-wrap gap-2 gap-sm-3 small text-muted-custom">
+                    <span>
+                        <i class="bi bi-people-fill me-1 text-warning"></i>नोंदणीकृत सभासद संख्या:
+                        <strong class="text-light ms-1">{{ loggedInUsersCount }}</strong>
+                    </span>
+                    <span class="text-secondary">|</span>
+                    <span>
+                        <i class="bi bi-eye-fill me-1 text-warning"></i>व्हेबसाईला भेट देणारे:
+                        <strong class="text-light ms-1">{{ visitorCount }}</strong>
+                    </span>
+                    <span class="text-secondary">|</span>
+                    <span>
+                        <i class="bi bi-person-vcard-fill me-1 text-warning"></i>सभासद माहिती पाहणारे:
+                        <strong class="text-light ms-1">{{ personalInfoAccessCount }}</strong>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Copyright Line -->
+            <div class="col-md-5 text-center text-md-end">
                 <p class="small text-muted-custom mb-0">
-                    &copy; 2026-27 सातारा जिल्हा मुस्लिम शिकलगार संघटना. सर्व हक्क सुरक्षित.
+                    &copy; 2026-27 सातारा जिल्हा मुस्लिम शिकलगार संघटना.
                 </p>
             </div>
         </div>

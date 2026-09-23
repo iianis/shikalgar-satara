@@ -100,4 +100,6 @@ export interface Member {
     helpReceived?: HelpReceived[];
     recommendationLetters?: RecommendationLetter[];
     timestamp?: Date;
+    modifiedBy?: string;
+    modifiedAt?: Date | Timestamp | string;
 }

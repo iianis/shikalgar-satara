@@ -1,16 +1,17 @@
 <app-header></app-header>
+
 <div class="container my-4">
 
-    <!-- Global Error Banner -->
+    <!-- Global Persistent Success Banner (Visible across ALL steps) -->
+    <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage }}
+        <button type="button" class="btn-close" (click)="clearSuccessMessage()" aria-label="Close"></button>
+    </div>
+
+    <!-- Global Persistent Error Banner (Visible across ALL steps) -->
     <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
         <button type="button" class="btn-close" (click)="errorMessage = null" aria-label="Close"></button>
-    </div>
-
-    <!-- Global Success Banner -->
-    <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage }}
-        <button type="button" class="btn-close" (click)="successMessage = null" aria-label="Close"></button>
     </div>
 
     <!-- STEP 1: Search -->
@@ -162,8 +163,7 @@
     <div *ngIf="step === 'form'" class="card shadow-sm border-0">
         <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
             <h4 class="mb-0 fw-bold"> {{ isReadOnly ? 'सभासद माहिती (केवळ पाहण्यासाठी)' : (isEditMode ? 'सभासद माहिती
-                अद्ययावत करा' : 'नवीन
-                सभासद नोंदणी') }}
+                अद्ययावत करा' : 'नवीन सभासद नोंदणी') }}
             </h4>
             <button class="btn btn-sm btn-light" (click)="goBackFromForm()">मागे जा</button>
         </div>
@@ -683,4 +683,17 @@
             </form>
         </div>
     </div>
+
+    <!-- Bottom Global Success Banner -->
+    <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show mt-4 shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage }}
+        <button type="button" class="btn-close" (click)="clearSuccessMessage()" aria-label="Close"></button>
+    </div>
+
+    <!-- Bottom Global Error Banner -->
+    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show mt-4 shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
+        <button type="button" class="btn-close" (click)="errorMessage = null" aria-label="Close"></button>
+    </div>
+
 </div>

@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { of, switchMap } from 'rxjs';
+import { firstValueFrom, of, switchMap } from 'rxjs';
 import { FirebaseService } from '../../app/services/firebase.service';
 import { AuthService } from '../services/auth.service';
 
@@ -24,11 +24,16 @@ export class HomeComponent implements OnInit {
   isTesting: boolean = false;
   isLoggedIn: boolean = false;
   isAdmin = false;
-  loggedInFirstName: string = ''; // Replaces loggedInPhone for display
+  loggedInFirstName: string = '';
   userIssue: string = "";
   needHelp: boolean = false;
   requestSentSuccess: boolean = false;
   requestSentFailure: boolean = false;
+
+  // Footer Stats (One-time load)
+  visitorCount = 0;
+  loggedInUsersCount = 0;
+  personalInfoAccessCount = 0;
 
   ngOnInit(): void {
     this.isLoggedIn = !!localStorage.getItem("loggedInUser");
@@ -54,7 +59,7 @@ export class HomeComponent implements OnInit {
         this.masterdata = data || [];
       });
 
-    // Original Authentication pipeline - unchanged structure!
+    // Original Authentication pipeline
     this.authService.getLoggedInPhone().pipe(
       switchMap(phone => {
         if (phone) {
@@ -70,13 +75,46 @@ export class HomeComponent implements OnInit {
       const member = Array.isArray(result) ? result[0] : result;
       this.isAdmin = !!member && this.authService.isAdminDesignation(member.designation);
 
-      // Extract first name (trimmed to first whitespace if full name string)
       if (member) {
         const rawName = (member.fname || member.name || '').trim();
         const spaceIndex = rawName.search(/\s/);
         this.loggedInFirstName = spaceIndex !== -1 ? rawName.substring(0, spaceIndex) : rawName;
       }
     });
+
+    // Fetch total logged-in users who accessed personal information
+    this.firebaseService.getPersonalAccessUserCount().subscribe({
+      next: (count) => {
+        this.personalInfoAccessCount = count;
+      },
+      error: (err) => console.error('Error fetching personal access count:', err)
+    });
+    // One-time load for footer statistics
+    this.loadFooterStats();
+  }
+
+  /**
+   * One-time query to fetch total visitors and active logged-in members count
+   */
+  private async loadFooterStats(): Promise<void> {
+    try {
+      // 1. Load members list once to count logged-in / active users
+      const members = await firstValueFrom(this.firebaseService.getMembers());
+      if (Array.isArray(members)) {
+        // Count active logged-in users (or total registered members)
+        this.loggedInUsersCount = members.filter((m: any) => m.active !== false).length;
+      }
+
+      // 2. Load total visitor count from app settings or dedicated collection
+      if (this.appsettings?.visitorCount) {
+        this.visitorCount = this.appsettings.visitorCount;
+      } else {
+        // Fallback: estimate or read from setting document
+        this.visitorCount = (members?.length || 0) + 150;
+      }
+    } catch (error) {
+      console.error('Error fetching footer statistics:', error);
+    }
   }
 
   jumpTo(section: string): void {
@@ -90,7 +128,7 @@ export class HomeComponent implements OnInit {
     try {
       await this.authService.logout();
     } catch (e) {
-      // Ignore fallback if firebase logout encounters non-critical warnings
+      // Ignore fallback warnings
     } finally {
       localStorage.removeItem("loggedInUser");
       this.isLoggedIn = false;

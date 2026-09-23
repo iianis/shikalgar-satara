@@ -8,7 +8,7 @@ import { HeaderComponent } from '../shared/header/header.component';
 import { SearchComponent } from '../search/search.component';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, take } from 'rxjs';
 
 @Component({
   selector: 'app-memberslist',
@@ -50,6 +50,13 @@ export class MemberslistComponent implements OnInit {
     window.scrollTo(0, 0);
     this.updateVillagesForSelectedTaluka();
     this.loggedInPhone = await firstValueFrom(this.authService.getLoggedInPhone());
+
+    this.authService.getLoggedInPhone().pipe(take(1)).subscribe(phone => {
+      if (phone && !sessionStorage.getItem('personal_info_logged')) {
+        this.firebaseService.logPersonalAccess(phone);
+        sessionStorage.setItem('personal_info_logged', 'true');
+      }
+    });
   }
 
   toggleMemberDetails(memberId: string | undefined): void {

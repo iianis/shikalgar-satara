@@ -367,4 +367,32 @@ export class FirebaseService {
 
     return snapshot.empty ? null : (snapshot.docs[0].data() as IMember);
   }
+
+  /**
+   * Logs an audit record when a user views personal information.
+   * Tracks unique accesses per phone number in 'personal_access_logs'.
+   */
+  async logPersonalAccess(userPhone: string): Promise<void> {
+    if (!userPhone) return;
+
+    try {
+      const collectionName = 'personal_access_logs' + checkIfWeAreTesting();
+
+      // Merge access log per phone number so each user is counted uniquely
+      await this.firestore.collection(collectionName).doc(userPhone).set({
+        phone: userPhone,
+        lastAccessedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    } catch (error) {
+      console.error('Error logging personal info access:', error);
+    }
+  }
+
+  /**
+   * Gets total count of logged-in users who accessed personal information.
+   */
+  getPersonalAccessUserCount(): Observable<number> {
+    const collectionName = 'personal_access_logs' + checkIfWeAreTesting();
+    return this.getCollectionCount(collectionName);
+  }
 }

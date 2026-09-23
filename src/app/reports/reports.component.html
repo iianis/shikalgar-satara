@@ -130,8 +130,9 @@
                 <thead class="table-dark">
                     <tr>
                         <th scope="col" class="py-1 px-2">#</th>
-                        <th scope="col" class="py-1 px-2">तारीख</th>
+                        <th scope="col" class="py-1 px-2">तारीख / वेळ</th>
                         <th scope="col" class="py-1 px-2">नाव / तपशील</th>
+                        <th scope="col" class="py-1 px-2" *ngIf="selectedReport === 'member-audit'">अद्ययावत करणारे</th>
                         <th scope="col" class="py-1 px-2"
                             *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'recommendation-letter'">
                             रक्कम
@@ -140,10 +141,14 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let item of records; let i = index">
+                        <!-- Index Column -->
                         <td class="fw-bold text-secondary py-1 px-2">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+
+                        <!-- Date / Time Column -->
                         <td class="font-monospace text-nowrap py-1 px-2">
                             <span class="text-muted" style="font-size: 0.78rem;">
-                                {{ formatDate(item.timestamp || item.date, false) }}
+                                {{ formatDate(item.modifiedAt || item.timestamp || item.date, selectedReport ===
+                                'member-audit') }}
                             </span>
                         </td>
 
@@ -180,7 +185,7 @@
                                 </a>
                             </div>
 
-                            <!-- Help Type and Details (Moved here under Column 3) -->
+                            <!-- Help Type and Details -->
                             <div *ngIf="item.details || item.helpType" class="text-secondary small fw-normal mt-1"
                                 style="font-size: 0.75rem;">
                                 <span class="badge bg-light text-dark border me-1 align-baseline fw-normal"
@@ -196,6 +201,12 @@
                                 <span *ngIf="item.contributionType">({{ item.contributionType }}) </span>
                                 <span *ngIf="item.description">{{ item.description }}</span>
                             </div>
+                        </td>
+
+                        <!-- Modified By Column (Only for member-audit) -->
+                        <td class="py-1 px-2 font-monospace text-primary" *ngIf="selectedReport === 'member-audit'">
+                            <span *ngIf="item.modifiedBy">📱 {{ item.modifiedBy }}</span>
+                            <span *ngIf="!item.modifiedBy" class="text-muted small">N/A</span>
                         </td>
 
                         <!-- Amount & Ref Column (Hidden for member-audit) -->
