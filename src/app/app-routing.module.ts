@@ -27,6 +27,8 @@ import { MembermanagerComponent } from './membermanager/membermanager.component'
 import { ReportsComponent } from './reports/reports.component';
 import { RegisterComponent } from './register/register.component';
 import { adminGuard } from './admin.guard';
+import { DirectorVisitComponent } from './director-visit/director-visit.component';
+import { DonationBoxTrackerComponent } from './donation-box-tracker/donation-box-tracker.component';
 
 const routes: Routes = [
   {
@@ -84,6 +86,14 @@ const routes: Routes = [
   {
     path: 'membermanager',
     component: MembermanagerComponent
+  },
+  {
+    path: 'directorvisit',
+    component: DirectorVisitComponent
+  },
+  {
+    path: 'donationboxtracker',
+    component: DonationBoxTrackerComponent
   },
   {
     path: '',

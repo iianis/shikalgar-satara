@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { map, Observable, from } from 'rxjs';
+import { map, Observable, from, firstValueFrom } from 'rxjs';
 
 export const ADMIN_DESIGNATIONS = [
   'अध्यक्ष',
@@ -42,6 +42,10 @@ export class AuthService {
   registerWithPhoneAndPassword(phone: string, pass: string): Observable<any> {
     const authUser = this.formatPhoneToAuthUser(phone);
     return from(this.afAuth.createUserWithEmailAndPassword(authUser, pass));
+  }
+
+  async getCurrentUser() {
+    return await firstValueFrom(this.afAuth.authState);
   }
 
   /**

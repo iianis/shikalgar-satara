@@ -26,7 +26,37 @@
                 </div>
             </div>
 
-            <!-- 2. Recommendation Letters -->
+            <!-- 2. Director Visits Report -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-primary border-opacity-25 role-button report-card-hover"
+                    tabindex="0" role="button" (click)="selectReport('directorvisits')"
+                    (keydown.enter)="selectReport('directorvisits')"
+                    (keydown.space)="selectReport('directorvisits'); $event.preventDefault()">
+                    <div class="card-body p-2 p-md-3">
+                        <h5 class="card-title mb-1 fw-bold fs-6">🏛️ संचालक दौरा व बैठक अहवाल</h5>
+                        <p class="card-text text-secondary small mb-0" style="font-size: 0.78rem;">
+                            संचालकांनी केलेल्या सर्व भेटी, बैठका व कार्यक्रमांची एकत्रित नोंद.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Donation Box Tracker Report -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-primary border-opacity-25 role-button report-card-hover"
+                    tabindex="0" role="button" (click)="selectReport('donationboxtracker')"
+                    (keydown.enter)="selectReport('donationboxtracker')"
+                    (keydown.space)="selectReport('donationboxtracker'); $event.preventDefault()">
+                    <div class="card-body p-2 p-md-3">
+                        <h5 class="card-title mb-1 fw-bold fs-6">📦 दानपेटी ट्रॅकर अहवाल</h5>
+                        <p class="card-text text-secondary small mb-0" style="font-size: 0.78rem;">
+                            वाटप केलेल्या दानपेट्या, उघडल्याच्या तारखा आणि जमा रक्कमेचा अहवाल.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Recommendation Letters -->
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm border-primary border-opacity-25 role-button report-card-hover"
                     tabindex="0" role="button" (click)="selectReport('recommendation-letter')"
@@ -41,7 +71,7 @@
                 </div>
             </div>
 
-            <!-- 3. Charity / Needy Family Fund -->
+            <!-- 5. Charity / Needy Family Fund -->
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm border-primary border-opacity-25 role-button report-card-hover"
                     tabindex="0" role="button" (click)="selectReport('needy-family-fund')"
@@ -56,7 +86,7 @@
                 </div>
             </div>
 
-            <!-- 4. Donors List -->
+            <!-- 6. Donors List -->
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm border-primary border-opacity-25 role-button report-card-hover"
                     tabindex="0" role="button" (click)="selectReport('donors')" (keydown.enter)="selectReport('donors')"
@@ -82,6 +112,10 @@
         <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
             <div>
                 <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'member-audit'">सभासद ऑडिट अहवाल</h3>
+                <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'directorvisits'">🏛️ संचालक दौरा व बैठक अहवाल
+                </h3>
+                <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'donationboxtracker'">📦 दानपेटी ट्रॅकर अहवाल
+                </h3>
                 <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'recommendation-letter'">शिफारस पत्र वाटप अहवाल
                 </h3>
                 <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'needy-family-fund'">गरजु कुटुंब नीधी वाटप अहवाल
@@ -127,7 +161,35 @@
         <div *ngIf="!isLoading && records.length > 0" class="table-responsive shadow-sm rounded-2 border">
             <table class="table table-sm table-striped table-hover align-middle mb-0 text-nowrap"
                 style="font-size: 0.82rem;">
-                <thead class="table-dark">
+
+                <!-- TABLE HEAD: DIRECTOR VISITS -->
+                <thead class="table-dark" *ngIf="selectedReport === 'directorvisits'">
+                    <tr>
+                        <th scope="col" class="py-1 px-2">#</th>
+                        <th scope="col" class="py-1 px-2">दिनांक</th>
+                        <th scope="col" class="py-1 px-2">संचालकाचे नाव & फोन</th>
+                        <th scope="col" class="py-1 px-2">प्रकार</th>
+                        <th scope="col" class="py-1 px-2">तालुका - गाव</th>
+                        <th scope="col" class="py-1 px-2">ठिकाण / उद्देश</th>
+                    </tr>
+                </thead>
+
+                <!-- TABLE HEAD: DONATION BOX TRACKER -->
+                <thead class="table-dark" *ngIf="selectedReport === 'donationboxtracker'">
+                    <tr>
+                        <th scope="col" class="py-1 px-2">#</th>
+                        <th scope="col" class="py-1 px-2">पेटी क्र.</th>
+                        <th scope="col" class="py-1 px-2">सदस्याचे नाव & फोन</th>
+                        <th scope="col" class="py-1 px-2">तालुका / गाव</th>
+                        <th scope="col" class="py-1 px-2">वाटप दिनांक</th>
+                        <th scope="col" class="py-1 px-2">शेवटची उघडलेली तारीख</th>
+                        <th scope="col" class="py-1 px-2 text-end">एकूण जमा (₹)</th>
+                    </tr>
+                </thead>
+
+                <!-- TABLE HEAD: OTHER STANDARD REPORTS -->
+                <thead class="table-dark"
+                    *ngIf="selectedReport !== 'directorvisits' && selectedReport !== 'donationboxtracker'">
                     <tr>
                         <th scope="col" class="py-1 px-2">#</th>
                         <th scope="col" class="py-1 px-2">तारीख / वेळ</th>
@@ -139,83 +201,138 @@
                         </th>
                     </tr>
                 </thead>
+
                 <tbody>
-                    <tr *ngFor="let item of records; let i = index">
-                        <!-- Index Column -->
-                        <td class="fw-bold text-secondary py-1 px-2">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                    <!-- ============================================== -->
+                    <!-- ROW TYPE 1: DIRECTOR VISITS                    -->
+                    <!-- ============================================== -->
+                    <ng-container *ngIf="selectedReport === 'directorvisits'">
+                        <tr *ngFor="let item of records; let i = index">
+                            <td class="fw-bold text-secondary py-1 px-2">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                            <td class="font-monospace py-1 px-2">{{ item.visitDate }}</td>
+                            <td class="py-1 px-2">
+                                <div class="fw-semibold">{{ item.directorName }}</div>
+                                <div class="text-muted small">📞 {{ item.phone }}</div>
+                            </td>
+                            <td class="py-1 px-2">
+                                <span class="badge bg-info text-dark">{{ item.visitType }}</span>
+                            </td>
+                            <td class="py-1 px-2">{{ item.taluka }} - {{ item.village }}</td>
+                            <td class="py-1 px-2">
+                                <div class="fw-semibold">{{ item.placeName }}</div>
+                                <div class="text-secondary small">{{ item.purpose }}</div>
+                            </td>
+                        </tr>
+                    </ng-container>
 
-                        <!-- Date / Time Column -->
-                        <td class="font-monospace text-nowrap py-1 px-2">
-                            <span class="text-muted" style="font-size: 0.78rem;">
-                                {{ formatDate(item.modifiedAt || item.timestamp || item.date, selectedReport ===
-                                'member-audit') }}
-                            </span>
-                        </td>
-
-                        <!-- Combined Name, Phone, and Details Column -->
-                        <td class="py-1 px-2">
-                            <div class="fw-semibold text-dark">
-                                <!-- Member Audit -->
-                                <ng-container *ngIf="selectedReport === 'member-audit'">
-                                    {{ item.initial }} {{ item.fname }} {{ item.lname }}
-                                    <span class="text-muted fw-normal" *ngIf="item.designation">, {{ item.designation
-                                        }}</span>
-                                    <span class="text-muted fw-normal" *ngIf="item.village">, {{ item.village }}</span>
-                                </ng-container>
-
-                                <!-- Needy Family Fund -->
-                                <ng-container *ngIf="selectedReport === 'needy-family-fund'">
-                                    {{ item.recipientName || 'N/A' }}
-                                    <span class="text-muted fw-normal" *ngIf="item.village">, {{ item.village }}</span>
-                                </ng-container>
-
-                                <!-- Recommendation Letters & Donors -->
-                                <ng-container
-                                    *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'needy-family-fund'">
-                                    {{ item.donorName || item.fname || item.name || item.title || item.recipient ||
-                                    'N/A' }}
-                                    <span class="text-muted fw-normal" *ngIf="item.lname"> {{ item.lname }}</span>
-                                </ng-container>
-                            </div>
-
-                            <!-- Phone Number -->
-                            <div *ngIf="item.phone" style="font-size: 0.75rem;">
-                                <a [href]="'tel:' + item.phone" class="text-decoration-none text-muted font-monospace">
-                                    📞 {{ item.phone }}
-                                </a>
-                            </div>
-
-                            <!-- Help Type and Details -->
-                            <div *ngIf="item.details || item.helpType" class="text-secondary small fw-normal mt-1"
-                                style="font-size: 0.75rem;">
-                                <span class="badge bg-light text-dark border me-1 align-baseline fw-normal"
-                                    style="font-size: inherit;" *ngIf="item.helpType">
-                                    {{ item.helpType }}
+                    <!-- ============================================== -->
+                    <!-- ROW TYPE 2: DONATION BOX TRACKER              -->
+                    <!-- ============================================== -->
+                    <ng-container *ngIf="selectedReport === 'donationboxtracker'">
+                        <tr *ngFor="let item of records; let i = index">
+                            <td class="fw-bold text-secondary py-1 px-2">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                            <td class="fw-bold text-primary py-1 px-2">#{{ item.boxNumber }}</td>
+                            <td class="py-1 px-2">
+                                <div class="fw-semibold">{{ item.memberName }}</div>
+                                <div class="text-muted small">📞 {{ item.phone }}</div>
+                            </td>
+                            <td class="py-1 px-2">{{ item.taluka }} - {{ item.village }}</td>
+                            <td class="py-1 px-2">{{ item.dateOfIssue }}</td>
+                            <td class="py-1 px-2">
+                                <span *ngIf="getLastOpenedEntry(item) as last" class="badge bg-info text-dark">
+                                    {{ last.date }} (₹{{ last.amount }})
                                 </span>
-                                <span>{{ item.details }}</span>
-                            </div>
+                                <span *ngIf="!getLastOpenedEntry(item)" class="text-muted small">अद्याप नाही</span>
+                            </td>
+                            <td class="fw-bold text-success text-end py-1 px-2">₹{{ getBoxTotalAmount(item) }}</td>
+                        </tr>
+                    </ng-container>
 
-                            <!-- Contribution Type / Description for Donors or Recommendation Letters -->
-                            <div *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'needy-family-fund' && (item.contributionType || item.description)"
-                                class="text-muted small fw-normal" style="font-size: 0.75rem;">
-                                <span *ngIf="item.contributionType">({{ item.contributionType }}) </span>
-                                <span *ngIf="item.description">{{ item.description }}</span>
-                            </div>
-                        </td>
+                    <!-- ============================================== -->
+                    <!-- ROW TYPE 3: STANDARD REPORTS                  -->
+                    <!-- ============================================== -->
+                    <ng-container
+                        *ngIf="selectedReport !== 'directorvisits' && selectedReport !== 'donationboxtracker'">
+                        <tr *ngFor="let item of records; let i = index">
+                            <!-- Index Column -->
+                            <td class="fw-bold text-secondary py-1 px-2">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
 
-                        <!-- Modified By Column (Only for member-audit) -->
-                        <td class="py-1 px-2 font-monospace text-primary" *ngIf="selectedReport === 'member-audit'">
-                            <span *ngIf="item.modifiedBy">📱 {{ item.modifiedBy }}</span>
-                            <span *ngIf="!item.modifiedBy" class="text-muted small">N/A</span>
-                        </td>
+                            <!-- Date / Time Column -->
+                            <td class="font-monospace text-nowrap py-1 px-2">
+                                <span class="text-muted" style="font-size: 0.78rem;">
+                                    {{ formatDate(item.modifiedAt || item.timestamp || item.date, selectedReport ===
+                                    'member-audit') }}
+                                </span>
+                            </td>
 
-                        <!-- Amount & Ref Column (Hidden for member-audit) -->
-                        <td class="py-1 px-2"
-                            *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'recommendation-letter'">
-                            <strong class="text-success" *ngIf="item.amount">₹{{ item.amount }}</strong>
-                            <span *ngIf="!item.amount" class="text-muted small">{{ item.refNo || 'N/A' }}</span>
-                        </td>
-                    </tr>
+                            <!-- Combined Name, Phone, and Details Column -->
+                            <td class="py-1 px-2">
+                                <div class="fw-semibold text-dark">
+                                    <!-- Member Audit -->
+                                    <ng-container *ngIf="selectedReport === 'member-audit'">
+                                        {{ item.initial }} {{ item.fname }} {{ item.lname }}
+                                        <span class="text-muted fw-normal" *ngIf="item.designation">, {{
+                                            item.designation }}</span>
+                                        <span class="text-muted fw-normal" *ngIf="item.village">, {{ item.village
+                                            }}</span>
+                                    </ng-container>
+
+                                    <!-- Needy Family Fund -->
+                                    <ng-container *ngIf="selectedReport === 'needy-family-fund'">
+                                        {{ item.recipientName || 'N/A' }}
+                                        <span class="text-muted fw-normal" *ngIf="item.village">, {{ item.village
+                                            }}</span>
+                                    </ng-container>
+
+                                    <!-- Recommendation Letters & Donors -->
+                                    <ng-container
+                                        *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'needy-family-fund'">
+                                        {{ item.donorName || item.fname || item.name || item.title || item.recipient ||
+                                        'N/A' }}
+                                        <span class="text-muted fw-normal" *ngIf="item.lname"> {{ item.lname }}</span>
+                                    </ng-container>
+                                </div>
+
+                                <!-- Phone Number -->
+                                <div *ngIf="item.phone" style="font-size: 0.75rem;">
+                                    <a [href]="'tel:' + item.phone"
+                                        class="text-decoration-none text-muted font-monospace">
+                                        📞 {{ item.phone }}
+                                    </a>
+                                </div>
+
+                                <!-- Help Type and Details -->
+                                <div *ngIf="item.details || item.helpType" class="text-secondary small fw-normal mt-1"
+                                    style="font-size: 0.75rem;">
+                                    <span class="badge bg-light text-dark border me-1 align-baseline fw-normal"
+                                        style="font-size: inherit;" *ngIf="item.helpType">
+                                        {{ item.helpType }}
+                                    </span>
+                                    <span>{{ item.details }}</span>
+                                </div>
+
+                                <!-- Contribution Type / Description -->
+                                <div *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'needy-family-fund' && (item.contributionType || item.description)"
+                                    class="text-muted small fw-normal" style="font-size: 0.75rem;">
+                                    <span *ngIf="item.contributionType">({{ item.contributionType }}) </span>
+                                    <span *ngIf="item.description">{{ item.description }}</span>
+                                </div>
+                            </td>
+
+                            <!-- Modified By Column (Only for member-audit) -->
+                            <td class="py-1 px-2 font-monospace text-primary" *ngIf="selectedReport === 'member-audit'">
+                                <span *ngIf="item.modifiedBy">📱 {{ item.modifiedBy }}</span>
+                                <span *ngIf="!item.modifiedBy" class="text-muted small">N/A</span>
+                            </td>
+
+                            <!-- Amount & Ref Column -->
+                            <td class="py-1 px-2"
+                                *ngIf="selectedReport !== 'member-audit' && selectedReport !== 'recommendation-letter'">
+                                <strong class="text-success" *ngIf="item.amount">₹{{ item.amount }}</strong>
+                                <span *ngIf="!item.amount" class="text-muted small">{{ item.refNo || 'N/A' }}</span>
+                            </td>
+                        </tr>
+                    </ng-container>
                 </tbody>
             </table>
         </div>

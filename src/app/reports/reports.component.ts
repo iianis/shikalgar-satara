@@ -1,11 +1,20 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { QueryDocumentSnapshot } from '@angular/fire/compat/firestore';
+import { firstValueFrom } from 'rxjs';
 import { Member } from '../interfaces/interfaces';
 import { FirebaseReportService } from '../services/firebasereport.service';
+import { FirebaseService } from '../services/firebase.service';
 import { HeaderComponent } from '../shared/header/header.component';
 
-export type ReportType = 'list' | 'member-audit' | 'recommendation-letter' | 'needy-family-fund' | 'donors';
+export type ReportType =
+  | 'list'
+  | 'member-audit'
+  | 'recommendation-letter'
+  | 'needy-family-fund'
+  | 'donors'
+  | 'directorvisits'
+  | 'donationboxtracker';
 
 @Component({
   selector: 'app-reports',
@@ -16,6 +25,7 @@ export type ReportType = 'list' | 'member-audit' | 'recommendation-letter' | 'ne
 })
 export class ReportsComponent implements OnInit {
   private reportService = inject(FirebaseReportService);
+  private firebaseService = inject(FirebaseService);
 
   // Active Report State ('list' shows dashboard)
   selectedReport: ReportType = 'list';
@@ -30,16 +40,7 @@ export class ReportsComponent implements OnInit {
   private pageSnapshots: (QueryDocumentSnapshot<any> | null)[] = [null];
   private currentLastDoc: QueryDocumentSnapshot<any> | null = null;
 
-  // In membermanager.component.ts or reports.component.ts
-  async ngOnInit(): Promise<void> {
-    // Call the temporary migration function once
-    // try {
-    //   const count = await this.reportService.migrateAliveFieldOneTime();
-    //   console.log(`Migration completed for ${count} records.`);
-    // } catch (err) {
-    //   console.error('Migration failed:', err);
-    // }
-  }
+  async ngOnInit(): Promise<void> { }
 
   // Handle Report Selection from Dashboard
   selectReport(report: ReportType): void {
@@ -83,6 +84,23 @@ export class ReportsComponent implements OnInit {
         this.records = result.records;
         this.hasNextPage = (pageNumber * this.pageSize) < result.totalCount;
         this.currentPage = pageNumber;
+      } else if (this.selectedReport === 'directorvisits') {
+        // Wrap Observable call in firstValueFrom to await array result
+        const allVisits = await firstValueFrom(
+          this.firebaseService.getMasterDataOrderByTimestamp('director_visits', 'createdAt')
+        );
+        const totalCount = allVisits.length;
+        const startIndex = (pageNumber - 1) * this.pageSize;
+        this.records = allVisits.slice(startIndex, startIndex + this.pageSize);
+        this.hasNextPage = startIndex + this.pageSize < totalCount;
+        this.currentPage = pageNumber;
+      } else if (this.selectedReport === 'donationboxtracker') {
+        const allBoxes = await this.firebaseService.getDonationBoxes();
+        const totalCount = allBoxes.length;
+        const startIndex = (pageNumber - 1) * this.pageSize;
+        this.records = allBoxes.slice(startIndex, startIndex + this.pageSize);
+        this.hasNextPage = startIndex + this.pageSize < totalCount;
+        this.currentPage = pageNumber;
       } else {
         // Query/Cursor-based pagination for collections (member-audit)
         const cursor = this.pageSnapshots[pageNumber - 1] || null;
@@ -118,6 +136,7 @@ export class ReportsComponent implements OnInit {
       this.isLoading = false;
     }
   }
+
   nextPage(): void {
     if (this.hasNextPage && !this.isLoading) {
       this.loadPage(this.currentPage + 1);
@@ -130,15 +149,19 @@ export class ReportsComponent implements OnInit {
     }
   }
 
-  /**
-   * Formats a timestamp into a short date/time string.
-   * @param timestamp Firestore Timestamp, JS Date object, or date string
-   * @param includeTime If true, includes time (e.g. 'DD/MM/YY, HH:MM AM/PM'). Defaults to true.
-   */
+  getBoxTotalAmount(box: any): number {
+    if (!box.boxOpenedHistory || box.boxOpenedHistory.length === 0) return 0;
+    return box.boxOpenedHistory.reduce((sum: number, entry: any) => sum + (Number(entry.amount) || 0), 0);
+  }
+
+  getLastOpenedEntry(box: any): any | null {
+    if (!box.boxOpenedHistory || box.boxOpenedHistory.length === 0) return null;
+    return box.boxOpenedHistory[box.boxOpenedHistory.length - 1];
+  }
+
   formatDate(timestamp: any, includeTime: boolean = true): string {
     if (!timestamp) return 'N/A';
 
-    // Handle Firestore Timestamp vs native JS Date/String
     const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
     if (isNaN(date.getTime())) return 'N/A';
 

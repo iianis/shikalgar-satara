@@ -1,0 +1,72 @@
+<div class="p-3">
+    <div class="d-flex justify-content-end mb-3" *ngIf="!isReadOnly">
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addFamilyMember()">
+            + सदस्य नोंद
+        </button>
+    </div>
+    <div *ngFor="let member of familyMembers.controls; let i = index" [formGroup]="$any(member)"
+        class="p-2 mb-2 bg-light rounded border">
+        <div *ngIf="!isEditing(i)" class="d-flex justify-content-between align-items-center px-2 py-1">
+            <div class="small">
+                <span class="badge bg-secondary me-2">{{ member.get('relation')?.value || 'नाते नाही' }}</span>
+                <strong class="text-dark">{{ member.get('name')?.value || 'नाव दिलेले नाही' }}</strong>
+                <span class="text-muted ms-2" *ngIf="member.get('age')?.value">({{ member.get('age')?.value }}
+                    वर्षे)</span>
+                <span class="text-muted ms-2" *ngIf="member.get('gender')?.value">• {{ member.get('gender')?.value
+                    }}</span>
+            </div>
+            <div class="d-flex gap-2" *ngIf="!isReadOnly">
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                    (click)="toggleEdit(i)">✏️</button>
+                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
+                    (click)="removeFamilyMember(i)">🗑️</button>
+            </div>
+        </div>
+        <div *ngIf="isEditing(i)" class="pt-2">
+            <div class="row g-2 align-items-center">
+                <div class="col-6 col-sm-4 col-md-2">
+                    <select class="form-select form-select-sm" formControlName="relation">
+                        <option value="">नाते</option>
+                        <option value="पत्नी">पत्नी</option>
+                        <option value="आई">आई</option>
+                        <option value="वडील">वडील</option>
+                        <option value="मुलगा">मुलगा</option>
+                        <option value="मुलगी">मुलगी</option>
+                        <option value="पति">पति</option>
+                    </select>
+                </div>
+                <div class="col-6 col-sm-8 col-md-3">
+                    <input type="text" class="form-control form-control-sm" formControlName="name"
+                        placeholder="नाव *" />
+                </div>
+                <div class="col-6 col-sm-4 col-md-2">
+                    <input type="text" class="form-control form-control-sm" formControlName="education"
+                        placeholder="शिक्षण" />
+                </div>
+                <div class="col-6 col-sm-4 col-md-1">
+                    <input type="number" class="form-control form-control-sm" formControlName="age" placeholder="वय" />
+                </div>
+                <div class="col-6 col-sm-4 col-md-2">
+                    <select class="form-select form-select-sm" formControlName="gender">
+                        <option value="">लिंग</option>
+                        <option value="पुरुष">पुरुष</option>
+                        <option value="स्त्री">स्त्री</option>
+                    </select>
+                </div>
+                <div class="col-6 col-sm-4 col-md-2">
+                    <input type="text" class="form-control form-control-sm" formControlName="occupation"
+                        placeholder="व्यवसाय" />
+                </div>
+                <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                    <button *ngIf="newIndexes.has(i)" type="button" class="btn btn-sm btn-outline-secondary"
+                        (click)="cancelNew(i)">रद्द करा</button>
+                    <button type="button" class="btn btn-sm btn-success px-4" (click)="finishEdit(i)">पूर्ण
+                        झाले</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="familyMembers.length === 0" class="text-muted small text-center py-2">
+        कौटुंबिक माहितीची नोंद नाही
+    </div>
+</div>

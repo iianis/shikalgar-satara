@@ -1,0 +1,118 @@
+<div [formGroup]="formGroup" class="row g-3">
+    <div class="col-6 col-sm-4 col-md-2">
+        <label class="form-label small text-muted">आदरार्थी <span class="text-danger">*</span></label>
+        <select class="form-select form-select-sm" formControlName="initial">
+            <option value="ज.">जनाब</option>
+            <option value="मो.">मोहतरमा</option>
+            <option value="म.">मरहूम</option>
+        </select>
+    </div>
+
+    <div class="col-12 col-sm-8 col-md-5">
+        <label class="form-label small text-muted">नाव <span class="text-danger">*</span></label>
+        <input type="text" class="form-control"
+            [class.is-invalid]="formGroup.get('fname')?.touched && formGroup.get('fname')?.invalid"
+            formControlName="fname" placeholder="सभासद आणि वडीलांचे नाव" />
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-5">
+        <label class="form-label small text-muted">आडनाव <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" formControlName="lname" />
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4">
+        <label class="form-label small text-muted">फोन <span class="text-danger">*</span></label>
+        <div class="input-group">
+            <span class="input-group-text">+91</span>
+            <input type="tel" class="form-control"
+                [class.is-invalid]="formGroup.get('phone')?.touched && formGroup.get('phone')?.invalid"
+                formControlName="phone" placeholder="10 अंकी नंबर" />
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4">
+        <label class="form-label small text-muted">वय <span class="text-danger">*</span></label>
+        <input type="text" inputmode="numeric" formControlName="age" class="form-control"
+            placeholder="वय नमूद करा (१ ते ९९)" maxlength="2" />
+        <div *ngIf="ageControl?.invalid && (ageControl?.touched || ageControl?.dirty)"
+            class="error-message text-danger mt-1">
+            <small *ngIf="ageControl?.errors?.['required']">वय प्रविष्ट करणे आवश्यक आहे.</small>
+            <small *ngIf="ageControl?.errors?.['pattern']">वय फक्त अंकांमध्ये असणे आवश्यक आहे.</small>
+            <small *ngIf="ageControl?.errors?.['min'] || ageControl?.errors?.['max']">वय ९९ पेक्षा कमी (१ ते ९९) असणे
+                आवश्यक आहे.</small>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4">
+        <label class="form-label small text-muted">शिक्षण</label>
+        <input type="text" class="form-control" formControlName="education" placeholder="शिक्षण नमूद करा (उदा. BSc)" />
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4">
+        <label class="form-label small text-muted">व्यवसाय</label>
+        <input type="text" class="form-control" formControlName="occupation" placeholder="व्यवसाय / काम नमूद करा" />
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4">
+        <label class="form-label small text-muted">पद <span class="text-danger">*</span></label>
+        <select class="form-select" formControlName="designation">
+            <option value="सभासद">सभासद</option>
+            <option value="कार्यकारणी सदस्य">कार्यकारणी सदस्य</option>
+            <option value="खजिनदार">खजिनदार</option>
+            <option value="सचिव">सचिव</option>
+            <option value="उपाध्यक्ष">उपाध्यक्ष</option>
+            <option value="अध्यक्ष">अध्यक्ष</option>
+            <option value="तालुका समिती सदस्य">तालुका समिती सदस्य</option>
+            <option value="संस्थापक">संस्थापक</option>
+            <option value="संस्थापक सदस्य">संस्थापक सदस्य</option>
+            <option value="आजिव सदस्य">आजिव सदस्य</option>
+        </select>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-4">
+        <label class="form-label small text-muted">सभासद झालेली तारीख <span class="text-danger">*</span></label>
+        <input type="date" class="form-control" formControlName="joinedOn" />
+    </div>
+
+    <div class="col-12 col-md-8">
+        <label class="form-label small text-muted">गल्ली / रस्ता / घर क्र.</label>
+        <input type="text" class="form-control" formControlName="address"
+            placeholder="घर क्रमांक - बिल्डींगचे नाव - रस्ता इ." />
+    </div>
+
+    <div class="col-12 col-sm-4 col-md-4">
+        <label class="form-label small text-muted">तालुका <span class="text-danger">*</span></label>
+        <select class="form-select" formControlName="taluka"
+            [class.is-invalid]="formGroup.get('taluka')?.touched && formGroup.get('taluka')?.invalid">
+            <option value="">तालुका निवडा</option>
+            <option *ngFor="let t of talukaList" [value]="t.name">{{ t.name }}</option>
+        </select>
+    </div>
+
+    <div class="col-12 col-sm-4 col-md-4">
+        <label class="form-label small text-muted">गावाचे नाव <span class="text-danger">*</span></label>
+        <select class="form-select" formControlName="village"
+            [class.is-invalid]="formGroup.get('village')?.touched && formGroup.get('village')?.invalid">
+            <option value="">गावं निवडा</option>
+            <option *ngFor="let v of filteredVillages" [value]="v.name">{{ v.name }}</option>
+        </select>
+    </div>
+
+    <div class="col-12 col-sm-4 col-md-4">
+        <label class="form-label small text-muted">जिल्हा <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" formControlName="district" />
+    </div>
+
+    <div class="col-12 mt-3">
+        <div class="d-flex gap-4 p-2 bg-light rounded border">
+            <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" id="aliveSwitch" formControlName="alive" />
+                <label class="form-check-label fw-medium" for="aliveSwitch">हयात</label>
+            </div>
+            <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" id="activeSwitch" formControlName="active" />
+                <label class="form-check-label fw-medium" for="activeSwitch">सक्रिय</label>
+            </div>
+        </div>
+    </div>
+</div>

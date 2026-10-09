@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FirebaseService } from '../services/firebase.service';
 import { AuthService } from '../services/auth.service';
 import { firstValueFrom } from 'rxjs';
@@ -14,12 +14,13 @@ import { HeaderComponent } from '../shared/header/header.component';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
   router = inject(Router);
+  route = inject(ActivatedRoute);
   firebaseService = inject(FirebaseService);
   authService = inject(AuthService);
-
+  returnUrl: string = '/home';
   // Login Credentials & UI State
   credentials = {
     phone: '',
@@ -35,6 +36,16 @@ export class LoginComponent {
   resetMessage = '';
   resetError = '';
   isApprovedForReset = false;
+  async ngOnInit(): Promise<void> {
+    // 1. Get the returnUrl query parameter (e.g., /login?returnUrl=/dashboard) or fallback to '/home'
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+
+    // 2. Check if user is already logged in
+    const currentUser = await this.authService.getCurrentUser(); // or check authService state/observable
+    if (currentUser) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
+  }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
@@ -63,7 +74,8 @@ export class LoginComponent {
       await firstValueFrom(
         this.authService.loginWithPhoneAndPassword(cleanPhone, this.credentials.password)
       );
-      this.router.navigateByUrl('home');
+      // Redirect to the stored return URL instead of hardcoded '/home'
+      this.router.navigateByUrl(this.returnUrl);
     } catch (error: any) {
       console.error('Login Error:', error);
       this.errorMessage = 'मोबाईल नंबर किंवा पासवर्ड चुकला आहे. कृपया पुन्हा प्रयत्न करा.';
@@ -213,5 +225,9 @@ export class LoginComponent {
 
   onBack(): void {
     this.router.navigateByUrl('');
+  }
+  // Inside LoginComponent class:
+  onGoHome(): void {
+    this.router.navigateByUrl('home'); // or '/' depending on your home route path
   }
 }

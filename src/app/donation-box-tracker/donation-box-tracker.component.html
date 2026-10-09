@@ -1,0 +1,234 @@
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+
+            <!-- Title Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <h4 class="mb-0 fw-bold text-primary">📦 दानपेटी ट्रॅकर (Donation Box Tracker)</h4>
+                    <small class="text-muted">सदस्य दानपेटी वाटप आणि जमा रक्कम नोंदवही</small>
+                </div>
+                <button *ngIf="!showAddBoxForm" class="btn btn-primary fw-bold shadow-sm" (click)="openNewBoxForm()">
+                    ➕ नवीन दानपेटी जोडा (Add New Box)
+                </button>
+            </div>
+
+            <!-- Alerts -->
+            <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+                ✅ {{ successMessage }}
+            </div>
+
+            <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+                ⚠️ {{ errorMessage }}
+            </div>
+
+            <!-- Loading Indicator -->
+            <div *ngIf="isLoading" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">माहिती लोड होत आहे...</span>
+                </div>
+                <p class="mt-2 text-muted small">दानपेटी माहिती लोड होत आहे...</p>
+            </div>
+
+            <!-- SECTION 1: Donation Boxes List -->
+            <div class="card shadow-sm border-0 mb-4" *ngIf="!isLoading">
+                <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-dark">📋 सर्व दानपेटी सूची (All Donation Boxes)</h5>
+                    <span class="badge bg-primary fs-6">{{ donationBoxes.length }} पेट्या</span>
+                </div>
+
+                <div class="card-body p-0">
+                    <div *ngIf="donationBoxes.length === 0" class="text-center py-4 text-muted">
+                        अद्याप कोणतीही दानपेटी नोंदवली नाही. कृपया <strong>'नवीन दानपेटी जोडा'</strong> वर क्लिक करा.
+                    </div>
+
+                    <div *ngIf="donationBoxes.length > 0" class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>पेटी क्र.</th>
+                                    <th>सदस्याचे नाव & मोबाईल</th>
+                                    <th>तालुका / गाव</th>
+                                    <th>वाटप दिनांक</th>
+                                    <th>शेवटची उघडलेली तारीख</th>
+                                    <th>शेवटची रक्कम</th>
+                                    <th>एकूण जमा</th>
+                                    <th class="text-end">कृती (Actions)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let box of donationBoxes">
+                                    <td class="fw-bold text-primary">#{{ box.boxNumber }}</td>
+                                    <td>
+                                        <div class="fw-semibold">{{ box.memberName }}</div>
+                                        <small class="text-muted">📞 {{ box.phone }}</small>
+                                    </td>
+                                    <td>{{ box.taluka }} - {{ box.village }}</td>
+                                    <td>{{ box.dateOfIssue }}</td>
+                                    <td>
+                                        <span *ngIf="getLastOpenedEntry(box) as last" class="badge bg-info text-dark">
+                                            {{ last.date }}
+                                        </span>
+                                        <span *ngIf="!getLastOpenedEntry(box)" class="text-muted small">अद्याप
+                                            नाही</span>
+                                    </td>
+                                    <td class="fw-bold text-success">
+                                        <span *ngIf="getLastOpenedEntry(box) as last">₹{{ last.amount }}</span>
+                                        <span *ngIf="!getLastOpenedEntry(box)">-</span>
+                                    </td>
+                                    <td class="fw-bold text-dark">₹{{ getTotalAmount(box) }}</td>
+                                    <td class="text-end text-nowrap">
+                                        <button class="btn btn-sm btn-success me-1" (click)="startOpeningRecord(box)"
+                                            title="पेटी उघडा व रक्कम नोंदवा">
+                                            💰 पेटी उघडा
+                                        </button>
+                                        <button *ngIf="box.id" class="btn btn-sm btn-outline-danger"
+                                            (click)="deleteBox(box.id)" title="हटवा">
+                                            🗑️
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Record Box Opened Entry Form Modal/Card -->
+            <div class="card shadow-sm border-warning mb-4" *ngIf="selectedBoxForOpening">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 fw-bold">
+                        🪙 दानपेटी उघडून रक्कम नोंदवा (Box #{{ selectedBoxForOpening.boxNumber }} - {{
+                        selectedBoxForOpening.memberName }})
+                    </h5>
+                    <button class="btn btn-sm btn-dark" (click)="cancelOpeningRecord()">रद्द करा</button>
+                </div>
+                <div class="card-body p-4">
+                    <form [formGroup]="openBoxForm" (ngSubmit)="onSubmitOpeningRecord()">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">उघडल्याची तारीख <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" class="form-control" formControlName="date">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">जमा रक्कम (₹) <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" formControlName="amount" min="0">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">पेटी उघडणारा (Opened By) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" formControlName="openedBy"
+                                    placeholder="संचालक / प्रतिनिधी">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">साक्षीदार (Witness) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" formControlName="witness"
+                                    placeholder="साक्षीदाराचे नाव">
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">टीप / शेरा (Remarks)</label>
+                                <input type="text" class="form-control" formControlName="remarks"
+                                    placeholder="इतर तपशील...">
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-3">
+                            <button type="submit" class="btn btn-warning fw-bold flex-grow-1" [disabled]="isSubmitting">
+                                💾 जमा रक्कम जतन करा (Save Opened Record)
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" (click)="cancelOpeningRecord()">रद्द
+                                करा</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SECTION 3: New Donation Box Registration Form -->
+            <div class="card shadow-sm border-0 mb-4" *ngIf="showAddBoxForm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 fw-bold">📝 नवीन दानपेटी नोंदणी (Register New Donation Box)</h5>
+                    <button class="btn btn-sm btn-light" (click)="cancelBoxForm()">रद्द करा</button>
+                </div>
+
+                <div class="card-body p-4">
+                    <form [formGroup]="boxForm" (ngSubmit)="onSubmitBox()">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">सदस्याचे नाव <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" formControlName="memberName"
+                                    placeholder="पूर्ण नाव">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">मोबाईल नंबर <span
+                                        class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" formControlName="phone" maxlength="10"
+                                    placeholder="१० अंकी मोबाईल नंबर">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">दानपेटी क्रमांक (Box Number) <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" formControlName="boxNumber"
+                                    placeholder="उदा. BOX-101">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">वाटप दिनांक (Date of Issue) <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" class="form-control" formControlName="dateOfIssue">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">जबाबदार संचालक (Director)</label>
+                                <input type="text" class="form-control bg-light" [value]="loggedInDirectorName"
+                                    readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">तालुका <span class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="taluka">
+                                    <option value="" disabled>तालुका निवडा</option>
+                                    <option *ngFor="let t of talukaList" [value]="t.name">{{ t.name }}</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">गाव <span class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="village">
+                                    <option value="" disabled>गाव निवडा</option>
+                                    <option *ngFor="let v of filteredVillages" [value]="v.name">{{ v.name }}</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">विवरण / पत्ता (Description)</label>
+                                <textarea class="form-control" formControlName="description" rows="2"
+                                    placeholder="काही विशेष तपशील किंवा पत्ता..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary flex-grow-1 btn-lg fw-bold"
+                                [disabled]="isSubmitting">
+                                💾 दानपेटी नोंद जतन करा (Save Box)
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-lg" (click)="cancelBoxForm()">
+                                रद्द करा
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -46,14 +46,9 @@
         <!-- Navigation Menu Links (Expands full-width on mobile below top bar) -->
         <div class="collapse navbar-collapse w-100" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-0 ms-lg-3 fw-semibold pt-2 pt-lg-0">
+                <!-- Home page -->
                 <li class="nav-item">
                     <a class="nav-link active" href="home">मुख्यपृष्ठ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="education">शैक्षणिक माहिती</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="eventhighlight">एका सदस्याचे मनोगत</a>
                 </li>
 
                 <!-- Dynamic Auth Links When User Logs-Out-->
@@ -76,6 +71,17 @@
                 </li>
                 <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
                     <a class="nav-link" href="register">सभासद नोंदणी</a>
+                </li>
+                <li class="nav-item" *ngIf="isLoggedIn">
+                    <a class="nav-link" (click)="openMyProfile()">
+                        👤 माझी माहिती (Profile)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="education">शैक्षणिक माहिती</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="eventhighlight">एका सदस्याचे मनोगत</a>
                 </li>
                 <!-- <li class="nav-item" *ngIf="isLoggedIn">
                     <a class="nav-link" href="announcement">सभा नोटीस</a>

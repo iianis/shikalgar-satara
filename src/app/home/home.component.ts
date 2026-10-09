@@ -91,6 +91,31 @@ export class HomeComponent implements OnInit {
     });
     // One-time load for footer statistics
     this.loadFooterStats();
+
+
+    // Inside your existing ngOnInit auth subscription:
+    this.authService.getLoggedInPhone().pipe(
+      switchMap(phone => {
+        if (phone) {
+          this.isLoggedIn = true;
+          return this.firebaseService.getMemberByPhone(phone);
+        }
+        this.isLoggedIn = false;
+        this.loggedInFirstName = '';
+        return of(null);
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(result => {
+      const member = Array.isArray(result) ? result[0] : result;
+      this.loggedInMember = member || null; // Store current member record
+      this.isAdmin = !!member && this.authService.isAdminDesignation(member.designation);
+
+      if (member) {
+        const rawName = (member.fname || member.name || '').trim();
+        const spaceIndex = rawName.search(/\s/);
+        this.loggedInFirstName = spaceIndex !== -1 ? rawName.substring(0, spaceIndex) : rawName;
+      }
+    });
   }
 
   /**
@@ -158,6 +183,22 @@ export class HomeComponent implements OnInit {
         this.userIssue = "";
         this.needHelp = false;
       }, 2000);
+    }
+  }
+
+  // home.component.ts
+
+  // Add this property to store the logged-in member object
+  loggedInMember: any = null;
+
+  // Add handler for opening personal details
+  openMyProfile(): void {
+    if (this.loggedInMember) {
+      this.router.navigate(['/membermanager'], {
+        state: { memberToEdit: this.loggedInMember }
+      });
+    } else {
+      this.router.navigateByUrl('/membermanager');
     }
   }
 }

@@ -395,4 +395,97 @@ export class FirebaseService {
     const collectionName = 'personal_access_logs' + checkIfWeAreTesting();
     return this.getCollectionCount(collectionName);
   }
+
+  async addDirectorVisit(visitData: any): Promise<void> {
+    const collectionName = 'director_visits' + checkIfWeAreTesting();
+    const id = this.firestore.createId();
+
+    const payload = {
+      ...visitData,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    return this.firestore.collection(collectionName).doc(id).set(payload);
+  }
+
+  async getDirectorVisitsByPhone(phone: string): Promise<any[]> {
+    const collectionName = 'director_visits' + checkIfWeAreTesting();
+    const snapshot = await firstValueFrom(
+      this.firestore.collection(collectionName, ref =>
+        ref.where('phone', '==', phone).orderBy('createdAt', 'desc')
+      ).get()
+    );
+
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data() as any
+    }));
+  }
+  /**
+   * Updates an existing director visit entry
+   */
+  async updateDirectorVisit(id: string, visitData: Partial<any>): Promise<void> {
+    const collectionName = 'director_visits' + checkIfWeAreTesting();
+    return await this.firestore.collection(collectionName).doc(id).update(visitData);
+  }
+
+  /**
+   * Deletes a director visit entry
+   */
+  async deleteDirectorVisit(id: string): Promise<void> {
+    const collectionName = 'director_visits' + checkIfWeAreTesting();
+    return await this.firestore.collection(collectionName).doc(id).delete();
+  }
+
+  // ==========================================
+  // DONATION BOX TRACKER SERVICES
+  // ==========================================
+
+  /**
+   * Fetches all registered donation boxes ordered by creation timestamp
+   */
+  async getDonationBoxes(): Promise<any[]> {
+    const collectionName = 'donation_boxes' + checkIfWeAreTesting();
+    const snapshot = await firstValueFrom(
+      this.firestore.collection(collectionName, ref =>
+        ref.orderBy('createdAt', 'desc')
+      ).get()
+    );
+
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data() as any
+    }));
+  }
+
+  /**
+   * Registers a new donation box
+   */
+  async addDonationBox(boxData: any): Promise<void> {
+    const collectionName = 'donation_boxes' + checkIfWeAreTesting();
+    const id = this.firestore.createId();
+
+    const payload = {
+      ...boxData,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    return this.firestore.collection(collectionName).doc(id).set(payload);
+  }
+
+  /**
+   * Updates existing donation box details or appends to boxOpenedHistory
+   */
+  async updateDonationBox(id: string, boxData: Partial<any>): Promise<void> {
+    const collectionName = 'donation_boxes' + checkIfWeAreTesting();
+    return await this.firestore.collection(collectionName).doc(id).update(boxData);
+  }
+
+  /**
+   * Deletes a donation box record
+   */
+  async deleteDonationBox(id: string): Promise<void> {
+    const collectionName = 'donation_boxes' + checkIfWeAreTesting();
+    return await this.firestore.collection(collectionName).doc(id).delete();
+  }
 }

@@ -136,6 +136,19 @@
                                     ⬅️ मागे जा (लॉगिन करा)
                                 </button>
                             </div>
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">
+                                    {{ isLoading ? 'लॉगिन होत आहे...' : 'लॉगिन करा' }}
+                                </button>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-secondary w-50" (click)="onBack()">
+                                        मागे जा
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary w-50" (click)="onGoHome()">
+                                        🏠 मुख्य पृष्ठ (Home)
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                     </div>

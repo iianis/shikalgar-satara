@@ -1,0 +1,68 @@
+<div class="p-3">
+    <!-- Only show add button if user has permission to edit this section AND view is not read-only -->
+    <!-- SHOW ADD BUTTON IF SECTION IS EDITABLE OR VIEW IS NOT READ-ONLY -->
+    <div class="d-flex justify-content-end mb-3" *ngIf="!isReadOnly && canEdit">
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="addDonation()">
+            + देणगी नोंद
+        </button>
+    </div>
+
+    <div *ngFor="let donation of donations.controls; let i = index" [formGroup]="$any(donation)"
+        class="p-2 mb-2 bg-light rounded border">
+
+        <!-- DISPLAY VIEW -->
+        <div *ngIf="!isEditing(i)" class="d-flex justify-content-between align-items-center px-2 py-1">
+            <div class="small">
+                <span class="badge bg-success me-2">₹{{ donation.get('amount')?.value || 0 }}</span>
+                <strong class="text-dark">{{ donation.get('contributionType')?.value || 'वर्गणी' }}</strong>
+                <span class="text-muted ms-2" *ngIf="donation.get('date')?.value">({{ donation.get('date')?.value
+                    }})</span>
+                <span class="text-muted ms-2" *ngIf="donation.get('description')?.value">• {{
+                    donation.get('description')?.value }}</span>
+            </div>
+
+            <!-- Edit / Delete actions hidden if user cannot edit this section -->
+            <div class="d-flex gap-2" *ngIf="canEdit && !isReadOnly">
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2"
+                    (click)="toggleEdit(i)">✏️</button>
+                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
+                    (click)="removeDonation(i)">🗑️</button>
+            </div>
+        </div>
+
+        <!-- EDIT VIEW -->
+        <div *ngIf="isEditing(i)" class="pt-2">
+            <div class="row g-2 align-items-center">
+                <div class="col-6 col-sm-4 col-md-3">
+                    <input type="date" class="form-control form-control-sm" formControlName="date" />
+                </div>
+                <div class="col-6 col-sm-4 col-md-3">
+                    <input type="number" class="form-control form-control-sm" formControlName="amount"
+                        placeholder="रक्कम (₹)" />
+                </div>
+                <div class="col-12 col-sm-4 col-md-3">
+                    <select class="form-select form-select-sm" formControlName="contributionType">
+                        <option value="सभासद वर्गणी">सभासद वर्गणी</option>
+                        <option value="इतर देणगी">इतर देणगी</option>
+                        <option value="विशेष योगदान">विशेष योगदान</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <input type="text" class="form-control form-control-sm" formControlName="description"
+                        placeholder="तपशील / टीप" />
+                </div>
+                <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                    <button *ngIf="newIndexes.has(i)" type="button" class="btn btn-sm btn-outline-secondary"
+                        (click)="cancelNew(i)">रद्द करा</button>
+                    <button type="button" class="btn btn-sm btn-success px-4" (click)="finishEdit(i)">पूर्ण
+                        झाले</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div *ngIf="donations.length === 0" class="text-muted small text-center py-2">
+        देणगी / वर्गणीची कोणतीही नोंद नाही
+    </div>
+</div>
