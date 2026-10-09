@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { CommonModule, Location, NgFor, NgIf } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { FirebaseService } from '../services/firebase.service';
@@ -31,6 +31,7 @@ export class DirectorVisitComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private firebaseService = inject(FirebaseService);
+  private location = inject(Location);
 
   visitForm!: FormGroup;
   isLoading = false;
@@ -53,7 +54,15 @@ export class DirectorVisitComponent implements OnInit {
     'इतर (Other)'
   ];
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    const phone = await firstValueFrom(this.authService.getLoggedInPhone());
+
+    if (!phone) {
+      this.errorMessage = 'कृपया प्रथम लॉगिन करा.';
+      this.isLoading = false;
+      return;
+    }
+
     this.initForm();
     this.setupAreaListeners();
     this.loadLoggedInUserData();
@@ -249,6 +258,14 @@ export class DirectorVisitComponent implements OnInit {
       this.errorMessage = 'माहिती जतन करताना त्रुटी आली. कृपया नंतर प्रयत्न करा.';
     } finally {
       this.isSubmitting = false;
+    }
+  }
+
+  goBack(): void {
+    if (this.showForm) {
+      this.cancelEdit();
+    } else {
+      this.location.back();
     }
   }
 }

@@ -48,7 +48,7 @@
                     (keydown.enter)="selectReport('donationboxtracker')"
                     (keydown.space)="selectReport('donationboxtracker'); $event.preventDefault()">
                     <div class="card-body p-2 p-md-3">
-                        <h5 class="card-title mb-1 fw-bold fs-6">📦 दानपेटी ट्रॅकर अहवाल</h5>
+                        <h5 class="card-title mb-1 fw-bold fs-6">📦 सदका डबे अहवाल</h5>
                         <p class="card-text text-secondary small mb-0" style="font-size: 0.78rem;">
                             वाटप केलेल्या दानपेट्या, उघडल्याच्या तारखा आणि जमा रक्कमेचा अहवाल.
                         </p>
@@ -114,7 +114,7 @@
                 <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'member-audit'">सभासद ऑडिट अहवाल</h3>
                 <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'directorvisits'">🏛️ संचालक दौरा व बैठक अहवाल
                 </h3>
-                <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'donationboxtracker'">📦 दानपेटी ट्रॅकर अहवाल
+                <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'donationboxtracker'">📦 सदका डबे अहवाल
                 </h3>
                 <h3 class="fw-bold fs-5 mb-0" *ngIf="selectedReport === 'recommendation-letter'">शिफारस पत्र वाटप अहवाल
                 </h3>
@@ -350,6 +350,5 @@
                 पुढील ({{ pageSize }}) &raquo;
             </button>
         </div>
-
     </div>
 </div>

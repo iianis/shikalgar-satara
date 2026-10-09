@@ -3,14 +3,20 @@
         <div class="col-lg-10">
 
             <!-- Title Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h4 class="mb-0 fw-bold text-primary">🏛️ संचालक दौरा व बैठक अहवाल नोंद</h4>
-                    <small class="text-muted">Director Visit & Meeting Accountability Tracker</small>
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Back Button -->
+                    <button class="btn btn-outline-secondary btn-sm px-3" (click)="goBack()" title="मागे जा">
+                        &larr; मागे जा
+                    </button>
+                    <div>
+                        <h4 class="mb-0 fw-bold text-primary">🏛️ संचालक दौरा व बैठक नोंद</h4>
+                        <small class="text-muted">Director Visit & Meeting Tracker</small>
+                    </div>
                 </div>
                 <!-- Add New Visit Button -->
                 <button *ngIf="!showForm" class="btn btn-primary fw-bold shadow-sm" (click)="openNewVisitForm()">
-                    ➕ नवी नोंद जोडा (Add New Visit)
+                    ➕ नवी नोंद जोडा
                 </button>
             </div>
 
@@ -34,7 +40,7 @@
             <!-- SECTION 1: Visit History List at the Top -->
             <div class="card shadow-sm border-0 mb-4" *ngIf="!isLoading">
                 <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold text-dark">📋 माझ्या भेटींचा अहवाल (Accountability Report Log)</h5>
+                    <h5 class="mb-0 fw-bold text-dark">📋 माझ्या भेटींचा अहवाल</h5>
                     <span class="badge bg-primary fs-6">{{ visitLogs.length }} नोंदी</span>
                 </div>
 
@@ -84,13 +90,13 @@
                         {{ editingId ? '✏️ नोंद संपादित करा (Edit Visit)' : '📝 नवीन भेट / बैठक नोंदवा (Add New Visit)'
                         }}
                     </h5>
-                    <button class="btn btn-sm btn-light" (click)="cancelEdit()">रद्द करा (Cancel)</button>
+                    <button class="btn btn-sm btn-light" (click)="cancelEdit()">रद्द करा</button>
                 </div>
 
                 <div class="card-body p-4">
                     <form [formGroup]="visitForm" (ngSubmit)="onSubmit()">
 
-                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">१. संचालक माहिती (Director Info)</h6>
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">१. संचालक माहिती</h6>
 
                         <div class="row g-3 mb-3">
                             <!-- Director Name -->
@@ -128,8 +134,7 @@
                             </div>
                         </div>
 
-                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2 mt-4">२. भेट / बैठकीचा तपशील (Visit &
-                            Meeting Details)</h6>
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2 mt-4">२. भेट / बैठकीचा तपशील</h6>
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-4">
@@ -165,7 +170,7 @@
                             </div>
 
                             <div class="col-md-12">
-                                <label class="form-label fw-semibold">इतर टीप / विषय (Remarks)</label>
+                                <label class="form-label fw-semibold">इतर टीप / विषय</label>
                                 <textarea class="form-control" formControlName="remarks" rows="2"
                                     placeholder="काही विशेष बाबी किंवा निर्णय..."></textarea>
                             </div>
@@ -175,10 +180,10 @@
                         <div class="d-flex gap-2 mt-4">
                             <button type="submit" class="btn btn-primary flex-grow-1 btn-lg fw-bold"
                                 [disabled]="isSubmitting">
-                                {{ editingId ? '🔄 बदला माहिती अद्ययावत करा (Update)' : '💾 भेट नोंद जतन करा (Save)' }}
+                                {{ editingId ? '🔄 बदला माहिती अद्ययावत करा' : '💾 भेटीची नोंद करा' }}
                             </button>
                             <button type="button" class="btn btn-outline-secondary btn-lg" (click)="cancelEdit()">
-                                रद्द करा (Cancel)
+                                रद्द करा
                             </button>
                         </div>
 

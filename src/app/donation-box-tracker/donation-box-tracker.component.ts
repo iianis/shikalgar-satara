@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { CommonModule, Location, NgFor, NgIf } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { FirebaseService } from '../services/firebase.service';
@@ -38,6 +38,7 @@ export class DonationBoxTrackerComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private firebaseService = inject(FirebaseService);
+  private location = inject(Location)
 
   boxForm!: FormGroup;
   openBoxForm!: FormGroup;
@@ -58,7 +59,15 @@ export class DonationBoxTrackerComponent implements OnInit {
   donationBoxes: DonationBox[] = [];
   loggedInDirectorName = '';
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    const phone = await firstValueFrom(this.authService.getLoggedInPhone());
+
+    if (!phone) {
+      this.errorMessage = 'कृपया प्रथम लॉगिन करा.';
+      this.isLoading = false;
+      return;
+    }
+
     this.initForms();
     this.setupAreaListeners();
     this.loadLoggedInDirectorAndBoxes();
@@ -285,5 +294,15 @@ export class DonationBoxTrackerComponent implements OnInit {
   private clearMessages(): void {
     this.successMessage = '';
     this.errorMessage = '';
+  }
+
+  goBack(): void {
+    if (this.showAddBoxForm) {
+      this.cancelBoxForm();
+    } else if (this.selectedBoxForOpening) {
+      this.cancelOpeningRecord();
+    } else {
+      this.location.back();
+    }
   }
 }

@@ -72,6 +72,15 @@
                 <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
                     <a class="nav-link" href="register">सभासद नोंदणी</a>
                 </li>
+                <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
+                    <a class="nav-link" href="directorvisit">कार्यकारणी सदस्याच्या भेटी</a>
+                </li>
+                <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
+                    <a class="nav-link" href="donationboxtracker">सदका डब्बे रजिस्टर</a>
+                </li>
+                <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
+                    <a class="nav-link" href="reports">अहवाल सुची</a>
+                </li>
                 <li class="nav-item" *ngIf="isLoggedIn">
                     <a class="nav-link" (click)="openMyProfile()">
                         👤 माझी माहिती (Profile)

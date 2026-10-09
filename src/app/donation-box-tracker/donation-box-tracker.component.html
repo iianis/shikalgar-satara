@@ -4,12 +4,15 @@
 
             <!-- Title Header -->
             <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <button class="btn btn-outline-secondary btn-sm px-3" (click)="goBack()" title="मागे जा">
+                    &larr; मागे जा (Back)
+                </button>
                 <div>
-                    <h4 class="mb-0 fw-bold text-primary">📦 दानपेटी ट्रॅकर (Donation Box Tracker)</h4>
-                    <small class="text-muted">सदस्य दानपेटी वाटप आणि जमा रक्कम नोंदवही</small>
+                    <h4 class="mb-0 fw-bold text-primary">📦 सदका डब्बा रजिस्टर</h4>
+                    <small class="text-muted">सदस्य सदका डब्बा आणि जमा रक्कम नोंदवही</small>
                 </div>
                 <button *ngIf="!showAddBoxForm" class="btn btn-primary fw-bold shadow-sm" (click)="openNewBoxForm()">
-                    ➕ नवीन दानपेटी जोडा (Add New Box)
+                    ➕ नवीन सदका डब्बा नोंदणी
                 </button>
             </div>
 
@@ -27,26 +30,27 @@
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">माहिती लोड होत आहे...</span>
                 </div>
-                <p class="mt-2 text-muted small">दानपेटी माहिती लोड होत आहे...</p>
+                <p class="mt-2 text-muted small">सदका डब्बा माहिती लोड होत आहे...</p>
             </div>
 
             <!-- SECTION 1: Donation Boxes List -->
             <div class="card shadow-sm border-0 mb-4" *ngIf="!isLoading">
                 <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold text-dark">📋 सर्व दानपेटी सूची (All Donation Boxes)</h5>
-                    <span class="badge bg-primary fs-6">{{ donationBoxes.length }} पेट्या</span>
+                    <h5 class="mb-0 fw-bold text-dark">📋 सदका डब्बा सूची</h5>
+                    <span class="badge bg-primary fs-6">{{ donationBoxes.length }} डब्बा</span>
                 </div>
 
                 <div class="card-body p-0">
                     <div *ngIf="donationBoxes.length === 0" class="text-center py-4 text-muted">
-                        अद्याप कोणतीही दानपेटी नोंदवली नाही. कृपया <strong>'नवीन दानपेटी जोडा'</strong> वर क्लिक करा.
+                        अद्याप कोणतीही सदका डब्बा नोंदणी नाही. कृपया <strong>'नवीन सदका डब्बा जोडा'</strong> वर क्लिक
+                        करा.
                     </div>
 
                     <div *ngIf="donationBoxes.length > 0" class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>पेटी क्र.</th>
+                                    <th>डब्बा क्र.</th>
                                     <th>सदस्याचे नाव & मोबाईल</th>
                                     <th>तालुका / गाव</th>
                                     <th>वाटप दिनांक</th>
@@ -98,7 +102,7 @@
             <div class="card shadow-sm border-warning mb-4" *ngIf="selectedBoxForOpening">
                 <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center py-3">
                     <h5 class="mb-0 fw-bold">
-                        🪙 दानपेटी उघडून रक्कम नोंदवा (Box #{{ selectedBoxForOpening.boxNumber }} - {{
+                        🪙 सदका डब्बा उघडून रक्कम नोंदवा (Box #{{ selectedBoxForOpening.boxNumber }} - {{
                         selectedBoxForOpening.memberName }})
                     </h5>
                     <button class="btn btn-sm btn-dark" (click)="cancelOpeningRecord()">रद्द करा</button>
@@ -153,7 +157,7 @@
             <!-- SECTION 3: New Donation Box Registration Form -->
             <div class="card shadow-sm border-0 mb-4" *ngIf="showAddBoxForm">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
-                    <h5 class="mb-0 fw-bold">📝 नवीन दानपेटी नोंदणी (Register New Donation Box)</h5>
+                    <h5 class="mb-0 fw-bold">📝 नवीन सदका डब्बा नोंदणी (Register New Donation Box)</h5>
                     <button class="btn btn-sm btn-light" (click)="cancelBoxForm()">रद्द करा</button>
                 </div>
 
@@ -175,7 +179,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label class="form-label fw-semibold">दानपेटी क्रमांक (Box Number) <span
+                                <label class="form-label fw-semibold">सदका डब्बा क्रमांक (Box Number) <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" formControlName="boxNumber"
                                     placeholder="उदा. BOX-101">
@@ -219,7 +223,7 @@
                         <div class="d-flex gap-2 mt-4">
                             <button type="submit" class="btn btn-primary flex-grow-1 btn-lg fw-bold"
                                 [disabled]="isSubmitting">
-                                💾 दानपेटी नोंद जतन करा (Save Box)
+                                💾 सदका डब्बा नोंद जतन करा (Save Box)
                             </button>
                             <button type="button" class="btn btn-outline-secondary btn-lg" (click)="cancelBoxForm()">
                                 रद्द करा

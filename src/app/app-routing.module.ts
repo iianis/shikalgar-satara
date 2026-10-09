@@ -69,7 +69,8 @@ const routes: Routes = [
   },
   {
     path: 'reports',
-    component: ReportsComponent
+    loadComponent: () => import('./reports/reports.component').then(m => m.ReportsComponent),
+    canActivate: [adminGuard]
   },
   {
     path: 'flashnews',
@@ -89,11 +90,13 @@ const routes: Routes = [
   },
   {
     path: 'directorvisit',
-    component: DirectorVisitComponent
+    loadComponent: () => import('./director-visit/director-visit.component').then(m => m.DirectorVisitComponent),
+    canActivate: [adminGuard]
   },
   {
     path: 'donationboxtracker',
-    component: DonationBoxTrackerComponent
+    loadComponent: () => import('./donation-box-tracker/donation-box-tracker.component').then(m => m.DonationBoxTrackerComponent),
+    canActivate: [adminGuard]
   },
   {
     path: '',

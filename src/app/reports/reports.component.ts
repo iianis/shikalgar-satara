@@ -6,6 +6,7 @@ import { Member } from '../interfaces/interfaces';
 import { FirebaseReportService } from '../services/firebasereport.service';
 import { FirebaseService } from '../services/firebase.service';
 import { HeaderComponent } from '../shared/header/header.component';
+import { AuthService } from '../services/auth.service';
 
 export type ReportType =
   | 'list'
@@ -20,10 +21,10 @@ export type ReportType =
   selector: 'app-reports',
   standalone: true,
   imports: [CommonModule, HeaderComponent],
-  templateUrl: './reports.component.html',
-  styleUrls: ['./reports.component.css']
+  templateUrl: './reports.component.html'
 })
 export class ReportsComponent implements OnInit {
+  private authService = inject(AuthService);
   private reportService = inject(FirebaseReportService);
   private firebaseService = inject(FirebaseService);
 
@@ -36,11 +37,21 @@ export class ReportsComponent implements OnInit {
   pageSize = 50;
   currentPage = 1;
   hasNextPage = false;
+  errorMessage = '';
 
   private pageSnapshots: (QueryDocumentSnapshot<any> | null)[] = [null];
   private currentLastDoc: QueryDocumentSnapshot<any> | null = null;
 
-  async ngOnInit(): Promise<void> { }
+  async ngOnInit(): Promise<void> {
+    const phone = await firstValueFrom(this.authService.getLoggedInPhone());
+
+    if (!phone) {
+      this.errorMessage = 'कृपया प्रथम लॉगिन करा.';
+      this.isLoading = false;
+      return;
+    }
+
+  }
 
   // Handle Report Selection from Dashboard
   selectReport(report: ReportType): void {
