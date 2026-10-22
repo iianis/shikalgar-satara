@@ -38,7 +38,10 @@ export class DonationBoxTrackerComponent implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private firebaseService = inject(FirebaseService);
-  private location = inject(Location)
+  private location = inject(Location);
+
+  private readonly TALUKA_STORAGE_KEY = 'mytaluka';
+  private readonly VILLAGE_STORAGE_KEY = 'myvillage';
 
   boxForm!: FormGroup;
   openBoxForm!: FormGroup;
@@ -58,6 +61,8 @@ export class DonationBoxTrackerComponent implements OnInit {
 
   donationBoxes: DonationBox[] = [];
   loggedInDirectorName = '';
+  searchTerm = '';
+  isSeeding = false;
 
   async ngOnInit(): Promise<void> {
     const phone = await firstValueFrom(this.authService.getLoggedInPhone());
@@ -76,7 +81,6 @@ export class DonationBoxTrackerComponent implements OnInit {
   private initForms(): void {
     const today = new Date().toISOString().split('T')[0];
 
-    // Form for Adding / Editing Box Information
     this.boxForm = this.fb.group({
       memberName: ['', [Validators.required, Validators.minLength(3)]],
       phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
@@ -87,23 +91,12 @@ export class DonationBoxTrackerComponent implements OnInit {
       description: ['']
     });
 
-    // Form for Recording a New "Box Opened" Entry
     this.openBoxForm = this.fb.group({
       date: [today, Validators.required],
       amount: [0, [Validators.required, Validators.min(0)]],
       openedBy: ['', Validators.required],
       witness: ['', Validators.required],
       remarks: ['']
-    });
-  }
-
-  private setupAreaListeners(): void {
-    this.boxForm.get('taluka')?.valueChanges.subscribe((selectedTaluka: string) => {
-      this.filterVillages(selectedTaluka);
-      const currentVillage = this.boxForm.get('village')?.value;
-      if (!this.filteredVillages.some(v => v.name === currentVillage)) {
-        this.boxForm.get('village')?.setValue('');
-      }
     });
   }
 
@@ -124,11 +117,16 @@ export class DonationBoxTrackerComponent implements OnInit {
           const memberData = matchingSnapshot[0];
           this.loggedInDirectorName = [memberData.fname, memberData.lname].filter(Boolean).join(' ');
 
-          const selectedTaluka = memberData.taluka || '';
-          this.filterVillages(selectedTaluka);
+          const savedTaluka = localStorage.getItem(this.TALUKA_STORAGE_KEY) || memberData.taluka || '';
+          const savedVillage = localStorage.getItem(this.VILLAGE_STORAGE_KEY) || memberData.village || '';
+
+          if (savedTaluka) {
+            this.filterVillages(savedTaluka);
+          }
+
           this.boxForm.patchValue({
-            taluka: selectedTaluka,
-            village: memberData.village || ''
+            taluka: savedTaluka,
+            village: savedVillage
           });
         }
       }
@@ -141,10 +139,35 @@ export class DonationBoxTrackerComponent implements OnInit {
     }
   }
 
+  private setupAreaListeners(): void {
+    this.boxForm.get('taluka')?.valueChanges.subscribe((selectedTaluka: string) => {
+      if (selectedTaluka) {
+        localStorage.setItem(this.TALUKA_STORAGE_KEY, selectedTaluka);
+      }
+      this.filterVillages(selectedTaluka);
+      const currentVillage = this.boxForm.get('village')?.value;
+      if (!this.filteredVillages.some(v => v.name === currentVillage)) {
+        this.boxForm.get('village')?.setValue('');
+      }
+    });
+
+    this.boxForm.get('village')?.valueChanges.subscribe((selectedVillage: string) => {
+      if (selectedVillage) {
+        localStorage.setItem(this.VILLAGE_STORAGE_KEY, selectedVillage);
+      }
+    });
+  }
+
   async loadDonationBoxes(): Promise<void> {
     try {
       if (this.firebaseService.getDonationBoxes) {
         this.donationBoxes = await this.firebaseService.getDonationBoxes();
+
+        this.donationBoxes.sort((a, b) => {
+          const numA = parseInt(String(a.boxNumber).replace(/\D/g, ''), 10) || 0;
+          const numB = parseInt(String(b.boxNumber).replace(/\D/g, ''), 10) || 0;
+          return numA - numB;
+        });
       }
     } catch (err) {
       console.error('Error loading donation boxes:', err);
@@ -154,38 +177,80 @@ export class DonationBoxTrackerComponent implements OnInit {
   openNewBoxForm(): void {
     this.editingBoxId = null;
     this.selectedBoxForOpening = null;
+    const today = new Date().toISOString().split('T')[0];
+
+    const talukaToUse = localStorage.getItem(this.TALUKA_STORAGE_KEY) || this.boxForm.get('taluka')?.value || '';
+    const villageToUse = localStorage.getItem(this.VILLAGE_STORAGE_KEY) || this.boxForm.get('village')?.value || '';
+
+    if (talukaToUse) {
+      this.filterVillages(talukaToUse);
+    }
+
     this.boxForm.reset({
-      dateOfIssue: new Date().toISOString().split('T')[0],
-      taluka: this.boxForm.get('taluka')?.value,
-      village: this.boxForm.get('village')?.value
+      dateOfIssue: today,
+      taluka: talukaToUse,
+      village: villageToUse,
+      boxNumber: '',
+      memberName: '',
+      phone: '',
+      description: ''
     });
+
     this.showAddBoxForm = true;
+  }
+
+  startEditBox(box: DonationBox): void {
+    if (!box.id) {
+      console.error('Box ID is missing, cannot edit!');
+      return;
+    }
+
+    this.editingBoxId = box.id;
+    this.selectedBoxForOpening = null;
+    this.showAddBoxForm = true;
+
+    if (box.taluka) {
+      this.filterVillages(box.taluka);
+    } else {
+      this.filteredVillages = [...this.allVillages];
+    }
+
+    this.boxForm.patchValue({
+      memberName: box.memberName || '',
+      phone: box.phone || '',
+      dateOfIssue: box.dateOfIssue || '',
+      boxNumber: box.boxNumber || '',
+      taluka: box.taluka || '',
+      village: box.village || '',
+      description: box.description || ''
+    });
+
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollTop, behavior: 'smooth' });
+    }, 100);
   }
 
   cancelBoxForm(): void {
     this.showAddBoxForm = false;
     this.editingBoxId = null;
+    this.clearMessages(); // Clear alerts when cancelling
   }
 
-  /**
-   * Calculates total collection accumulated across all opened instances
-   */
+  cancelOpeningRecord(): void {
+    this.selectedBoxForOpening = null;
+    this.clearMessages(); // Clear alerts when cancelling
+  }
+
   getTotalAmount(box: DonationBox): number {
     if (!box.boxOpenedHistory || box.boxOpenedHistory.length === 0) return 0;
     return box.boxOpenedHistory.reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
   }
 
-  /**
-   * Retrieves details of the most recent opening event
-   */
   getLastOpenedEntry(box: DonationBox): BoxOpenedEntry | null {
     if (!box.boxOpenedHistory || box.boxOpenedHistory.length === 0) return null;
     return box.boxOpenedHistory[box.boxOpenedHistory.length - 1];
   }
 
-  /**
-   * Open modal/section to record box opening history
-   */
   startOpeningRecord(box: DonationBox): void {
     this.selectedBoxForOpening = box;
     this.openBoxForm.reset({
@@ -194,15 +259,12 @@ export class DonationBoxTrackerComponent implements OnInit {
       openedBy: this.loggedInDirectorName,
       witness: ''
     });
+
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollTop, behavior: 'smooth' });
+    }, 100);
   }
 
-  cancelOpeningRecord(): void {
-    this.selectedBoxForOpening = null;
-  }
-
-  /**
-   * Save new box registration or updates
-   */
   async onSubmitBox(): Promise<void> {
     this.clearMessages();
 
@@ -213,21 +275,38 @@ export class DonationBoxTrackerComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    const formData = this.boxForm.value;
+    const formData = this.boxForm.getRawValue();
 
-    const payload: DonationBox = {
-      ...formData,
-      directorName: this.loggedInDirectorName,
-      boxOpenedHistory: this.editingBoxId ? undefined : []
-    };
+    if (formData.taluka) {
+      localStorage.setItem(this.TALUKA_STORAGE_KEY, formData.taluka);
+    }
+    if (formData.village) {
+      localStorage.setItem(this.VILLAGE_STORAGE_KEY, formData.village);
+    }
 
     try {
       if (this.editingBoxId) {
-        await this.firebaseService.updateDonationBox(this.editingBoxId, payload);
+        const updatePayload = {
+          memberName: formData.memberName,
+          phone: formData.phone,
+          dateOfIssue: formData.dateOfIssue,
+          boxNumber: formData.boxNumber,
+          taluka: formData.taluka,
+          village: formData.village,
+          description: formData.description || ''
+        };
+
+        await this.firebaseService.updateDonationBox(this.editingBoxId, updatePayload);
         this.successMessage = 'दानपेटी माहिती यशस्वीपणे अद्ययावत झाली!';
       } else {
-        await this.firebaseService.addDonationBox(payload);
-        this.successMessage = 'नवीन दानपेटी यशस्वीपणे नोंदवली गेली!';
+        const createPayload: DonationBox = {
+          ...formData,
+          directorName: this.loggedInDirectorName,
+          boxOpenedHistory: []
+        };
+
+        await this.firebaseService.addDonationBox(createPayload);
+        this.successMessage = 'नवीन सदका डब्बा नोंदवली गेली!';
       }
 
       this.cancelBoxForm();
@@ -240,9 +319,6 @@ export class DonationBoxTrackerComponent implements OnInit {
     }
   }
 
-  /**
-   * Save a new box opening record entry into boxOpenedHistory array
-   */
   async onSubmitOpeningRecord(): Promise<void> {
     this.clearMessages();
 
@@ -304,5 +380,16 @@ export class DonationBoxTrackerComponent implements OnInit {
     } else {
       this.location.back();
     }
+  }
+
+  get filteredDonationBoxes(): DonationBox[] {
+    if (!this.searchTerm.trim()) return this.donationBoxes;
+    const term = this.searchTerm.toLowerCase();
+    return this.donationBoxes.filter(box =>
+      box.boxNumber.toLowerCase().includes(term) ||
+      box.memberName.toLowerCase().includes(term) ||
+      box.village.toLowerCase().includes(term) ||
+      box.phone.includes(term)
+    );
   }
 }

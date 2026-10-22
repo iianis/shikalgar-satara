@@ -33,15 +33,227 @@
                 <p class="mt-2 text-muted small">सदका डब्बा माहिती लोड होत आहे...</p>
             </div>
 
+            <!-- SECTION 3: New Donation Box Registration Form -->
+            <div class="card shadow-sm border-0 mb-4" *ngIf="showAddBoxForm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 fw-bold">
+                        {{ editingBoxId ? '✏️ सदका डब्बा माहिती संपादित करा' : '📝 नवीन सदका डब्बा नोंदणी' }}
+                    </h5>
+                    <button class="btn btn-sm btn-light" (click)="cancelBoxForm()">रद्द करा</button>
+                </div>
+
+                <div class="card-body p-4">
+                    <form [formGroup]="boxForm" (ngSubmit)="onSubmitBox()">
+                        <div class="row g-3">
+
+                            <!-- Member Name -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">सदस्याचे नाव <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" formControlName="memberName"
+                                    placeholder="पूर्ण नाव"
+                                    [ngClass]="{'is-invalid': boxForm.get('memberName')?.invalid && boxForm.get('memberName')?.touched}">
+                                <div class="invalid-feedback"
+                                    *ngIf="boxForm.get('memberName')?.hasError('required') && boxForm.get('memberName')?.touched">
+                                    सदस्याचे नाव आवश्यक आहे.
+                                </div>
+                                <div class="invalid-feedback"
+                                    *ngIf="boxForm.get('memberName')?.hasError('minlength') && boxForm.get('memberName')?.touched">
+                                    नाव किमान ३ अक्षरी असावे.
+                                </div>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">मोबाईल नंबर <span
+                                        class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" formControlName="phone" maxlength="10"
+                                    placeholder="१० अंकी मोबाईल नंबर"
+                                    [ngClass]="{'is-invalid': boxForm.get('phone')?.invalid && boxForm.get('phone')?.touched}">
+                                <div class="invalid-feedback"
+                                    *ngIf="boxForm.get('phone')?.invalid && boxForm.get('phone')?.touched">
+                                    कृपया वैध १० अंकी मोबाईल नंबर प्रविष्ट करा.
+                                </div>
+                            </div>
+
+                            <!-- Box Number -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">सदका डब्बा क्रमांक <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" formControlName="boxNumber"
+                                    placeholder="उदा. BOX-101"
+                                    [ngClass]="{'is-invalid': boxForm.get('boxNumber')?.invalid && boxForm.get('boxNumber')?.touched}">
+                                <div class="invalid-feedback"
+                                    *ngIf="boxForm.get('boxNumber')?.invalid && boxForm.get('boxNumber')?.touched">
+                                    डब्बा क्रमांक आवश्यक आहे.
+                                </div>
+                            </div>
+
+                            <!-- Date of Issue -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">वाटप दिनांक <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" class="form-control" formControlName="dateOfIssue"
+                                    [ngClass]="{'is-invalid': boxForm.get('dateOfIssue')?.invalid && boxForm.get('dateOfIssue')?.touched}">
+                            </div>
+
+                            <!-- Director Name (Readonly) -->
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">जबाबदार संचालक</label>
+                                <input type="text" class="form-control bg-light" [value]="loggedInDirectorName"
+                                    readonly>
+                            </div>
+
+                            <!-- Taluka -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">तालुका <span class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="taluka"
+                                    [ngClass]="{'is-invalid': boxForm.get('taluka')?.invalid && boxForm.get('taluka')?.touched}">
+                                    <option value="" disabled>तालुका निवडा</option>
+                                    <option *ngFor="let t of talukaList" [value]="t.name">{{ t.name }}</option>
+                                </select>
+                                <div class="invalid-feedback"
+                                    *ngIf="boxForm.get('taluka')?.invalid && boxForm.get('taluka')?.touched">
+                                    तालुका निवडणे आवश्यक आहे.
+                                </div>
+                            </div>
+
+                            <!-- Village -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">गाव <span class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="village"
+                                    [ngClass]="{'is-invalid': boxForm.get('village')?.invalid && boxForm.get('village')?.touched}">
+                                    <option value="" disabled>गाव निवडा</option>
+                                    <option *ngFor="let v of filteredVillages" [value]="v.name">{{ v.name }}</option>
+                                </select>
+                                <div class="invalid-feedback"
+                                    *ngIf="boxForm.get('village')?.invalid && boxForm.get('village')?.touched">
+                                    गाव निवडणे आवश्यक आहे.
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">विवरण / पत्ता</label>
+                                <textarea class="form-control" formControlName="description" rows="2"
+                                    placeholder="काही विशेष तपशील किंवा पत्ता..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary flex-grow-1 btn-lg fw-bold"
+                                [disabled]="isSubmitting">
+                                💾 {{ editingBoxId ? 'डब्बा माहिती अद्ययावत करा' : 'सदका डब्बा नोंद जतन करा' }}
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-lg" (click)="cancelBoxForm()">
+                                रद्द करा
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Record Box Opened Entry Form Modal/Card -->
+            <div class="card shadow-sm border-warning mb-4" *ngIf="selectedBoxForOpening">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 fw-bold">
+                        🪙 सदका डब्बा उघडून रक्कम नोंदवा (#{{ selectedBoxForOpening.boxNumber }} - {{
+                        selectedBoxForOpening.memberName }})
+                    </h5>
+                    <button class="btn btn-sm btn-dark" (click)="cancelOpeningRecord()">रद्द करा</button>
+                </div>
+                <div class="card-body p-4">
+                    <form [formGroup]="openBoxForm" (ngSubmit)="onSubmitOpeningRecord()">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">उघडल्याची तारीख <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" class="form-control" formControlName="date"
+                                    [ngClass]="{'is-invalid': openBoxForm.get('date')?.invalid && openBoxForm.get('date')?.touched}">
+                                <div class="invalid-feedback"
+                                    *ngIf="openBoxForm.get('date')?.invalid && openBoxForm.get('date')?.touched">
+                                    तारीख आवश्यक आहे.
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">जमा रक्कम (₹) <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" formControlName="amount" min="0"
+                                    [ngClass]="{'is-invalid': openBoxForm.get('amount')?.invalid && openBoxForm.get('amount')?.touched}">
+                                <div class="invalid-feedback"
+                                    *ngIf="openBoxForm.get('amount')?.invalid && openBoxForm.get('amount')?.touched">
+                                    वैध जमा रक्कम प्रविष्ट करा.
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">पेटी उघडणारा <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" formControlName="openedBy"
+                                    placeholder="संचालक / प्रतिनिधी"
+                                    [ngClass]="{'is-invalid': openBoxForm.get('openedBy')?.invalid && openBoxForm.get('openedBy')?.touched}">
+                                <div class="invalid-feedback"
+                                    *ngIf="openBoxForm.get('openedBy')?.invalid && openBoxForm.get('openedBy')?.touched">
+                                    नाव आवश्यक आहे.
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">साक्षीदार <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" formControlName="witness"
+                                    placeholder="साक्षीदाराचे नाव"
+                                    [ngClass]="{'is-invalid': openBoxForm.get('witness')?.invalid && openBoxForm.get('witness')?.touched}">
+                                <div class="invalid-feedback"
+                                    *ngIf="openBoxForm.get('witness')?.invalid && openBoxForm.get('witness')?.touched">
+                                    साक्षीदाराचे नाव आवश्यक आहे.
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">टीप / शेरा </label>
+                                <input type="text" class="form-control" formControlName="remarks"
+                                    placeholder="इतर तपशील...">
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-3">
+                            <button type="submit" class="btn btn-warning fw-bold flex-grow-1" [disabled]="isSubmitting">
+                                💾 जमा रक्कम जतन करा
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" (click)="cancelOpeningRecord()">रद्द
+                                करा</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- SECTION 1: Donation Boxes List -->
             <div class="card shadow-sm border-0 mb-4" *ngIf="!isLoading">
                 <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-bold text-dark">📋 सदका डब्बा सूची</h5>
-                    <span class="badge bg-primary fs-6">{{ donationBoxes.length }} डब्बा</span>
+                    <span class="badge bg-primary fs-6">{{ filteredDonationBoxes.length }} डब्बा</span>
+                </div>
+
+                <!-- Padded body container for Search Bar & Actions to fix edge-touching bug -->
+                <div class="card-body p-3 border-bottom bg-white" *ngIf="donationBoxes.length > 0">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" [(ngModel)]="searchTerm"
+                                placeholder="🔍 डब्बा क्र., सदस्य नाव किंवा गावावरून शोधा...">
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <button *ngIf="!showAddBoxForm" class="btn btn-primary fw-bold shadow-sm w-100"
+                                (click)="openNewBoxForm()">
+                                ➕ नवीन डब्बा नोंदणी
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card-body p-0">
-                    <div *ngIf="donationBoxes.length === 0" class="text-center py-4 text-muted">
+                    <div *ngIf="filteredDonationBoxes.length === 0" class="text-center py-4 text-muted">
                         अद्याप कोणतीही सदका डब्बा नोंदणी नाही. कृपया <strong>'नवीन सदका डब्बा जोडा'</strong> वर क्लिक
                         करा.
                     </div>
@@ -57,11 +269,11 @@
                                     <th>शेवटची उघडलेली तारीख</th>
                                     <th>शेवटची रक्कम</th>
                                     <th>एकूण जमा</th>
-                                    <th class="text-end">कृती (Actions)</th>
+                                    <th class="text-end">कृती</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let box of donationBoxes">
+                                <tr *ngFor="let box of filteredDonationBoxes">
                                     <td class="fw-bold text-primary">#{{ box.boxNumber }}</td>
                                     <td>
                                         <div class="fw-semibold">{{ box.memberName }}</div>
@@ -86,6 +298,10 @@
                                             title="पेटी उघडा व रक्कम नोंदवा">
                                             💰 पेटी उघडा
                                         </button>
+                                        <button class="btn btn-sm btn-outline-primary me-1" (click)="startEditBox(box)"
+                                            title="डब्बा माहिती संपादित करा">
+                                            ✏️
+                                        </button>
                                         <button *ngIf="box.id" class="btn btn-sm btn-outline-danger"
                                             (click)="deleteBox(box.id)" title="हटवा">
                                             🗑️
@@ -97,142 +313,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- SECTION 2: Record Box Opened Entry Form Modal/Card -->
-            <div class="card shadow-sm border-warning mb-4" *ngIf="selectedBoxForOpening">
-                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center py-3">
-                    <h5 class="mb-0 fw-bold">
-                        🪙 सदका डब्बा उघडून रक्कम नोंदवा (Box #{{ selectedBoxForOpening.boxNumber }} - {{
-                        selectedBoxForOpening.memberName }})
-                    </h5>
-                    <button class="btn btn-sm btn-dark" (click)="cancelOpeningRecord()">रद्द करा</button>
-                </div>
-                <div class="card-body p-4">
-                    <form [formGroup]="openBoxForm" (ngSubmit)="onSubmitOpeningRecord()">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">उघडल्याची तारीख <span
-                                        class="text-danger">*</span></label>
-                                <input type="date" class="form-control" formControlName="date">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">जमा रक्कम (₹) <span
-                                        class="text-danger">*</span></label>
-                                <input type="number" class="form-control" formControlName="amount" min="0">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">पेटी उघडणारा (Opened By) <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" formControlName="openedBy"
-                                    placeholder="संचालक / प्रतिनिधी">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold">साक्षीदार (Witness) <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" formControlName="witness"
-                                    placeholder="साक्षीदाराचे नाव">
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold">टीप / शेरा (Remarks)</label>
-                                <input type="text" class="form-control" formControlName="remarks"
-                                    placeholder="इतर तपशील...">
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-2 mt-3">
-                            <button type="submit" class="btn btn-warning fw-bold flex-grow-1" [disabled]="isSubmitting">
-                                💾 जमा रक्कम जतन करा (Save Opened Record)
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary" (click)="cancelOpeningRecord()">रद्द
-                                करा</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- SECTION 3: New Donation Box Registration Form -->
-            <div class="card shadow-sm border-0 mb-4" *ngIf="showAddBoxForm">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
-                    <h5 class="mb-0 fw-bold">📝 नवीन सदका डब्बा नोंदणी (Register New Donation Box)</h5>
-                    <button class="btn btn-sm btn-light" (click)="cancelBoxForm()">रद्द करा</button>
-                </div>
-
-                <div class="card-body p-4">
-                    <form [formGroup]="boxForm" (ngSubmit)="onSubmitBox()">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">सदस्याचे नाव <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" formControlName="memberName"
-                                    placeholder="पूर्ण नाव">
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">मोबाईल नंबर <span
-                                        class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" formControlName="phone" maxlength="10"
-                                    placeholder="१० अंकी मोबाईल नंबर">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">सदका डब्बा क्रमांक (Box Number) <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" class="form-control" formControlName="boxNumber"
-                                    placeholder="उदा. BOX-101">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">वाटप दिनांक (Date of Issue) <span
-                                        class="text-danger">*</span></label>
-                                <input type="date" class="form-control" formControlName="dateOfIssue">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold">जबाबदार संचालक (Director)</label>
-                                <input type="text" class="form-control bg-light" [value]="loggedInDirectorName"
-                                    readonly>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">तालुका <span class="text-danger">*</span></label>
-                                <select class="form-select" formControlName="taluka">
-                                    <option value="" disabled>तालुका निवडा</option>
-                                    <option *ngFor="let t of talukaList" [value]="t.name">{{ t.name }}</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">गाव <span class="text-danger">*</span></label>
-                                <select class="form-select" formControlName="village">
-                                    <option value="" disabled>गाव निवडा</option>
-                                    <option *ngFor="let v of filteredVillages" [value]="v.name">{{ v.name }}</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold">विवरण / पत्ता (Description)</label>
-                                <textarea class="form-control" formControlName="description" rows="2"
-                                    placeholder="काही विशेष तपशील किंवा पत्ता..."></textarea>
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary flex-grow-1 btn-lg fw-bold"
-                                [disabled]="isSubmitting">
-                                💾 सदका डब्बा नोंद जतन करा (Save Box)
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-lg" (click)="cancelBoxForm()">
-                                रद्द करा
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
         </div>
     </div>
 </div>

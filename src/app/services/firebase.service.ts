@@ -488,4 +488,74 @@ export class FirebaseService {
     const collectionName = 'donation_boxes' + checkIfWeAreTesting();
     return await this.firestore.collection(collectionName).doc(id).delete();
   }
+
+  /**
+   * Seeds default donation box entries for specified directors
+   */
+  async seedDefaultDonationBoxes2(directors: string[]): Promise<void> {
+    const collectionName = 'donation_boxes' + checkIfWeAreTesting();
+    let boxCounter = 1; // Starting box number sequence
+
+    for (const director of directors) {
+      for (let i = 1; i <= 10; i++) {
+        // Stop once we hit approximately 99-100 items if needed,
+        // or let each loop run to create the exact quota.
+        const id = this.firestore.createId();
+        const payload = {
+          boxNumber: boxCounter++,
+          directorName: director,
+          memberName: '',
+          phone: '',
+          dateOfIssue: '2026-10-09',
+          taluka: 'सातारा',
+          village: 'सातारा',
+          description: '',
+          boxOpenedHistory: [],
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date('2026-10-19T18:45:34+05:30'))
+        };
+
+        await this.firestore.collection(collectionName).doc(id).set(payload);
+      }
+    }
+  }
+
+  /**
+   * Clears all existing donation box records and seeds 100 new default entries
+   */
+  async seedDefaultDonationBoxes(directors: string[]): Promise<void> {
+    const collectionName = 'donation_boxes' + checkIfWeAreTesting();
+    const collectionRef = this.firestore.collection(collectionName);
+
+    // 1. Fetch and delete all existing documents
+    const snapshot = await firstValueFrom(collectionRef.get());
+    const batch = this.firestore.firestore.batch();
+
+    snapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+
+    // 2. Seed 100 new entries starting from BOX-1 (10 entries per director across 10 directors)
+    let boxCounter = 1;
+
+    for (const director of directors) {
+      for (let i = 1; i <= 10; i++) {
+        const id = this.firestore.createId();
+        const payload = {
+          boxNumber: `BOX-${boxCounter++}`,
+          directorName: director,
+          memberName: '',
+          phone: '',
+          dateOfIssue: '2026-10-09',
+          taluka: 'सातारा',
+          village: 'सातारा',
+          description: '',
+          boxOpenedHistory: [],
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date('2026-10-19T18:45:34+05:30'))
+        };
+
+        await collectionRef.doc(id).set(payload);
+      }
+    }
+  }
 }

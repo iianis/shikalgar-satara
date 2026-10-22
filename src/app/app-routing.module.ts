@@ -84,9 +84,14 @@ const routes: Routes = [
     path: 'zakatcalculator',
     component: ZakatcalculatorComponent
   },
+  // {
+  //   path: 'membermanager',
+  //   component: MembermanagerComponent
+  // },
   {
     path: 'membermanager',
-    component: MembermanagerComponent
+    loadComponent: () => import('./membermanager/membermanager.component').then(m => m.MembermanagerComponent),
+    canActivate: [adminGuard]
   },
   {
     path: 'directorvisit',

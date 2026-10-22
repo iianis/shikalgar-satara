@@ -10,6 +10,16 @@ import { setThrowInvalidWriteToSignalError } from '@angular/core/primitives/sign
 export class SlideshowComponent {
     slides = [
         { title: "", image: "/assets/images/slide1.jpg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/21.jpeg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/22.jpeg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/24.jpg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/23.jpeg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/25.jpg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/27.jpeg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/30.jpeg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/26.jpeg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/28.jpeg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/29.jpeg", header1: "", header2: "" },
         { title: "", image: "/assets/gallery/2026-27/0.jpeg", header1: "", header2: "" },
         { title: "", image: "/assets/gallery/2026-27/9.jpeg", header1: "", header2: "" },
         { title: "", image: "/assets/gallery/2026-27/11.jpeg", header1: "", header2: "" },
@@ -24,8 +34,6 @@ export class SlideshowComponent {
         { title: "", image: "/assets/gallery/2026-27/10.jpeg", header1: "", header2: "" },
         { title: "", image: "/assets/gallery/2026-27/12.jpeg", header1: "", header2: "" },
         { title: "", image: "/assets/gallery/2026-27/13.jpeg", header1: "", header2: "" },
-        //{ title: "", image: "/assets/images/slide9.jpeg", header1: "", header2: "" },
-        //{ title: "", image: "/assets/gallery/2026-27/62.jpg", header1: "", header2: "" },
     ];
 }
 

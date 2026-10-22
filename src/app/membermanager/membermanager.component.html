@@ -57,11 +57,24 @@
                 <div class="card-body p-2 p-md-3">
                     <div class="list-group">
                         <div *ngFor="let member of foundMembers"
-                            class="list-group-item p-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                            class="list-group-item p-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3"
+                            [ngClass]="{
+                                'bg-light text-muted border-secondary opacity-75': member.alive === false || member.active === false,
+                                'border-danger': member.alive === false
+                            }">
                             <div>
-                                <h5 class="mb-0 fw-bold">{{ member.initial }} {{ member.fname }} {{ member.lname }}</h5>
-                                <p class="mb-1 text-muted small">{{ member.village }} - {{ member.taluka }}</p>
-                                <small class="text-muted"><i class="bi bi-telephone"></i> +91 {{ member.phone }}</small>
+                                <h5 class="mb-0 fw-bold" [class.text-decoration-line-through]="member.alive === false">
+                                    {{ member.initial }} {{ member.fname }} {{ member.lname }}
+
+                                    <!-- Badges for Status -->
+                                    <span *ngIf="member.alive === false" class="badge bg-danger ms-2 fs-6">मृत
+                                        (Deceased)</span>
+                                    <span *ngIf="member.alive === false && member.alive !== false"
+                                        class="badge bg-warning text-dark ms-2 fs-6">निष्क्रिय (Inactive)</span>
+                                </h5>
+                                <p class="mb-1 small" [class.text-muted]="member.alive !== false">{{ member.village }}
+                                    - {{ member.taluka }}</p>
+                                <small><i class="bi bi-telephone"></i> +91 {{ member.phone }}</small>
                             </div>
                             <div class="d-flex gap-2">
                                 <button class="btn btn-sm btn-outline-info" (click)="viewMemberDetails(member)">👁️
