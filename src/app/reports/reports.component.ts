@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { QueryDocumentSnapshot } from '@angular/fire/compat/firestore';
 import { firstValueFrom } from 'rxjs';
 import { Member } from '../interfaces/interfaces';
@@ -27,6 +27,7 @@ export class ReportsComponent implements OnInit {
   private authService = inject(AuthService);
   private reportService = inject(FirebaseReportService);
   private firebaseService = inject(FirebaseService);
+  private location = inject(Location); // Injected Location
 
   // Active Report State ('list' shows dashboard)
   selectedReport: ReportType = 'list';
@@ -74,7 +75,10 @@ export class ReportsComponent implements OnInit {
     this.pageSnapshots = [null];
     this.currentLastDoc = null;
   }
-
+  // Navigate back to the previous screen outside reports
+  navigateBack(): void {
+    this.location.back();
+  }
   async loadPage(pageNumber: number): Promise<void> {
     if (pageNumber < 1) return;
     this.isLoading = true;

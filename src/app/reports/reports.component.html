@@ -5,9 +5,14 @@
     <!-- 1. REPORT SELECTION DASHBOARD (List View)  -->
     <!-- ========================================== -->
     <div *ngIf="selectedReport === 'list'">
-        <div class="mb-3">
-            <h2 class="fw-bold text-primary fs-5 fs-md-4 mb-0">अहवाल केंद्र</h2>
-            <p class="text-muted small mb-0" style="font-size: 0.8rem;">खालील यादीतून आवश्यक तो अहवाल निवडा.</p>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="fw-bold text-primary fs-5 fs-md-4 mb-0">अहवाल केंद्र</h2>
+                <p class="text-muted small mb-0" style="font-size: 0.8rem;">खालील यादीतून आवश्यक तो अहवाल निवडा.</p>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm py-1 px-3" (click)="navigateBack()">
+                &larr; मागे जा
+            </button>
         </div>
 
         <div class="row g-2 g-md-3">

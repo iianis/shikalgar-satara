@@ -110,3 +110,4 @@ interface CharityRecord {
     charityCount: number;
     charityAmount: number;
 }
+

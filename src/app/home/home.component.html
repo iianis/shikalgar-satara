@@ -58,31 +58,33 @@
                 <li class="nav-item" *ngIf="!isLoggedIn">
                     <a class="nav-link text-success fw-bold" href="register">खाते तयार करा</a>
                 </li>
-
-                <!-- Dynamic Auth Links When User Logs-In-->
-                <li class="nav-item" *ngIf="isLoggedIn">
-                    <a class="nav-link" href="memberslist">सभासद यादी</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="announcement">सभा नोटीस</a>
                 </li>
                 <li class="nav-item" *ngIf="isLoggedIn">
                     <a class="nav-link" href="audits">मागील वर्षाचे ऑडिट</a>
                 </li>
-                <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
-                    <a class="nav-link" href="membermanager">माहिती व्यवस्थापन</a>
+                <!-- Dynamic Auth Links When User Logs-In-->
+                <li class="nav-item" *ngIf="isLoggedIn">
+                    <a class="nav-link" href="memberslist">सभासद यादी</a>
                 </li>
                 <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
+                    <a class="nav-link" href="membermanager">सभासद व्यवस्थापन</a>
+                </li>
+                <!-- <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
                     <a class="nav-link" href="register">सभासद नोंदणी</a>
+                </li> -->
+                <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
+                    <a class="nav-link" href="donationboxtracker">सदका डब्बे नोंद</a>
                 </li>
                 <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
-                    <a class="nav-link" href="directorvisit">कार्यकारणी सदस्याच्या भेटी</a>
-                </li>
-                <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
-                    <a class="nav-link" href="donationboxtracker">सदका डब्बे रजिस्टर</a>
+                    <a class="nav-link" href="directorvisit">कार्यकारणी सदस्य दैनंदिनी</a>
                 </li>
                 <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
                     <a class="nav-link" href="eventplanning">सभा नियोजन</a>
                 </li>
                 <li class="nav-item" *ngIf="isLoggedIn && isAdmin">
-                    <a class="nav-link" href="reports">अहवाल सुची</a>
+                    <a class="nav-link" href="reports">अहवाल (रिपोर्ट)</a>
                 </li>
                 <li class="nav-item" *ngIf="isLoggedIn">
                     <a class="nav-link" (click)="openMyProfile()">
@@ -95,9 +97,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="eventhighlight">एका सदस्याचे मनोगत</a>
                 </li>
-                <!-- <li class="nav-item" *ngIf="isLoggedIn">
-                    <a class="nav-link" href="announcement">सभा नोटीस</a>
-                </li> -->
                 <li class="nav-item" *ngIf="isLoggedIn">
                     <a class="nav-link text-danger" href="#" (click)="logout()">लॉगआउट</a>
                 </li>
