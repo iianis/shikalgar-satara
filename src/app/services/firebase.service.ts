@@ -113,10 +113,6 @@ export class FirebaseService {
       .valueChanges();
   }
 
-  getSettingById(id: string): Observable<any> {
-    return this.firestore.collection('settings' + checkIfWeAreTesting()).doc(id).valueChanges();
-  }
-
   getMemberByPhone(phone: string): Observable<any[]> {
     return this.firestore.collection('members' + checkIfWeAreTesting(), ref => ref.where('phone', '==', phone)).valueChanges({ idField: 'id' });
   }
@@ -557,5 +553,19 @@ export class FirebaseService {
         await collectionRef.doc(id).set(payload);
       }
     }
+  }
+
+  incrementVisitorCount(settingDocId: string = 'eG52d1h6Gt0ON3n0ZgRx'): Promise<void> {
+    return this.firestore
+      .collection('settings')
+      .doc(settingDocId)
+      .update({
+        visitorCount: firebase.firestore.FieldValue.increment(1)
+      });
+  }
+
+  // Get reactive stream of settings (so the UI updates live or on load)
+  getSettingById(id: string): Observable<any> {
+    return this.firestore.collection('settings' + checkIfWeAreTesting()).doc(id).valueChanges();
   }
 }

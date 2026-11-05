@@ -32,20 +32,27 @@ export class HomeComponent implements OnInit {
 
   // Footer Stats (One-time load)
   visitorCount = 0;
-  loggedInUsersCount = 0;
+  registeredUsersCount = 0;
   personalInfoAccessCount = 0;
 
   ngOnInit(): void {
+
+    // 1. Session-based Visitor Increment
+    this.registerVisitorVisit();
+
+    // 2. Listen to Settings Doc (reactive count display)
+    this.firebaseService.getSettingById('eG52d1h6Gt0ON3n0ZgRx')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data: any) => {
+        this.appsettings = data;
+        if (data?.visitorCount) {
+          this.visitorCount = data.visitorCount;
+        }
+      });
+
     this.isLoggedIn = !!localStorage.getItem("loggedInUser");
 
     localStorage.setItem("isTesting", String(this.isTesting));
-
-    // Fetch Application Settings
-    this.firebaseService.getSettingById("eG52d1h6Gt0ON3n0ZgRx")
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(data => {
-        this.appsettings = data;
-      });
 
     const charityCountString = localStorage.getItem('charityCount');
     if (charityCountString) {
@@ -92,7 +99,6 @@ export class HomeComponent implements OnInit {
     // One-time load for footer statistics
     this.loadFooterStats();
 
-
     // Inside your existing ngOnInit auth subscription:
     this.authService.getLoggedInPhone().pipe(
       switchMap(phone => {
@@ -123,20 +129,13 @@ export class HomeComponent implements OnInit {
    */
   private async loadFooterStats(): Promise<void> {
     try {
-      // 1. Load members list once to count logged-in / active users
-      const members = await firstValueFrom(this.firebaseService.getMembers());
-      if (Array.isArray(members)) {
-        // Count active logged-in users (or total registered members)
-        this.loggedInUsersCount = members.filter((m: any) => m.active !== false).length;
-      }
+      // 1. Load members list once to count logged-in / active?? users
+      this.firebaseService.getCollectionCount('members').subscribe(count => {
+        this.registeredUsersCount = count;
+      });
 
-      // 2. Load total visitor count from app settings or dedicated collection
-      if (this.appsettings?.visitorCount) {
-        this.visitorCount = this.appsettings.visitorCount;
-      } else {
-        // Fallback: estimate or read from setting document
-        this.visitorCount = (members?.length || 0) + 150;
-      }
+      //this.visitorCount = this.appsettings.visitorCount;
+
     } catch (error) {
       console.error('Error fetching footer statistics:', error);
     }
@@ -199,6 +198,20 @@ export class HomeComponent implements OnInit {
       });
     } else {
       this.router.navigateByUrl('/membermanager');
+    }
+  }
+
+  private registerVisitorVisit(): void {
+    const SESSION_KEY = 'v_logged_session';
+    const hasVisitedThisSession = sessionStorage.getItem(SESSION_KEY);
+
+    // Only increment if it's a new browser tab/session and not in testing mode
+    if (!hasVisitedThisSession && !this.isTesting) {
+      this.firebaseService.incrementVisitorCount('eG52d1h6Gt0ON3n0ZgRx')
+        .then(() => {
+          sessionStorage.setItem(SESSION_KEY, 'true');
+        })
+        .catch((err) => console.error('Error recording visit:', err));
     }
   }
 }
