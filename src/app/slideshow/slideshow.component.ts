@@ -13,6 +13,7 @@ export class SlideshowComponent {
         { title: "", image: "assets/gallery/2026-27/21.jpeg", header1: "", header2: "" },
         { title: "", image: "assets/gallery/2026-27/22.jpeg", header1: "", header2: "" },
         { title: "", image: "assets/gallery/2026-27/24.jpg", header1: "", header2: "" },
+        { title: "", image: "assets/gallery/2026-27/31.jpeg", header1: "", header2: "" },
         { title: "", image: "assets/gallery/2026-27/23.jpeg", header1: "", header2: "" },
         { title: "", image: "assets/gallery/2026-27/25.jpg", header1: "", header2: "" },
         { title: "", image: "assets/gallery/2026-27/27.jpeg", header1: "", header2: "" },
